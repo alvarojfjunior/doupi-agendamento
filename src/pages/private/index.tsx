@@ -4,12 +4,9 @@ import { AppContext } from "@/contexts/app";
 import { useRouter } from "next/router";
 import { AuthContext } from "@/contexts/auth";
 import Page from "@/components/Page";
-import DoubleLineChart from "@/components/DoubleLineChart ";
 
 export default function Panel() {
-  const router = useRouter();
   const appContext = useContext(AppContext);
-  const authContext = useContext(AuthContext);
 
   useEffect(() => {
     appContext.onCloseLoading();
