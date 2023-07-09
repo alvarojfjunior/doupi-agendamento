@@ -14,6 +14,10 @@ try {
         type: String,
         required: true,
       },
+      phone: {
+        type: String,
+        required: true,
+      },
       email: {
         type: String,
         unique: true,
@@ -25,15 +29,10 @@ try {
         type: String,
         required: true,
       },
-      type: {
+      active: {
         type: Number,
         required: true,
-        default: 0, //0 = admin | 2 = professor | 3 = aluno
-      },
-      status: {
-        type: Number,
-        required: true,
-        default: 1, //0 = disabled | 1 = enabled
+        default: 1,
       },
     },
     { collection: "users", timestamps: true }

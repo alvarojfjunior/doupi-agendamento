@@ -2,7 +2,7 @@ import Mongoose from "mongoose";
 
 export let ScheduleSchemaSchema: Mongoose.Schema;
 try {
-  ScheduleSchemaSchema = Mongoose.model("ScheduleSchema").schema;
+  ScheduleSchemaSchema = Mongoose.model("Schedule").schema;
 } catch (error) {
   ScheduleSchemaSchema = new Mongoose.Schema(
     {
@@ -21,11 +21,6 @@ try {
       userPhone: {
         type: String,
         required: true,
-      },
-      date: {
-        type: Date,
-        required: true,
-        default: Date.now
       },
       time: {
         type: String,

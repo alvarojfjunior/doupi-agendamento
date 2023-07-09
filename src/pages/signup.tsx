@@ -15,6 +15,7 @@ import {
   useColorModeValue,
   FormErrorMessage,
   useToast,
+  Select,
 } from "@chakra-ui/react";
 import { useState, useContext } from "react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
@@ -27,10 +28,21 @@ import { AppContext } from "@/contexts/app";
 import Page from "@/components/Page";
 
 interface IForm {
-  firstName: string;
-  lastName: string;
+  companyName: String;
+  userName: String;
+  type: String;
+  phone: String;
+  email: String;
+  password: String;
+  confirmPassword: String;
+}
+
+interface IUserAuth {
   email: string;
-  password: string;
+  name: string;
+  status: number;
+  token: string;
+  type: number;
 }
 
 export default function SignupCard() {
@@ -42,43 +54,56 @@ export default function SignupCard() {
   const router = useRouter();
 
   const SignupSchema = Yup.object().shape({
-    firstName: Yup.string()
-      .min(2, "Too Short!")
-      .max(50, "Too Long!")
-      .required("Required"),
-    lastName: Yup.string()
-      .min(2, "Too Short!")
-      .max(50, "Too Long!")
-      .required("Required"),
-    email: Yup.string().email("Invalid email").required("Required"),
+    companyName: Yup.string().min(2).max(50).required(),
+    userName: Yup.string().min(2).max(50).required(),
+    phone: Yup.string()
+      .matches(/^[1-9]{2}9?[0-9]{8}$/, "")
+      .required(),
+    email: Yup.string().email("Invalid email").required(),
     password: Yup.string()
-      .min(8, "Password must contain at least 8 characters!")
-      .matches(/[0-9]/, "Password must contain at least a number!")
-      .matches(/[a-z]/, "Password must contain at least a lowercase letter!")
-      .matches(/[A-Z]/, "Password must contain at least a uppercase letter!")
-      .matches(/[^\w]/, "Password must contain at least a special character!")
-      .required("Required"),
+      .min(8, "A senha deve ter 8 caracteres!")
+      .matches(/[0-9]/, "A senha deve ter número!")
+      .required("Campo obrigatório"),
+    confirmPassword: Yup.string()
+      .oneOf([Yup.ref("password"), null], "As senhas não coincidem")
+      .required("Campo obrigatório"),
   });
 
   const onSubmit = async (values: IForm) => {
     try {
       appContext.onOpenLoading();
-      const data = {
-        name: `${values.firstName} ${values.lastName}`,
+      const signupData = {
+        companyName: values.companyName,
+        userName: values.userName,
+        type: values.type,
+        phone: values.phone,
         email: values.email,
         password: values.password,
+        confirmPassword: values.confirmPassword,
       };
-      await api.post("api/auth/signup", data);
+      await api.post("api/auth/signup", signupData);
 
       toast({
         title: "Conta criada com sucesso!",
-        description: "Faça o login e começe praticar!",
+        description: "Agora é hora de personalizar o seu negócio!",
         status: "success",
         position: "top-right",
         duration: 9000,
         isClosable: true,
       });
-      router.push("/signin");
+
+      const credentials = {
+        email: signupData.email,
+        password: signupData.password
+      }
+
+      const { data } = await api.post("/api/auth/signin", credentials);
+
+      const userAuth: IUserAuth = data;
+
+      localStorage.setItem("user", JSON.stringify(userAuth));
+
+      router.push("private");
     } catch (error: any) {
       const errorMessage = error.response.data.message;
       toast({
@@ -94,7 +119,11 @@ export default function SignupCard() {
   };
 
   return (
-    <Page path='/signup' title='E Agora - Criar conta' description='App para para gestão de agenda!' >
+    <Page
+      path="/signup"
+      title="E Agora - Criar conta"
+      description="App para para gestão de agenda!"
+    >
       <Flex
         align={"center"}
         justify={"center"}
@@ -102,10 +131,13 @@ export default function SignupCard() {
       >
         <Formik
           initialValues={{
-            firstName: "",
-            lastName: "",
+            companyName: "",
+            userName: "",
+            type: "Beleza",
+            phone: "",
             email: "",
             password: "",
+            confirmPassword: "",
           }}
           validationSchema={SignupSchema}
           onSubmit={onSubmit}
@@ -125,67 +157,131 @@ export default function SignupCard() {
                   rounded={"lg"}
                   bg={useColorModeValue("white", "gray.700")}
                   boxShadow={"lg"}
-                  p={8}
+                  p={7}
                 >
-                  <Stack spacing={4}>
+                  <Stack spacing={4} mb={5}>
+                    <HStack>
+                      <FormControl
+                        id="companyName"
+                        isRequired
+                        isInvalid={!!errors.companyName && touched.companyName}
+                      >
+                        <FormLabel>Nome da Empresa</FormLabel>
+                        <Field as={Input} type="text" name="companyName" />
+                      </FormControl>
+
+                      <FormControl
+                        id="userName"
+                        isRequired
+                        isInvalid={!!errors.userName && touched.userName}
+                      >
+                        <FormLabel>Seu Nome</FormLabel>
+                        <Field as={Input} type="text" name="userName" />
+                      </FormControl>
+                    </HStack>
+                  </Stack>
+
+                  <Stack spacing={4} mb={5}>
                     <HStack>
                       <Box>
                         <FormControl
-                          id="firstName"
+                          id="type"
                           isRequired
-                          isInvalid={!!errors.firstName && touched.firstName}
+                          isInvalid={!!errors.type && touched.type}
                         >
-                          <FormLabel>Nome</FormLabel>
-                          <Field as={Input} type="text" name="firstName" />
-                          <FormErrorMessage>{errors.firstName}</FormErrorMessage>
+                          <FormLabel>Ramo da sua empresa</FormLabel>
+                          <Field as={Select} type="text" name="type">
+                            <option value="Beleza">Beleza</option>
+                            <option value="Clínica">Clínica</option>
+                          </Field>
                         </FormControl>
                       </Box>
+
                       <Box>
                         <FormControl
-                          id="lastName"
+                          id="phone"
                           isRequired
-                          isInvalid={!!errors.lastName && touched.lastName}
+                          isInvalid={!!errors.phone && touched.phone}
                         >
-                          <FormLabel>Sobrenome</FormLabel>
-                          <Field as={Input} type="text" name="lastName" />
-                          <FormErrorMessage>{errors.lastName}</FormErrorMessage>
+                          <FormLabel>Telefone (whatsapp) </FormLabel>
+                          <Field as={Input} type="text" name="phone" />
                         </FormControl>
                       </Box>
                     </HStack>
+
                     <FormControl
+                      mb={5}
                       id="email"
                       isRequired
                       isInvalid={!!errors.email && touched.email}
                     >
-                      <FormLabel>Digite seu email</FormLabel>
+                      <FormLabel>Email para contato e login</FormLabel>
                       <Field as={Input} type="email" name="email" />
-                      <FormErrorMessage>{errors.email}</FormErrorMessage>
                     </FormControl>
-                    <FormControl
-                      id="password"
-                      isRequired
-                      isInvalid={!!errors.password && touched.password}
-                    >
-                      <FormLabel>Senha</FormLabel>
-                      <InputGroup>
-                        <Field
-                          as={Input}
-                          type={showPassword ? "text" : "password"}
-                          name="password"
-                        />
-                        <InputRightElement h={"full"}>
-                          <Button
-                            variant={"ghost"}
-                            onClick={() =>
-                              setShowPassword((showPassword) => !showPassword)
+
+                    <Stack spacing={4} mb={5}>
+                      <HStack>
+                        <Box>
+                          <FormControl
+                            id="password"
+                            isRequired
+                            isInvalid={!!errors.password && touched.password}
+                          >
+                            <FormLabel>Senha</FormLabel>
+                            <InputGroup>
+                              <Field
+                                as={Input}
+                                type={showPassword ? "text" : "password"}
+                                name="password"
+                              />
+                              <InputRightElement h={"full"}>
+                                <Button
+                                  variant={"ghost"}
+                                  onClick={() =>
+                                    setShowPassword(
+                                      (showPassword) => !showPassword
+                                    )
+                                  }
+                                >
+                                  {showPassword ? (
+                                    <ViewIcon />
+                                  ) : (
+                                    <ViewOffIcon />
+                                  )}
+                                </Button>
+                              </InputRightElement>
+                              <FormErrorMessage position={"absolute"} top={8}>
+                                {errors.password}
+                              </FormErrorMessage>
+                            </InputGroup>
+                          </FormControl>
+                        </Box>
+
+                        <Box>
+                          <FormControl
+                            id="confirmPassword"
+                            isRequired
+                            isInvalid={
+                              !!errors.confirmPassword &&
+                              touched.confirmPassword
                             }
                           >
-                            {showPassword ? <ViewIcon /> : <ViewOffIcon />}
-                          </Button>
-                        </InputRightElement>
-                      </InputGroup>
-                      <FormErrorMessage>{errors.password}</FormErrorMessage>
-                    </FormControl>
+                            <FormLabel>Confirme a Senha</FormLabel>
+                            <InputGroup>
+                              <Field
+                                as={Input}
+                                type={showPassword ? "text" : "password"}
+                                name="confirmPassword"
+                              />
+                              <FormErrorMessage position={"absolute"} top={8}>
+                                {errors.confirmPassword}
+                              </FormErrorMessage>
+                            </InputGroup>
+                          </FormControl>
+                        </Box>
+                      </HStack>
+                    </Stack>
+
                     <Stack spacing={10} pt={2}>
                       <Button
                         type="submit"
