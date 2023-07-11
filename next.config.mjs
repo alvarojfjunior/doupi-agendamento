@@ -6,6 +6,9 @@
 !process.env.SKIP_ENV_VALIDATION && (await import("./src/env/server.mjs"));
 
 const nextConfig = {
+  env: {
+    NEXT_PUBLIC_API_BODY_SIZE_LIMIT: "5mb",
+  },
   reactStrictMode: true,
   // esmExternals: false,
   images: {

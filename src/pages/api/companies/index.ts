@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Company } from "../../../services/database";
 import { authenticate } from "@/utils/apiAuth";
-import { createDossie } from "@/utils/createDossie";
+import { createDossie } from "@/utils/createDossie";;
 
 export default async function handler(
   req: NextApiRequest,
@@ -44,10 +44,14 @@ export default async function handler(
       const auth = authenticate(req);
       if (!auth) return res.status(401).json({ message: "Unauthorized" });
 
-      const body = JSON.parse(JSON.stringify(req.body));
+      let body = JSON.parse(JSON.stringify(req.body));
 
-      const _id = body._id;
-      delete body._id;
+      body._v++;
+
+      const _id = body._id
+      delete body._id
+      delete body.updatedAt
+      delete body.createdAt
 
       const { modifiedCount } = await Company.updateOne({ _id }, body).lean();
 

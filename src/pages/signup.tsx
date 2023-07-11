@@ -26,6 +26,7 @@ import { useRouter } from "next/router";
 import { getAxiosInstance } from "@/services/api";
 import { AppContext } from "@/contexts/app";
 import Page from "@/components/Page";
+import { PhoneInput } from "@/components/Fields";
 
 interface IForm {
   companyName: String;
@@ -56,15 +57,14 @@ export default function SignupCard() {
   const SignupSchema = Yup.object().shape({
     companyName: Yup.string().min(2).max(50).required(),
     userName: Yup.string().min(2).max(50).required(),
-    phone: Yup.string()
-      .matches(/^[1-9]{2}9?[0-9]{8}$/, "")
-      .required(),
+    phone: Yup.string().min(16).max(16).required(),
     email: Yup.string().email("Invalid email").required(),
     password: Yup.string()
       .min(8, "A senha deve ter 8 caracteres!")
       .matches(/[0-9]/, "A senha deve ter número!")
       .required("Campo obrigatório"),
     confirmPassword: Yup.string()
+      //@ts-ignore
       .oneOf([Yup.ref("password"), null], "As senhas não coincidem")
       .required("Campo obrigatório"),
   });
@@ -94,8 +94,8 @@ export default function SignupCard() {
 
       const credentials = {
         email: signupData.email,
-        password: signupData.password
-      }
+        password: signupData.password,
+      };
 
       const { data } = await api.post("/api/auth/signin", credentials);
 
@@ -103,7 +103,7 @@ export default function SignupCard() {
 
       localStorage.setItem("user", JSON.stringify(userAuth));
 
-      router.push("private");
+      router.push("private/company");
     } catch (error: any) {
       const errorMessage = error.response.data.message;
       toast({
@@ -121,7 +121,7 @@ export default function SignupCard() {
   return (
     <Page
       path="/signup"
-      title="E Agora - Criar conta"
+      title="Doupi - Criar conta"
       description="App para para gestão de agenda!"
     >
       <Flex
@@ -149,7 +149,7 @@ export default function SignupCard() {
                   <Heading fontSize={"4xl"} textAlign={"center"}>
                     Nova conta
                   </Heading>
-                  <Text fontSize={"lg"} color={"#D13F1A"}>
+                  <Text fontSize={"lg"} color={"#3e4d92"}>
                     Crie sua conta, é simples e rápido ✌️
                   </Text>
                 </Stack>
@@ -203,8 +203,8 @@ export default function SignupCard() {
                           isRequired
                           isInvalid={!!errors.phone && touched.phone}
                         >
-                          <FormLabel>Telefone (whatsapp) </FormLabel>
-                          <Field as={Input} type="text" name="phone" />
+                          <FormLabel>Telefone de contato </FormLabel>
+                          <Field as={PhoneInput} type="text" name="phone" />
                         </FormControl>
                       </Box>
                     </HStack>
@@ -288,10 +288,8 @@ export default function SignupCard() {
                         loadingText="Submitting"
                         size="lg"
                         color={useColorModeValue("#fff", "#fff")}
-                        bg={useColorModeValue("#D13F1A", "#D13F1A")}
-                        _hover={{
-                          bg: useColorModeValue("#e93e13", "#e93e13"),
-                        }}
+                        bg={useColorModeValue("#ffc03f", "#ffc03f")}
+                        _hover={{ filter: "brightness(110%)" }}
                       >
                         Cadastrar
                       </Button>
@@ -299,7 +297,7 @@ export default function SignupCard() {
                     <Stack pt={6}>
                       <Text align={"center"}>
                         Já é cadastrado?{" "}
-                        <Link as={NextLink} href="./signin" color={"#D13F1A"}>
+                        <Link as={NextLink} href="./signin" color={"#ffc03f"}>
                           Entrar
                         </Link>
                       </Text>

@@ -1,0 +1,348 @@
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Heading,
+  Image as ChakraImage,
+  Input,
+  VStack,
+  Select,
+  useColorModeValue,
+  HStack,
+} from "@chakra-ui/react";
+import InputColor from "react-input-color";
+import { useContext, useEffect } from "react";
+import * as Yup from "yup";
+import InputMask from "react-input-mask";
+import { useFormik } from "formik";
+import { AppContext } from "@/contexts/app";
+import Page from "@/components/Page";
+import { AxiosInstance } from "axios";
+import { IUser } from "@/types/api/User";
+import { getAxiosInstance } from "@/services/api";
+import { useRouter } from "next/router";
+
+let user: IUser;
+let api: AxiosInstance;
+export default function Panel() {
+  const appContext = useContext(AppContext);
+  const router = useRouter();
+
+  function handleImageChange(e: any) {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      const image = new Image();
+      //@ts-ignore
+      image.src = reader.result;
+
+      image.onload = () => {
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+
+        // Define a largura e altura máximas para a imagem
+        const maxWidth = 800;
+        const maxHeight = 800;
+
+        let width = image.width;
+        let height = image.height;
+
+        // Redimensiona a imagem se a largura ou altura excederem os limites máximos
+        if (width > maxWidth || height > maxHeight) {
+          const ratio = Math.min(maxWidth / width, maxHeight / height);
+          width *= ratio;
+          height *= ratio;
+        }
+
+        // Desenha a imagem redimensionada no canvas
+        canvas.width = width;
+        canvas.height = height;
+        //@ts-ignore
+        context.drawImage(image, 0, 0, width, height);
+
+        // Converte o conteúdo do canvas em uma URL de dados com a melhor qualidade
+        const dataURL = canvas.toDataURL(file.type, 1);
+
+        // Define a melhor resolução e qualidade da imagem no state (setImageAvatar)
+        formik.setFieldValue("coverImage", dataURL);
+      };
+    };
+
+    if (!e.target.files) {
+      return;
+    }
+
+    if (file.type === "image/png" || file.type === "image/jpeg") {
+      reader.readAsDataURL(file);
+      formik.setFieldValue(
+        "coverImage",
+        URL.createObjectURL(e.target.files[0])
+      );
+    }
+  }
+
+  const onSubmit = async (values: any) => {
+    try {
+      appContext.onOpenLoading();
+      if (!values.coverImage) delete values.coverImage;
+      const { data } = await api.put(`/api/companies`, values);
+      appContext.onCloseLoading();
+      router.push("/private");
+    } catch (error) {
+      console.log(error);
+      appContext.onCloseLoading();
+    }
+  };
+
+  const formik = useFormik({
+    initialValues: {
+      coverImage: "",
+      name: "",
+      responsableName: "",
+      businessType: "",
+      color: "",
+      phone: "",
+      whatsapp: "",
+      email: "",
+      document: "",
+    },
+    validationSchema: Yup.object().shape({
+      coverImage: Yup.string().min(100).required(),
+      name: Yup.string().min(2).max(50).required(),
+      document: Yup.string().min(2).max(50).required(),
+      color: Yup.string().min(2).max(10).required(),
+      businessType: Yup.string().min(2).max(50).required(),
+      responsableName: Yup.string().min(2).max(50).required(),
+      phone: Yup.string().required(),
+      whatsapp: Yup.string().max(16).required(),
+    }),
+    onSubmit: onSubmit,
+  });
+
+  useEffect(() => {
+    user = JSON.parse(String(localStorage.getItem("user")));
+    api = getAxiosInstance(user);
+    getCompanyData();
+    appContext.onCloseLoading();
+  }, []);
+
+  const getCompanyData = async () => {
+    try {
+      const { data } = await api.get(`/api/companies?_id=${user.companyId}`);
+      if (data.length > 0) {
+        formik.setValues(data[0]);
+        appContext.onCloseLoading();
+      } else {
+        router.push("/");
+      }
+    } catch (error) {
+      console.log(error);
+      appContext.onCloseLoading();
+    }
+  };
+
+  return (
+    <Page
+      path="/private/company"
+      title="Doupi - Empresa"
+      description="App para genciamento de agendamentos"
+    >
+      <form onSubmit={formik.handleSubmit}>
+        <Box p={4} maxWidth="700px" mx="auto">
+          <Heading mb={4}>Configurações da empresa</Heading>
+          <VStack spacing={4} align="stretch">
+            <FormControl
+              id="color"
+              isRequired
+              isInvalid={!!formik.errors.color && formik.touched.color}
+            >
+              <FormLabel>Imagem de Capa</FormLabel>
+              <Box
+                position="relative"
+                display="inline-block"
+                width={"100%"}
+                height={150}
+                overflow="hidden"
+                justifyContent="center"
+                alignItems="center"
+              >
+                <ChakraImage
+                  src={formik.values.coverImage}
+                  alt="Imagem de Capa"
+                  mb={2}
+                  rounded={10}
+                  style={{
+                    objectFit: "cover",
+                    width: "100%",
+                    height: "100%",
+                  }}
+                />
+                <Input
+                  type="file"
+                  accept="image/*"
+                  name="coverPreview"
+                  onChange={handleImageChange}
+                  position="absolute"
+                  top={0}
+                  left={0}
+                  opacity={0}
+                  width="100%"
+                  height="100%"
+                  cursor="pointer"
+                  zIndex={1}
+                  required={false}
+                />
+              </Box>
+            </FormControl>
+            <FormControl
+              id="color"
+              isRequired
+              isInvalid={!!formik.errors.color && formik.touched.color}
+            >
+              <FormLabel>Cor tema</FormLabel>
+              {/* <BlockPicker
+                name="color"
+                triangle={"hide"}
+                width={"100%"}
+                color={{ hex: formik.values.color }}
+                onChange={(e: any) => formik.setFieldValue("color", e.hex)}
+              /> */}
+              <InputColor
+                initialValue={formik.values.color}
+                onChange={(e: any) => formik.setFieldValue("color", e.hex)}
+                placement="right"
+              />
+            </FormControl>
+
+            <HStack>
+              <FormControl
+                id="name"
+                isRequired
+                isInvalid={!!formik.errors.name && formik.touched.name}
+              >
+                <FormLabel>Nome da empresa</FormLabel>
+                <Input
+                  type="text"
+                  name="name"
+                  value={formik.values.name}
+                  onChange={formik.handleChange}
+                />
+              </FormControl>
+
+              <FormControl
+                id="responsableName"
+                isRequired
+                isInvalid={
+                  !!formik.errors.responsableName &&
+                  formik.touched.responsableName
+                }
+              >
+                <FormLabel>Nome da responsável</FormLabel>
+                <Input
+                  type="text"
+                  name="responsableName"
+                  value={formik.values.responsableName}
+                  onChange={formik.handleChange}
+                />
+              </FormControl>
+            </HStack>
+            <HStack>
+              <FormControl
+                id="businessType"
+                isRequired
+                isInvalid={
+                  !!formik.errors.businessType && formik.touched.businessType
+                }
+              >
+                <FormLabel>Ramo da sua empresa</FormLabel>
+                <Select
+                  name="businessType"
+                  id="businessType"
+                  value={formik.values.businessType}
+                  onChange={formik.handleChange}
+                >
+                  <option value="Beleza">Beleza</option>
+                  <option value="Clínica">Clínica</option>
+                </Select>
+              </FormControl>
+
+              <FormControl
+                id="document"
+                isRequired
+                isInvalid={!!formik.errors.document && formik.touched.document}
+              >
+                <FormLabel> Documento (CNPJ ou CPF) </FormLabel>
+                <Input
+                  type="string"
+                  name="document"
+                  value={formik.values.document}
+                  onChange={formik.handleChange}
+                />
+              </FormControl>
+            </HStack>
+
+            <HStack>
+              <FormControl
+                id="phone"
+                isRequired
+                isInvalid={!!formik.errors.phone && formik.touched.phone}
+              >
+                <FormLabel>Telefone de contato </FormLabel>
+                <Input
+                  name="phone"
+                  as={InputMask}
+                  value={formik.values.phone}
+                  onChange={formik.handleChange}
+                  mask="(99) 9 9999-9999"
+                />
+              </FormControl>
+
+              <FormControl
+                id="whatsapp"
+                isRequired
+                isInvalid={!!formik.errors.whatsapp && formik.touched.whatsapp}
+              >
+                <FormLabel> Whatsapp </FormLabel>
+
+                <Input
+                  name="whatsapp"
+                  as={InputMask}
+                  value={formik.values.whatsapp}
+                  onChange={formik.handleChange}
+                  mask="(99) 9 9999-9999"
+                />
+              </FormControl>
+            </HStack>
+
+            <HStack>
+              <FormControl
+                id="email"
+                isRequired
+                isInvalid={!!formik.errors.email && formik.touched.email}
+              >
+                <FormLabel> Email </FormLabel>
+                <Input
+                  type="email"
+                  name="email"
+                  value={formik.values.email}
+                  onChange={formik.handleChange}
+                />
+              </FormControl>
+            </HStack>
+
+            <Button
+              color={useColorModeValue("#fff", "#fff")}
+              bg={useColorModeValue("#ffc03f", "#ffc03f")}
+              _hover={{ filter: "brightness(110%)" }}
+              type={"submit"}
+            >
+              Salvar
+            </Button>
+          </VStack>
+        </Box>
+      </form>
+    </Page>
+  );
+}

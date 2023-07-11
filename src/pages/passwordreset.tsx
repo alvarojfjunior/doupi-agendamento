@@ -180,11 +180,9 @@ export default function ResetPasswordForm(): JSX.Element {
                 <Button
                   type="submit"
                   loadingText="Submitting"
-                  bg={"#D13F1A"}
+                  bg={"#ffc03f"}
                   color={"white"}
-                  _hover={{
-                    bg: "#D13F1A",
-                  }}
+                  _hover={{ filter: "brightness(110%)" }}
                 >
                   Alterar
                 </Button>

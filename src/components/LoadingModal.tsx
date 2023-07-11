@@ -28,7 +28,7 @@ export default function LoadingModal({ isOpen }: IProps) {
           <Spinner
             thickness="4px"
             speed="0.65s"
-            color={"#D13F1A"}
+            color={"#ffc03f"}
             size="xl"
           />
           <br />

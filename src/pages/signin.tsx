@@ -95,7 +95,7 @@ export default function SignIn() {
   return (
     <Page
       path="/signin"
-      title="E Agora - Login"
+      title="Doupi - Login"
       description="App para para gestão de agenda!"
     >
       <Flex
@@ -176,10 +176,8 @@ export default function SignIn() {
                       </Stack>
                       <Button
                         color={useColorModeValue("#fff", "#fff")}
-                        bg={useColorModeValue("#D13F1A", "#D13F1A")}
-                        _hover={{
-                          bg: useColorModeValue("#e93e13", "#e93e13"),
-                        }}
+                        bg={useColorModeValue("#ffc03f", "#ffc03f")}
+                        _hover={{ filter: "brightness(110%)" }}
                         type={"submit"}
                       >
                         Entrar
@@ -187,7 +185,7 @@ export default function SignIn() {
                       <Stack>
                         <Text align={"center"}>
                           Não tem uma conta?{" "}
-                          <Link as={NextLink} href="./signup" color={"#e93e13"}>
+                          <Link as={NextLink} href="./signup" color={"#ffc03f"}>
                             Cadastre-se
                           </Link>
                         </Text>

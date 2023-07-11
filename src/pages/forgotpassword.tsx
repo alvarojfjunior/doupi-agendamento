@@ -75,7 +75,7 @@ export default function ForgotPasswordForm(): JSX.Element {
   return (
     <Page
       path="/forgotpassword"
-      title="E Agora - Esqueceu senha"
+      title="Doupi - Esqueceu senha"
       description="App para para gestão de agenda!"
     >
       <Flex
@@ -122,14 +122,12 @@ export default function ForgotPasswordForm(): JSX.Element {
                     <FormErrorMessage>{errors.email}</FormErrorMessage>
                   </FormControl>
                   <Button
-                    bg={"#D13F1A"}
+                    bg={"#ffc03f"}
                     color={"white"}
                     width="100%"
                     loadingText="Submitting"
                     type="submit"
-                    _hover={{
-                      bg: "#D13F1A",
-                    }}
+                    _hover={{ filter: "brightness(110%)" }}
                   >
                     Redefinir senha
                   </Button>

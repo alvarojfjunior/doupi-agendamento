@@ -42,8 +42,8 @@ export default async function handler(
           Password: process.env.EMAIL_SECRET,
           To: email,
           From: process.env.SENDER_EMAIL,
-          Subject: "E Agora - Recuperar senha",
-          Body: `<html><h2>E Agora - Recuperar senha</h2><p>Para recuperar sua senha, utilize o link a seguir: <a href='${link}'>Clique aqui</a></p></html>`,
+          Subject: "Doupi - Recuperar senha",
+          Body: `<html><h2>Doupi - Recuperar senha</h2><p>Para recuperar sua senha, utilize o link a seguir: <a href='${link}'>Clique aqui</a></p></html>`,
         });
 
         await createDossie({

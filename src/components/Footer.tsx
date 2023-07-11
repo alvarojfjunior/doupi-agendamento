@@ -35,9 +35,7 @@ const SocialButton = ({
       justifyContent={"center"}
       transition={"background 0.3s ease"}
       bg={useColorModeValue("blackAlpha.100", "whiteAlpha.100")}
-      _hover={{
-        bg: useColorModeValue("blackAlpha.200", "whiteAlpha.200"),
-      }}
+      _hover={{ filter: "brightness(110%)" }}
     >
       <VisuallyHidden>{label}</VisuallyHidden>
       {children}
@@ -70,15 +68,9 @@ export default function SmallWithLogoLeft() {
         onClick={() =>
           isAuth ? router.push("private") : router.push("/")
         }>
-          <Logo height={32} />
-          <Text
-            marginLeft={5}
-            variant={"solid"}
-          >
-            E Agora
-          </Text>
+          <Logo color={"dark"} height={32} />
         </Flex>
-        <Text>© 2023 E Agora. Developed with love ❤️ </Text>
+        <Text>© 2023 Doupi. Developed with love ❤️ </Text>
         {/* <Stack direction={"row"} spacing={6}>
           <SocialButton label={"Twitter"} href={"#"}>
             <FaTwitter />

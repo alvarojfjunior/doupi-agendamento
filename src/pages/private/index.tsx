@@ -15,11 +15,11 @@ export default function Panel() {
   return (
     <Page
       path="/private"
-      title="E Agora - Painel Geral"
+      title="Doupi - Painel Geral"
       description="App para genciamento de agendamentos"
     >
       <Box margin={"auto"} textAlign={"center"}>
-        <Text fontSize={"3xl"} mb={"10"} color="#274765" fontWeight="bold">
+        <Text fontSize={"3xl"} mb={"10"} color="#3e4d92" fontWeight="bold">
           Painel aqui
         </Text>
       </Box>

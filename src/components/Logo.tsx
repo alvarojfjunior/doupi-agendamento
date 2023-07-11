@@ -1,11 +1,12 @@
-import Fluency from "@/public/fluency-logo.svg";
+import FluencyWhite from "@/public/logo-white.png";
+import FluencyBLue from "@/public/logo-blue.png";
 import Image, { StaticImageData } from "next/image";
 
 export default function Logo(props: any) {
   return (
     <Image
-      src={Fluency as StaticImageData}
-      alt={"fluency-logo"}
+      src={props.color === "dark" ? FluencyBLue : FluencyWhite as StaticImageData}
+      alt={'Logo'}
       {...props}
     ></Image>
   );

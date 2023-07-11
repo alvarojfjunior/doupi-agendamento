@@ -24,6 +24,7 @@ export const authenticate = (req: NextApiRequest): IUser | undefined => {
       type: decoded.type,
     }
 
+    //@ts-ignore
     return user;
   } catch (error) {
     return undefined;

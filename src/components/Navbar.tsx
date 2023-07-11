@@ -39,7 +39,7 @@ export default function Navbar() {
   return (
     <>
       <Box
-        bg={useColorModeValue("#274765", "#274765")}
+        bg={useColorModeValue("#3e4d92", "#3e4d92")}
         px={4}
         py={{ base: 30, md: 2, lg: 2 }}
         display={
@@ -58,18 +58,8 @@ export default function Navbar() {
             }
           >
             <Logo
-              width={45}
-              height={45}
+              width={120}
             />
-            <Text
-              marginLeft={5}
-              fontSize={20}
-              fontWeight={"bold"}
-              variant={"solid"}
-              color={useColorModeValue("#fff", "#fff")}
-            >
-              E Agora
-            </Text>
           </Flex>
 
           <Flex alignItems={"center"}>
@@ -85,10 +75,8 @@ export default function Navbar() {
                       <Button
                         variant={"solid"}
                         color={useColorModeValue("#fff", "#fff")}
-                        bg={useColorModeValue("#D13F1A", "#D13F1A")}
-                        _hover={{
-                          bg: useColorModeValue("#e93e13", "#e93e13"),
-                        }}
+                        bg={useColorModeValue("#ffc03f", "#ffc03f")}
+                        _hover={{ filter: "brightness(110%)" }}
                         w={100}
                         textAlign={'center'}
                         onClick={() => router.push("/signup")}
@@ -100,11 +88,9 @@ export default function Navbar() {
                       <Button
                         mt={{ base: 2, md: 0, lg: 0 }}
                         variant={'solid'}
-                        bgColor={'#1BA890'}
+                        bgColor={'#3e4d92'}
                         color={"#fff"}
-                        _hover={{
-                          bg: '#1fb99f',
-                        }}
+                        _hover={{ filter: "brightness(110%)" }}
                         w={100}
                         textAlign={'center'}
                         onClick={() => router.push("/signin")}

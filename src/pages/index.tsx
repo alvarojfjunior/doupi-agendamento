@@ -21,7 +21,7 @@ export default function Home({ data }: any) {
             <Text
               as={"span"}
               position={"relative"}
-              color={useColorModeValue("#e93e13", "#FFF")}
+              color={useColorModeValue("#ffc03f", "#FFF")}
               _after={{
                 content: "''",
                 width: "full",
@@ -29,33 +29,31 @@ export default function Home({ data }: any) {
                 position: "absolute",
                 bottom: 1,
                 left: 0,
-                bg: useColorModeValue("#e93e1336", "#e93e13"),
+                bg: useColorModeValue("#ffc03f36", "#ffc03f"),
                 zIndex: -1,
               }}
             >
-              E Agora
+              Doupi
             </Text>
             <br />{" "}
             <Text
-              color={useColorModeValue("#274765", "#1BA890")}
+              color={useColorModeValue("#3e4d92", "#3e4d92")}
               as={"span"}
               textAlign={"center"}
             >
-              Gerencie todo o seu negócio com o E Agora!
+              Gerencie todo o seu negócio com o Doupi!
             </Text>{" "}
           </Heading>
           <Text fontSize={{ base: "md", lg: "lg" }} color={"gray.500"}>
-            Com o E Agora, você consegue controlar todos os agendamentos do seu
+            Com o Doupi, você consegue controlar todos os agendamentos do seu
             negócio e se tornar cada vez mais profissional e competitivo!
           </Text>
           <Stack direction={{ base: "column", md: "row" }} spacing={4}>
             <Button
               rounded={"full"}
-              bg={useColorModeValue("#31587c", "#1BA890")}
+              bg={useColorModeValue("#ffc03f", "#3e4d92")}
               color={"white"}
-              _hover={{
-                bg: useColorModeValue("#31587c", "#3bcab2"),
-              }}
+              _hover={{ filter: "brightness(110%)" }}
               onClick={() => router.push("/signup")}
             >
               Testar Grátis!
