@@ -1,14 +1,19 @@
+import { ReactNode } from "react";
 import { useContext, useEffect } from "react";
 import {
   Box,
   Flex,
   Avatar,
+  HStack,
+  Link,
+  IconButton,
   Button,
   Menu,
   MenuButton,
   MenuList,
   MenuItem,
   MenuDivider,
+  useDisclosure,
   useColorModeValue,
   Stack,
   useColorMode,
@@ -20,6 +25,29 @@ import { useRouter } from "next/router";
 import { AuthContext } from "@/contexts/auth";
 import Logo from "@/components/Logo";
 import { IUser } from "@/types/api/User";
+import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
+
+const Links = [
+  { route: "schedules", text: "Agendas" },
+  { route: "clients", text: "Clientes" },
+  { route: "profissionals", text: "Profissionais" },
+  { route: "services", text: "Serviços" },
+];
+
+const NavLink = ({ children }: { children: ReactNode }) => (
+  <Link
+    px={2}
+    py={1}
+    rounded={"md"}
+    _hover={{
+      textDecoration: "none",
+      bg: useColorModeValue("gray.200", "gray.700"),
+    }}
+    href={"#"}
+  >
+    {children}
+  </Link>
+);
 
 let user: IUser;
 export default function Navbar() {
@@ -35,40 +63,50 @@ export default function Navbar() {
     localStorage.removeItem("user");
     router.push("/");
   };
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <>
-      <Box
-        bg={useColorModeValue("#3e4d92", "#3e4d92")}
-        px={4}
-        py={{ base: 30, md: 2, lg: 2 }}
-        display={
-          router.pathname.indexOf("private/chat") > -1 ? "none" : "block"
-        }
-      >
+      <Box bg={"#3e4d92"} px={4}>
         <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
-          <Flex
-            h={16}
-            alignItems={"center"}
-            justifyContent={"flex-start"}
-            marginLeft={15}
-            cursor={"pointer"}
-            onClick={() =>
-              isAuth ? router.push("private") : router.push("/")
-            }
-          >
-            <Logo
-              width={120}
-            />
-          </Flex>
-
+          <IconButton
+            size={"md"}
+            icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
+            aria-label={"Open Menu"}
+            display={{ md: "none" }}
+            onClick={isOpen ? onClose : onOpen}
+          />
+          <HStack spacing={8} alignItems={"center"}>
+            <Flex
+              h={16}
+              alignItems={"center"}
+              justifyContent={"flex-start"}
+              marginLeft={15}
+              cursor={"pointer"}
+              onClick={() =>
+                isAuth ? router.push("private") : router.push("/")
+              }
+            >
+              <Logo width={120} />
+            </Flex>
+            <HStack
+              as={"nav"}
+              spacing={4}
+              display={{ base: "none", md: "flex" }}
+            >
+              {isAuth &&
+                Links.map((link) => (
+                  <NavLink activeStyle={{ color: "white" }} key={link.route}>{link.text}ssss</NavLink>
+                ))}
+            </HStack>
+          </HStack>
           <Flex alignItems={"center"}>
             <Stack direction={"row"} spacing={{ base: 0, md: 5, lg: 5 }}>
               <Menu>
                 {!isAuth ? (
                   <Stack
                     direction={{ base: "column", md: "row", lg: "row" }}
-                    alignItems={'center'}
+                    alignItems={"center"}
                     spacing={{ base: 3, md: 2, lg: 2 }}
                   >
                     {router.pathname.indexOf("signup") <= -1 && (
@@ -78,7 +116,7 @@ export default function Navbar() {
                         bg={useColorModeValue("#ffc03f", "#ffc03f")}
                         _hover={{ filter: "brightness(110%)" }}
                         w={100}
-                        textAlign={'center'}
+                        textAlign={"center"}
                         onClick={() => router.push("/signup")}
                       >
                         Criar conta
@@ -87,12 +125,12 @@ export default function Navbar() {
                     {router.pathname.indexOf("signin") <= -1 && (
                       <Button
                         mt={{ base: 2, md: 0, lg: 0 }}
-                        variant={'solid'}
-                        bgColor={'#3e4d92'}
+                        variant={"solid"}
+                        bgColor={"#3e4d92"}
                         color={"#fff"}
                         _hover={{ filter: "brightness(110%)" }}
                         w={100}
-                        textAlign={'center'}
+                        textAlign={"center"}
                         onClick={() => router.push("/signin")}
                       >
                         Entrar
@@ -126,12 +164,15 @@ export default function Navbar() {
                         />
                       </Center>
                       <br />
-                      <Center color={'gray.500'}>
+                      <Center color={"gray.500"}>
                         <p>{user && user.name}</p>
                       </Center>
                       <br />
                       <MenuDivider />
                       {/* <MenuItem>Meus dados</MenuItem> */}
+                      <MenuItem onClick={() => router.push("/private/company")}>
+                        Dados da empresa
+                      </MenuItem>
                       <MenuItem onClick={handleLogout}>Sair</MenuItem>
                     </MenuList>
                   </Stack>
@@ -148,6 +189,17 @@ export default function Navbar() {
             </Stack>
           </Flex>
         </Flex>
+
+        {isOpen ? (
+          <Box pb={4} display={{ md: "none" }}>
+            <Stack as={"nav"} spacing={4}>
+              {isAuth &&
+                Links.map((link) => (
+                  <NavLink key={link.route}>{link.text}</NavLink>
+                ))}
+            </Stack>
+          </Box>
+        ) : null}
       </Box>
     </>
   );
