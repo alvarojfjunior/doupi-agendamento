@@ -10,6 +10,7 @@ import {
   Select,
   useColorModeValue,
   HStack,
+  useToast,
 } from "@chakra-ui/react";
 import InputColor from "react-input-color";
 import { useContext, useEffect } from "react";
@@ -27,6 +28,7 @@ let user: IUser;
 let api: AxiosInstance;
 export default function Panel() {
   const appContext = useContext(AppContext);
+  const toast = useToast();
   const router = useRouter();
 
   function handleImageChange(e: any) {
@@ -90,8 +92,24 @@ export default function Panel() {
       const { data } = await api.put(`/api/companies`, values);
       appContext.onCloseLoading();
       router.push("/private");
-    } catch (error) {
+      toast({
+        title: "Sucesso!",
+        description: "Os dados da sua empresa foram alterados!",
+        status: "success",
+        position: "top-right",
+        duration: 9000,
+        isClosable: true,
+      });
+    } catch (error: any) {
       console.log(error);
+      toast({
+        title: "Houve um erro",
+        description: error.Message,
+        status: "error",
+        position: "top-right",
+        duration: 9000,
+        isClosable: true,
+      });
       appContext.onCloseLoading();
     }
   };
@@ -146,12 +164,14 @@ export default function Panel() {
   return (
     <Page
       path="/private/company"
-      title="Doupi - Empresa"
+      title="Doupi - Configurações da Empresa"
       description="App para genciamento de agendamentos"
     >
       <form onSubmit={formik.handleSubmit}>
         <Box p={4} maxWidth="700px" mx="auto">
-          <Heading mb={4}>Configurações da empresa</Heading>
+          <Heading mb={5} fontSize={"2xl"} textAlign={"center"}>
+            Configurações da empresa
+          </Heading>
           <VStack spacing={4} align="stretch">
             <FormControl
               id="color"
@@ -163,7 +183,7 @@ export default function Panel() {
                 position="relative"
                 display="inline-block"
                 width={"100%"}
-                height={150}
+                height={250}
                 overflow="hidden"
                 justifyContent="center"
                 alignItems="center"
@@ -202,17 +222,15 @@ export default function Panel() {
               isInvalid={!!formik.errors.color && formik.touched.color}
             >
               <FormLabel>Cor tema</FormLabel>
-              {/* <BlockPicker
-                name="color"
-                triangle={"hide"}
-                width={"100%"}
-                color={{ hex: formik.values.color }}
-                onChange={(e: any) => formik.setFieldValue("color", e.hex)}
-              /> */}
               <InputColor
+                placement="left"
+                //@ts-ignore
+                style={{
+                  width: "100%",
+                  height: 70,
+                }}
                 initialValue={formik.values.color}
                 onChange={(e: any) => formik.setFieldValue("color", e.hex)}
-                placement="right"
               />
             </FormControl>
 

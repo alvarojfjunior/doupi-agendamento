@@ -71,17 +71,6 @@ export default function SmallWithLogoLeft() {
           <Logo color={"dark"} height={32} />
         </Flex>
         <Text>© 2023 Doupi. Developed with love ❤️ </Text>
-        {/* <Stack direction={"row"} spacing={6}>
-          <SocialButton label={"Twitter"} href={"#"}>
-            <FaTwitter />
-          </SocialButton>
-          <SocialButton label={"YouTube"} href={"#"}>
-            <FaYoutube />
-          </SocialButton>
-          <SocialButton label={"Instagram"} href={"#"}>
-            <FaInstagram />
-          </SocialButton>
-        </Stack> */}
       </Container>
     </Box>
   );

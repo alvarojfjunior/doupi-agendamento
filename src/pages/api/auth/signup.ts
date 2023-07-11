@@ -13,7 +13,7 @@ export default async function handler(
       const body = JSON.parse(JSON.stringify(req.body));
 
       const newCompany = {
-        name: body.userName,
+        name: body.companyName,
         color: '#2D4356',
         businessType: body.type,
         responsableName: body.userName,

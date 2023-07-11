@@ -28,10 +28,10 @@ import { IUser } from "@/types/api/User";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 
 const Links = [
-  { route: "schedules", text: "Agendas" },
-  { route: "clients", text: "Clientes" },
-  { route: "profissionals", text: "Profissionais" },
-  { route: "services", text: "Serviços" },
+  { route: "private/schedules", text: "Agendas" },
+  { route: "private/clients", text: "Clientes" },
+  { route: "private/professionals", text: "Profissionais" },
+  { route: "private/services", text: "Serviços" },
 ];
 
 const NavLink = ({ children }: { children: ReactNode }) => (
@@ -96,7 +96,15 @@ export default function Navbar() {
             >
               {isAuth &&
                 Links.map((link) => (
-                  <NavLink activeStyle={{ color: "white" }} key={link.route}>{link.text}ssss</NavLink>
+                  <Button
+                    key={link.route}
+                    color="white"
+                    colorScheme="whiteAlpha"
+                    variant="ghost"
+                    onClick={() => router.push(link.route)}
+                  >
+                    {link.text}
+                  </Button>
                 ))}
             </HStack>
           </HStack>
@@ -195,7 +203,15 @@ export default function Navbar() {
             <Stack as={"nav"} spacing={4}>
               {isAuth &&
                 Links.map((link) => (
-                  <NavLink key={link.route}>{link.text}</NavLink>
+                  <Button
+                    key={link.route}
+                    color="white"
+                    colorScheme="whiteAlpha"
+                    variant="ghost"
+                    onClick={() => router.push(link.route)}
+                  >
+                    {link.text}
+                  </Button>
                 ))}
             </Stack>
           </Box>

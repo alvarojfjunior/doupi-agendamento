@@ -81,7 +81,7 @@ export default function SignIn() {
     } catch (error: any) {
       const errorMessage = error.response.data.message;
       toast({
-        title: "Houve um erro",
+        title: "Usuário ou senha incorretos.",
         description: errorMessage,
         status: "error",
         position: "top-right",
