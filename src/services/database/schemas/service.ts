@@ -10,6 +10,10 @@ try {
         type: String,
         required: true,
       },
+      image: {
+        type: String,
+        required: true,
+      },
       name: {
         type: String,
         required: true,
@@ -19,7 +23,7 @@ try {
         required: true,
       },
       price: {
-        type: Number,
+        type: String,
         required: true,
       },
       duration : {

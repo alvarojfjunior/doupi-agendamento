@@ -31,60 +31,6 @@ export default function Panel() {
   const toast = useToast();
   const router = useRouter();
 
-  function handleImageChange(e: any) {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-
-    reader.onloadend = () => {
-      const image = new Image();
-      //@ts-ignore
-      image.src = reader.result;
-
-      image.onload = () => {
-        const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d");
-
-        // Define a largura e altura máximas para a imagem
-        const maxWidth = 800;
-        const maxHeight = 800;
-
-        let width = image.width;
-        let height = image.height;
-
-        // Redimensiona a imagem se a largura ou altura excederem os limites máximos
-        if (width > maxWidth || height > maxHeight) {
-          const ratio = Math.min(maxWidth / width, maxHeight / height);
-          width *= ratio;
-          height *= ratio;
-        }
-
-        // Desenha a imagem redimensionada no canvas
-        canvas.width = width;
-        canvas.height = height;
-        //@ts-ignore
-        context.drawImage(image, 0, 0, width, height);
-
-        // Converte o conteúdo do canvas em uma URL de dados com a melhor qualidade
-        const dataURL = canvas.toDataURL(file.type, 1);
-
-        // Define a melhor resolução e qualidade da imagem no state (setImageAvatar)
-        formik.setFieldValue("coverImage", dataURL);
-      };
-    };
-
-    if (!e.target.files) {
-      return;
-    }
-
-    if (file.type === "image/png" || file.type === "image/jpeg") {
-      reader.readAsDataURL(file);
-      formik.setFieldValue(
-        "coverImage",
-        URL.createObjectURL(e.target.files[0])
-      );
-    }
-  }
-
   const onSubmit = async (values: any) => {
     try {
       appContext.onOpenLoading();
@@ -161,6 +107,61 @@ export default function Panel() {
     }
   };
 
+
+  function handleImageChange(e: any) {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      const image = new Image();
+      //@ts-ignore
+      image.src = reader.result;
+
+      image.onload = () => {
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+
+        // Define a largura e altura máximas para a imagem
+        const maxWidth = 800;
+        const maxHeight = 800;
+
+        let width = image.width;
+        let height = image.height;
+
+        // Redimensiona a imagem se a largura ou altura excederem os limites máximos
+        if (width > maxWidth || height > maxHeight) {
+          const ratio = Math.min(maxWidth / width, maxHeight / height);
+          width *= ratio;
+          height *= ratio;
+        }
+
+        // Desenha a imagem redimensionada no canvas
+        canvas.width = width;
+        canvas.height = height;
+        //@ts-ignore
+        context.drawImage(image, 0, 0, width, height);
+
+        // Converte o conteúdo do canvas em uma URL de dados com a melhor qualidade
+        const dataURL = canvas.toDataURL(file.type, 1);
+
+        // Define a melhor resolução e qualidade da imagem no state (setImageAvatar)
+        formik.setFieldValue("coverImage", dataURL);
+      };
+    };
+
+    if (!e.target.files) {
+      return;
+    }
+
+    if (file.type === "image/png" || file.type === "image/jpeg") {
+      reader.readAsDataURL(file);
+      formik.setFieldValue(
+        "coverImage",
+        URL.createObjectURL(e.target.files[0])
+      );
+    }
+  }
+
   return (
     <Page
       path="/private/company"
@@ -174,9 +175,9 @@ export default function Panel() {
           </Heading>
           <VStack spacing={4} align="stretch">
             <FormControl
-              id="color"
+              id="coverImage"
               isRequired
-              isInvalid={!!formik.errors.color && formik.touched.color}
+              isInvalid={!!formik.errors.coverImage && formik.touched.coverImage}
             >
               <FormLabel>Imagem de Capa</FormLabel>
               <Box
