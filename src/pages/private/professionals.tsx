@@ -51,6 +51,7 @@ export default function Professionals() {
   const appContext = useContext(AppContext);
   const [isEditing, setIsEditing] = useState(false);
   const [data, setData] = useState([]);
+  const [services, setServices] = useState([]);
   const {
     isOpen: formIsOpen,
     onOpen: formOnOpen,
@@ -60,25 +61,21 @@ export default function Professionals() {
   const router = useRouter();
   const animatedComponents = makeAnimated();
 
-  const serviceOptions = [
-    { value: "1351351", label: "Corte" },
-    { value: "1531351", label: "Barba" },
-    { value: "5.65.65", label: "Sombrancelha" },
-  ];
-
   const onSubmit = async (values: any) => {
     try {
       appContext.onOpenLoading();
 
       if (!values.photo) values.photo = profissionalPhoto;
       values.companyId = user.companyId;
+      values.serviceIds = values.services.map((s: any) => s.value);
+      delete values.services;
 
       let res: any;
 
       if (isEditing) res = await api.put(`/api/professionals`, values);
       else res = await api.post(`/api/professionals`, values);
 
-      updateData(res.data);
+      getData();
       appContext.onCloseLoading();
       toast({
         title: "Sucesso!",
@@ -190,25 +187,37 @@ export default function Professionals() {
     getData();
   }, []);
 
-  const updateData = (item: any) => {
-    const indice = data.findIndex((d: any) => d._id === item._id);
-    if (indice > -1) {
-      const newArray = [...data];
-      //@ts-ignore
-      newArray[indice] = item;
-      setData(newArray);
-    } else {
-      //@ts-ignore
-      setData((prevArray) => [...prevArray, item]);
-    }
-  };
-
   const getData = async () => {
     try {
       const { data } = await api.get(
         `/api/professionals?companyId=${user.companyId}`
       );
-      setData(data);
+
+      const { data: services } = await api.get(
+        `/api/services?companyId=${user.companyId}`
+      );
+
+      setData(
+        data.map((d: any) => {
+          d.services = d.serviceIds.map((sid: any) => {
+            return {
+              value: sid._id,
+              label: sid.name,
+            };
+          });
+
+          return d;
+        })
+      );
+
+      setServices(
+        services.map((s: any) => {
+          return {
+            value: s._id,
+            label: s.name,
+          };
+        })
+      );
 
       appContext.onCloseLoading();
     } catch (error) {
@@ -500,7 +509,7 @@ export default function Professionals() {
                 closeMenuOnSelect={false}
                 components={animatedComponents}
                 isMulti
-                options={serviceOptions}
+                options={services}
                 styles={{
                   control: (baseStyles, state) => ({
                     ...baseStyles,
@@ -541,7 +550,7 @@ export default function Professionals() {
                 formik.touched.defaultSchedule
               }
             >
-              <FormLabel> Horários Padrão </FormLabel>
+              <FormLabel> Períodos de Trabalho Padrão </FormLabel>
               <SchedulesInput
                 schedules={formik.values.defaultSchedule}
                 onChange={(value: any) =>

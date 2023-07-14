@@ -8,8 +8,9 @@ try {
   PasswordResetSchema = new Mongoose.Schema(
     {
       userId: {
-        type: String, // need to be: Schema.Types.ObjectId
-        required: true,
+        type: Mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
       },
       token: {
         type: String,

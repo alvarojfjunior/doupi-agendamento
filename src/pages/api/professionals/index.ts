@@ -16,6 +16,9 @@ export default async function handler(
 
       const result = await Professional.find({
         ...query,
+      }).populate({
+        path: 'serviceIds',
+        select: '-image'
       }).lean();
 
       return res.status(200).json(result);
@@ -32,7 +35,7 @@ export default async function handler(
       await professional.save();
 
       createDossie({
-        userId: 'own',
+        userId: auth._id,
         action: "new",
         identfier: "professional",
       });
@@ -77,8 +80,6 @@ export default async function handler(
       const result = await Professional.deleteOne({
         ...query,
       }).lean();
-
-      console.log(result)
 
       return res.status(200).json(result);
     } else {

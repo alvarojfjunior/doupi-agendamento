@@ -46,8 +46,6 @@ export default async function handler(
 
       let body = JSON.parse(JSON.stringify(req.body));
 
-      body._v++;
-
       const _id = body._id
       delete body._id
       delete body.updatedAt

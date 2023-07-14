@@ -7,8 +7,9 @@ try {
   DossieSchema = new Mongoose.Schema(
     {
       userId: {
-        type: String,
-        required: true,
+        type: Mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
       },
       action: {
         type: String,

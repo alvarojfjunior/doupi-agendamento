@@ -1,7 +1,8 @@
 import Mongoose from "mongoose";
-import { CompanySchema } from "./schemas/compenie";
+import { CompanySchema } from "./schemas/company";
 import { ProfessionalSchema } from "./schemas/professional";
 import { ServiceSchema } from "./schemas/service";
+import { ClientSchema } from "./schemas/client";
 import { ScheduleSchemaSchema } from "./schemas/schedule";
 
 import { UserSchema } from "./schemas/user";
@@ -32,4 +33,5 @@ export const PasswordReset = Mongoose.model(
 export const Company = Mongoose.model("Company", CompanySchema);
 export const Professional = Mongoose.model("Professional", ProfessionalSchema);
 export const Service = Mongoose.model("Service", ServiceSchema);
+export const Client = Mongoose.model("Client", ClientSchema);
 export const Schedule = Mongoose.model("Schedule", ScheduleSchemaSchema);

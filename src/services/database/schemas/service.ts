@@ -7,8 +7,9 @@ try {
   ServiceSchema = new Mongoose.Schema(
     {
       companyId: {
-        type: String,
-        required: true,
+        type: Mongoose.Schema.Types.ObjectId,
+        ref: 'Company',
+        required: true
       },
       image: {
         type: String,

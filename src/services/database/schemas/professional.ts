@@ -7,8 +7,9 @@ try {
   ProfessionalSchema = new Mongoose.Schema(
     {
       companyId: {
-        type: String,
-        required: true,
+        type: Mongoose.Schema.Types.ObjectId,
+        ref: 'Company',
+        required: true
       },
       name: {
         type: String,
@@ -26,11 +27,6 @@ try {
         type: String,
         required: true,
       },
-      active: {
-        type: Boolean,
-        required: true,
-        default: true
-      },
       whatsapp: {
         type: String,
         required: true,
@@ -38,7 +34,15 @@ try {
       defaultSchedule: {
         type: Object,
         required: true,
-        default: Array
+      },
+      serviceIds: [{
+        type: Mongoose.Schema.Types.ObjectId,
+        ref: 'Service'
+      }],
+      active: {
+        type: Boolean,
+        required: true,
+        default: true
       },
     },
     { collection: "professionals", timestamps: true }

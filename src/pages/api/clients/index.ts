@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Service } from "../../../services/database";
+import { Client } from "../../../services/database";
 import { authenticate } from "@/utils/apiAuth";
 import { createDossie } from "@/utils/createDossie";;
 
@@ -14,7 +14,7 @@ export default async function handler(
 
       const query = JSON.parse(JSON.stringify(req.query));
 
-      const result = await Service.find({
+      const result = await Client.find({
         ...query,
       }).lean();
 
@@ -22,28 +22,22 @@ export default async function handler(
     }
 
     else if (req.method === "POST") {
-      const auth: any = authenticate(req);
-      if (!auth) return res.status(401).json({ message: "Unauthorized" });
-
       const body = JSON.parse(JSON.stringify(req.body));
 
-      const service = new Service(body);
+      const client = new Client(body);
 
-      await service.save();
+      await client.save();
 
       createDossie({
         userId: 'own',
         action: "new",
-        identfier: "service",
+        identfier: "client",
       });
 
-      return res.status(201).json(service);
+      return res.status(201).json(client);
     }
 
     else if (req.method === "PUT") {
-      const auth = authenticate(req);
-      if (!auth) return res.status(401).json({ message: "Unauthorized" });
-
       let body = JSON.parse(JSON.stringify(req.body));
 
       body._v++;
@@ -53,17 +47,17 @@ export default async function handler(
       delete body.updatedAt
       delete body.createdAt
 
-      const { modifiedCount } = await Service.updateOne({ _id }, body).lean();
+      const { modifiedCount } = await Client.updateOne({ _id }, body).lean();
 
       await createDossie({
-        userId: auth._id,
+        userId: "own",
         action: "update",
-        identfier: "service",
+        identfier: "client",
       });
 
       if (modifiedCount > 0) {
-        const serviceRes = await Service.findOne({ _id }).lean();
-        return res.status(200).json(serviceRes);
+        const clientRes = await Client.findOne({ _id }).lean();
+        return res.status(200).json(clientRes);
       } else return res.status(500)
     }
 
@@ -74,7 +68,7 @@ export default async function handler(
 
       const query = JSON.parse(JSON.stringify(req.query));
 
-      const result = await Service.deleteOne({
+      const result = await Client.deleteOne({
         ...query,
       }).lean();
 

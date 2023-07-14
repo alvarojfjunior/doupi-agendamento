@@ -12,9 +12,10 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
+import ReactInputMask from "react-input-mask";
 
 const ScheduleForm = ({ schedules, onChange }: any) => {
-  const [currentDay, setCurrentDay] = useState("");
+  const [currentDay, setCurrentDay] = useState("segunda");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [error, setError] = useState("");
@@ -49,7 +50,7 @@ const ScheduleForm = ({ schedules, onChange }: any) => {
     }
 
     onChange([...schedules, newSchedule]);
-    setCurrentDay("");
+    setCurrentDay("segunda");
     setStartTime("");
     setEndTime("");
     setError("");
@@ -69,7 +70,6 @@ const ScheduleForm = ({ schedules, onChange }: any) => {
         <Stack direction="row" spacing={2} mb={2}>
           <Select
             w={200}
-            placeholder="Dia da semana"
             value={currentDay}
             onChange={(e) => setCurrentDay(e.target.value)}
           >
@@ -83,17 +83,22 @@ const ScheduleForm = ({ schedules, onChange }: any) => {
           </Select>
           <Input
             w={100}
-            type="time"
             placeholder="Início"
+            as={ReactInputMask}
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
+            defaultValue={"01:00"}
+            mask="99:99"
           />
+
           <Input
             w={100}
-            type="time"
-            placeholder="Fim"
+            placeholder="Início"
+            as={ReactInputMask}
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
+            defaultValue={"01:00"}
+            mask="99:99"
           />
           <Button colorScheme="blue" onClick={handleAddSchedule}>
             +
@@ -101,6 +106,11 @@ const ScheduleForm = ({ schedules, onChange }: any) => {
         </Stack>
         <FormErrorMessage>{error}</FormErrorMessage>
       </FormControl>
+
+      <br />
+      <hr />
+      <br />
+
       <VStack align="start" spacing={4}>
         {[
           "segunda",

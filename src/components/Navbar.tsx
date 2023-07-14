@@ -28,7 +28,7 @@ import { IUser } from "@/types/api/User";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 
 const Links = [
-  { route: "/private/schedules", text: "Agendas" },
+  { route: "/private/", text: "Agendas" },
   { route: "/private/clients", text: "Clientes" },
   { route: "/private/professionals", text: "Profissionais" },
   { route: "/private/services", text: "Serviços" },
@@ -120,10 +120,11 @@ export default function Navbar() {
                     {router.pathname.indexOf("signup") <= -1 && (
                       <Button
                         variant={"solid"}
+                        fontSize={{ base: 15, md: 15, lg: 15 }}
                         color={useColorModeValue("#fff", "#fff")}
                         bg={useColorModeValue("#ffc03f", "#ffc03f")}
                         _hover={{ filter: "brightness(110%)" }}
-                        w={100}
+                        w={{ base: 20, md: 100, lg: 100 }}
                         textAlign={"center"}
                         onClick={() => router.push("/signup")}
                       >
@@ -133,6 +134,7 @@ export default function Navbar() {
                     {router.pathname.indexOf("signin") <= -1 && (
                       <Button
                         mt={{ base: 2, md: 0, lg: 0 }}
+                        display={{ base: 'none', md: 'block', lg: 'block' }}
                         variant={"solid"}
                         bgColor={"#3e4d92"}
                         color={"#fff"}

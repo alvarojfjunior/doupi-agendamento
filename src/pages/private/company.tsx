@@ -23,6 +23,7 @@ import { AxiosInstance } from "axios";
 import { IUser } from "@/types/api/User";
 import { getAxiosInstance } from "@/services/api";
 import { useRouter } from "next/router";
+import { defaultCoverImage } from "@/utils/images";
 
 let user: IUser;
 let api: AxiosInstance;
@@ -34,7 +35,6 @@ export default function Panel() {
   const onSubmit = async (values: any) => {
     try {
       appContext.onOpenLoading();
-      if (!values.coverImage) delete values.coverImage;
       const { data } = await api.put(`/api/companies`, values);
       appContext.onCloseLoading();
       router.push("/private");
@@ -62,10 +62,10 @@ export default function Panel() {
 
   const formik = useFormik({
     initialValues: {
-      coverImage: "",
+      coverImage: defaultCoverImage,
       name: "",
       responsableName: "",
-      businessType: "",
+      businessType: "Beleza",
       color: "",
       phone: "",
       whatsapp: "",
@@ -155,10 +155,7 @@ export default function Panel() {
 
     if (file.type === "image/png" || file.type === "image/jpeg") {
       reader.readAsDataURL(file);
-      formik.setFieldValue(
-        "coverImage",
-        URL.createObjectURL(e.target.files[0])
-      );
+      formik.setFieldValue("coverImage", URL.createObjectURL(e.target.files[0]));
     }
   }
 

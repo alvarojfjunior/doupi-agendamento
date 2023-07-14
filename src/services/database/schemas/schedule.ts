@@ -7,22 +7,33 @@ try {
   ScheduleSchemaSchema = new Mongoose.Schema(
     {
       companyId: {
-        type: String,
-        required: true,
+        type: Mongoose.Schema.Types.ObjectId,
+        ref: 'Company',
+        required: true
       },
-      profissionalId: {
-        type: String,
-        required: true,
+      clientID: {
+        type: Mongoose.Schema.Types.ObjectId,
+        ref: 'Client',
+        required: true
       },
-      serviceId: {
-        type: String,
-        required: true,
+      professionalId: {
+        type: Mongoose.Schema.Types.ObjectId,
+        ref: 'Professional',
+        required: true
       },
-      userPhone: {
-        type: String,
+      serviceIds: [{
+        type: Mongoose.Schema.Types.ObjectId,
+        ref: 'Service'
+      }],
+      date: {
+        type: Date,
         required: true,
       },
       time: {
+        type: String,
+        required: true,
+      },
+      duration: {
         type: String,
         required: true,
       },
