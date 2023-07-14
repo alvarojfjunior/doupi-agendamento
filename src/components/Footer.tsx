@@ -48,7 +48,6 @@ export default function SmallWithLogoLeft() {
   const { isAuth, users } = useContext(AuthContext);
   return (
     <Box
-      display={router.pathname.indexOf("private/chat") > -1 ? "none" : "block"}
       w="full"
       bg={useColorModeValue("gray.50", "gray.900")}
       color={useColorModeValue("gray.700", "gray.200")}

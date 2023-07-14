@@ -22,8 +22,10 @@ import {
   Text,
   useToast,
   Image as ChakraImage,
+  Select as ChakraSelect,
   useDisclosure,
   Drawer,
+  Flex,
   DrawerOverlay,
   DrawerContent,
   HStack,
@@ -34,6 +36,9 @@ import {
   Input,
   DrawerFooter,
   Button,
+  Tag,
+  TagLabel,
+  TagCloseButton,
 } from "@chakra-ui/react";
 import makeAnimated from "react-select/animated";
 import Select from "react-select";
@@ -81,7 +86,7 @@ export default function Panel() {
       let res: any;
 
       values.companyId = user.companyId;
-      values.professionalId = values.professional.value;
+      values.professionalId = values.professional;
       values.serviceIds = values.services.map((s: any) => s.value);
 
       delete values.professional;
@@ -90,8 +95,9 @@ export default function Panel() {
       if (isEditing) res = await api.put(`/api/schedules`, values);
       else res = await api.post(`/api/schedules`, values);
 
-      updateData(res.data);
-      appContext.onCloseLoading();
+      setIsEditing(false);
+      formOnClose();
+      await getSchedules();
       toast({
         title: "Sucesso!",
         description: "Os dados foram salvos!",
@@ -100,8 +106,6 @@ export default function Panel() {
         duration: 9000,
         isClosable: true,
       });
-      setIsEditing(false);
-      formOnClose();
     } catch (error: any) {
       toast({
         title: "Houve um erro",
@@ -118,33 +122,19 @@ export default function Panel() {
   const schema = Yup.object().shape({
     name: Yup.string().min(2).max(50).required(),
     phone: Yup.string().min(2).required(),
-    professional: Yup.object().required(),
+    professional: Yup.string().required(),
     services: Yup.array().min(1).required(),
     date: Yup.string().required(),
     time: Yup.string().min(5).required(),
     duration: Yup.string().min(5).required(),
   });
 
-  // schema
-  //   .validate(data)
-  //   .then(() => {
-  //     console.log("Validação bem-sucedida");
-  //   })
-  //   .catch((error) => {
-  //     console.log(formik.values)
-  //     if (error.name === "ValidationError") {
-  //       console.log("Erros de validação:", error.errors);
-  //     } else {
-  //       console.log("Erro desconhecido:", error);
-  //     }
-  //   });
-
   const formik = useFormik({
     initialValues: {
       name: "",
       phone: "",
       duration: "",
-      professional: {},
+      professional: "",
       services: [],
       date: new Date(),
       time: "",
@@ -153,39 +143,44 @@ export default function Panel() {
     onSubmit: onSubmit,
   });
 
-  const getData = async () => {
+  const getSchedules = async () => {
     try {
       const { data } = await api.get(
         `/api/schedules?companyId=${user.companyId}`
       );
-
       console.log(data);
-
       setData(data);
+      appContext.onCloseLoading();
+    } catch (error) {
+      console.log(error);
+      appContext.onCloseLoading();
+    }
+  };
+
+  const getData = async () => {
+    try {
+      appContext.onOpenLoading();
+      await getSchedules();
 
       const { data: professionals } = await api.get(
         `/api/professionals?companyId=${user.companyId}`
       );
 
-      setProfessionals(
-        professionals.map((s: any) => {
-          s.value = s._id;
-          s.label = s.name;
-          return s;
-        })
-      );
+      setProfessionals(professionals);
+
+      formik.setFieldValue("professioanl", professionals[0]._id);
+      getServicesPerProfessional(professionals[0]._id);
 
       appContext.onCloseLoading();
     } catch (error) {
       console.log(error);
-
       appContext.onCloseLoading();
     }
   };
 
   const getServicesPerProfessional = async (professionalId: string) => {
     const professional = professionals.find(
-      (p: any) => p.value === professionalId
+      (p: any) => p._id === professionalId
     );
     if (professional) {
       setServices(
@@ -196,26 +191,8 @@ export default function Panel() {
           return s;
         })
       );
-
-      formik.setFieldValue("services", undefined);
+      formik.setFieldValue("services", []);
     }
-  };
-
-  const updateData = (item: any) => {
-    const indice = data.findIndex((d: any) => d._id === item._id);
-    if (indice > -1) {
-      const newArray = [...data];
-      //@ts-ignore
-      newArray[indice] = item;
-      setData(newArray);
-    } else {
-      //@ts-ignore
-      setData((prevArray: any) => [...prevArray, item]);
-    }
-  };
-
-  const getHorariosAgendados = (date: any) => {
-    return mockAgenda.filter((item) => isSameDay(date, selectedDate));
   };
 
   return (
@@ -233,7 +210,19 @@ export default function Panel() {
                 roundedTop={10}
               >
                 <Box as="span" flex="1" textAlign="left" fontWeight="bold">
-                  {item && item.professional && item.professional.name}
+                  <Flex alignItems={"center"} gap={3}>
+                    <ChakraImage
+                      src={item.professional.photo}
+                      alt="Foto"
+                      rounded={"full"}
+                      style={{
+                        objectFit: "cover",
+                        width: "50px",
+                        height: "50px",
+                      }}
+                    />
+                    {item && item.professional && item.professional.name}
+                  </Flex>
                 </Box>
                 <AccordionIcon />
               </AccordionButton>
@@ -243,7 +232,16 @@ export default function Panel() {
                 roundedBottom={10}
               >
                 <Box>
-                  <Grid templateColumns="repeat(10, 1fr)" gap={4} mt={4}>
+                  <Grid
+                    templateColumns={[
+                      "repeat(2, 1fr)",
+                      "repeat(4, 1fr)",
+                      "repeat(6, 1fr)",
+                      "repeat(10, 1fr)",
+                    ]}
+                    gap={[2, 2, 2, 2]}
+                    mt={1}
+                  >
                     {item &&
                       item.schedules &&
                       item.schedules.map((schedule: any) => (
@@ -251,6 +249,7 @@ export default function Panel() {
                           cursor={"pointer"}
                           key={schedule._id}
                           colSpan={1}
+                          h={"100px"}
                           _hover={{
                             bgColor: "#3E4D92",
                             color: "white",
@@ -261,11 +260,29 @@ export default function Panel() {
                           borderRadius="md"
                         >
                           <Text fontWeight="bold">{schedule.time}</Text>
-                          <Text>
+                          <Text noOfLines={1}>
                             {schedule &&
                               schedule.client &&
                               schedule.client.name}
                           </Text>
+                          <Flex
+                            bgColor={'red'}
+                          >
+                            {schedule.services.map((s: any, i: number) => (
+                              <Tag
+                                alignItems={'end'}
+                                key={i}
+                                size="sm"
+                                noOfLines={1}
+                                borderRadius="full"
+                                textAlign="center"
+                              >
+                                <TagLabel textAlign="center">
+                                  {s.name}
+                                </TagLabel>
+                              </Tag>
+                            ))}
+                          </Flex>
                         </GridItem>
                       ))}
                   </Grid>
@@ -346,48 +363,22 @@ export default function Panel() {
                 }
               >
                 <FormLabel> Profissional </FormLabel>
-                <Select
+                <ChakraSelect
                   name="professional"
-                  onBlur={() =>
-                    getServicesPerProfessional(
-                      //@ts-ignore
-                      formik.values.professional.value
-                    )
-                  }
                   value={formik.values.professional}
-                  onChange={(e: any) => formik.setFieldValue("professional", e)}
-                  closeMenuOnSelect={false}
-                  components={animatedComponents}
-                  isMulti={false}
-                  options={professionals}
-                  styles={{
-                    control: (baseStyles, state) => ({
-                      ...baseStyles,
-                      backgroundColor: "transparent",
-                    }),
-                    menuList: (baseStyles, state) =>
-                      colorMode === "dark"
-                        ? {
-                            ...baseStyles,
-                            backgroundColor: "#2D3748",
-                          }
-                        : {
-                            ...baseStyles,
-                            backgroundColor: "white",
-                          },
-                    multiValue: (baseStyles, state) =>
-                      colorMode === "dark"
-                        ? {
-                            ...baseStyles,
-                            backgroundColor: "#a09dff",
-                            color: "red",
-                          }
-                        : {
-                            ...baseStyles,
-                            backgroundColor: "ButtonShadow",
-                          },
+                  onChange={(e: any) => {
+                    getServicesPerProfessional(e.target.value);
+                    formik.setFieldValue("professional", e.target.value);
                   }}
-                />
+                  //@ts-ignore
+                  closeMenuOnSelect={false}
+                >
+                  {professionals.map((p: any) => (
+                    <option key={p._id} value={p._id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </ChakraSelect>
               </FormControl>
 
               <FormControl
@@ -403,15 +394,15 @@ export default function Panel() {
                   value={formik.values.services}
                   onChange={(e: any) => {
                     formik.setFieldValue("services", e);
-                    console.log(e);
                   }}
                   onBlur={() => {
-                    formik.setFieldValue(
-                      "duration",
-                      sumHours(
-                        formik.values.services.map((s: any) => s.duration)
-                      )
-                    );
+                    if (formik.values.services.length > 0)
+                      formik.setFieldValue(
+                        "duration",
+                        sumHours(
+                          formik.values.services.map((s: any) => s.duration)
+                        )
+                      );
                   }}
                   closeMenuOnSelect={false}
                   components={animatedComponents}

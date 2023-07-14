@@ -125,6 +125,7 @@ export default function Clients() {
 
   const getData = async () => {
     try {
+      appContext.onOpenLoading();
       const { data } = await api.get(
         `/api/clients?companyId=${user.companyId}`
       );

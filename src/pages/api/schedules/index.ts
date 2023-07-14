@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Client, Schedule } from "../../../services/database";
 import { authenticate } from "@/utils/apiAuth";
-import { createDossie } from "@/utils/createDossie";;
+import { createDossie } from "@/utils/createDossie";
+import mongoose from "mongoose";
 
 export default async function handler(
   req: NextApiRequest,
@@ -15,6 +16,22 @@ export default async function handler(
       const query = JSON.parse(JSON.stringify(req.query));
 
       let schedules = await Schedule.aggregate([
+        { $match: { companyId: new mongoose.Types.ObjectId(query.companyId) } },
+        {
+          $lookup: {
+            from: 'services', // Nome da coleção de serviços
+            let: { serviceIds: '$serviceIds' }, // Array de IDs de serviço da entidade principal
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $in: ['$_id', '$$serviceIds'] } // Filtra os documentos onde o _id está presente no array de IDs
+                }
+              },
+              // Outras etapas do pipeline, se necessário
+            ],
+            as: 'services' // Nome do array no qual os documentos vinculados serão armazenados
+          }
+        },
         {
           $lookup: {
             from: 'professionals',
@@ -46,7 +63,7 @@ export default async function handler(
       ])
 
       schedules = schedules.map((s: any) => {
-        let newArr:any = {}
+        let newArr: any = {}
         newArr.professional = s.schedules[0].professional
         newArr.schedules = s.schedules
         return newArr

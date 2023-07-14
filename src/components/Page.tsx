@@ -13,7 +13,7 @@ interface IProps {
 export default function Page({ title, description, path, children }: IProps) {
     const url = process.env.NEXT_PUBLIC_API_URL + path
     return <>
-        <NextSeo 
+        <NextSeo
             title={title} 
             description={description} 
             canonical={url}

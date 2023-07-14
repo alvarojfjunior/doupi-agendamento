@@ -189,6 +189,7 @@ export default function Professionals() {
 
   const getData = async () => {
     try {
+      appContext.onOpenLoading();
       const { data } = await api.get(
         `/api/professionals?companyId=${user.companyId}`
       );

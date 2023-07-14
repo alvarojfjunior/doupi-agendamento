@@ -134,6 +134,7 @@ export default function Services() {
 
   const getData = async () => {
     try {
+      appContext.onOpenLoading();
       const { data } = await api.get(
         `/api/services?companyId=${user.companyId}`
       );
