@@ -1,7 +1,7 @@
-import { Dossie } from "@/services/database";
+import { Dossie } from '@/services/database';
 
 interface INewDossie {
-  userId: string; 
+  userId: string;
   action: string;
   identfier: string;
 }
@@ -9,8 +9,8 @@ interface INewDossie {
 export async function createDossie(param: INewDossie) {
   try {
     const dossie = new Dossie(param);
-    await dossie.save(); 
+    await dossie.save();
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 }

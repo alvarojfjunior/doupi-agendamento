@@ -1,15 +1,15 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import { Company, User } from "../../../services/database";
-import bcrypt from "bcrypt";
-import { createDossie } from "@/utils/createDossie";
-import { defaultCoverImage, defaultLogoImage } from "@/utils/images";
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { Company, User } from '../../../services/database';
+import bcrypt from 'bcrypt';
+import { createDossie } from '@/utils/createDossie';
+import { defaultCoverImage, defaultLogoImage } from '@/utils/images';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   try {
-    if (req.method === "POST") {
+    if (req.method === 'POST') {
       const body = JSON.parse(JSON.stringify(req.body));
 
       const newCompany = {
@@ -23,7 +23,7 @@ export default async function handler(
         phone: body.phone,
         whatsapp: body.phone,
         document: '0',
-      }
+      };
 
       const company = await new Company(newCompany).save();
 
@@ -33,7 +33,7 @@ export default async function handler(
         phone: body.phone,
         email: body.email,
         password: body.password,
-      }
+      };
 
       const user = new User(newUser);
 
@@ -49,24 +49,24 @@ export default async function handler(
         //@ts-ignore
         userId: user._id,
         action: 'signup',
-        identfier: 'company'
+        identfier: 'company',
       });
 
       await createDossie({
         //@ts-ignore
         userId: user._id,
         action: 'signup',
-        identfier: 'user'
+        identfier: 'user',
       });
 
-      user._id
+      user._id;
 
       return res.status(201).json(user);
     }
 
     return res
       .status(404)
-      .json({ data: undefined, message: "Rota inexistente" });
+      .json({ data: undefined, message: 'Rota inexistente' });
   } catch (error: any) {
     const body = JSON.parse(JSON.stringify(req.body));
     await Company.deleteOne({ email: body.email });

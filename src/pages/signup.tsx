@@ -16,26 +16,26 @@ import {
   FormErrorMessage,
   useToast,
   Select,
-} from "@chakra-ui/react";
-import { useState, useContext } from "react";
-import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
-import NextLink from "next/link";
-import * as Yup from "yup";
-import { Formik, Form, Field } from "formik";
-import { useRouter } from "next/router";
-import { getAxiosInstance } from "@/services/api";
-import { AppContext } from "@/contexts/app";
-import Page from "@/components/Page";
-import { PhoneInput } from "@/components/Fields";
+} from '@chakra-ui/react';
+import { useState, useContext } from 'react';
+import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
+import NextLink from 'next/link';
+import * as Yup from 'yup';
+import { Formik, Form, Field } from 'formik';
+import { useRouter } from 'next/router';
+import { getAxiosInstance } from '@/services/api';
+import { AppContext } from '@/contexts/app';
+import Page from '@/components/Page';
+import { PhoneInput } from '@/components/Fields';
 
 interface IForm {
-  companyName: String;
-  userName: String;
-  type: String;
-  phone: String;
-  email: String;
-  password: String;
-  confirmPassword: String;
+  companyName: string;
+  userName: string;
+  type: string;
+  phone: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
 }
 
 interface IUserAuth {
@@ -58,15 +58,15 @@ export default function SignupCard() {
     companyName: Yup.string().min(2).max(50).required(),
     userName: Yup.string().min(2).max(50).required(),
     phone: Yup.string().min(16).max(16).required(),
-    email: Yup.string().email("Invalid email").required(),
+    email: Yup.string().email('Invalid email').required(),
     password: Yup.string()
-      .min(8, "A senha deve ter 8 caracteres!")
-      .matches(/[0-9]/, "A senha deve ter número!")
-      .required("Campo obrigatório"),
+      .min(8, 'A senha deve ter 8 caracteres!')
+      .matches(/[0-9]/, 'A senha deve ter número!')
+      .required('Campo obrigatório'),
     confirmPassword: Yup.string()
       //@ts-ignore
-      .oneOf([Yup.ref("password"), null], "As senhas não coincidem")
-      .required("Campo obrigatório"),
+      .oneOf([Yup.ref('password'), null], 'As senhas não coincidem')
+      .required('Campo obrigatório'),
   });
 
   const onSubmit = async (values: IForm) => {
@@ -81,13 +81,13 @@ export default function SignupCard() {
         password: values.password,
         confirmPassword: values.confirmPassword,
       };
-      await api.post("api/auth/signup", signupData);
+      await api.post('api/auth/signup', signupData);
 
       toast({
-        title: "Conta criada com sucesso!",
-        description: "Agora é hora de personalizar o seu negócio!",
-        status: "success",
-        position: "top-right",
+        title: 'Conta criada com sucesso!',
+        description: 'Agora é hora de personalizar o seu negócio!',
+        status: 'success',
+        position: 'top-right',
         duration: 9000,
         isClosable: true,
       });
@@ -97,20 +97,20 @@ export default function SignupCard() {
         password: signupData.password,
       };
 
-      const { data } = await api.post("/api/auth/signin", credentials);
+      const { data } = await api.post('/api/auth/signin', credentials);
 
       const userAuth: IUserAuth = data;
 
-      localStorage.setItem("user", JSON.stringify(userAuth));
+      localStorage.setItem('user', JSON.stringify(userAuth));
 
-      router.push("private/company");
+      router.push('private/company');
     } catch (error: any) {
       const errorMessage = error.response.data.message;
       toast({
-        title: "Houve um erro",
+        title: 'Houve um erro',
         description: errorMessage,
-        status: "error",
-        position: "top-right",
+        status: 'error',
+        position: 'top-right',
         duration: 9000,
         isClosable: true,
       });
@@ -120,63 +120,63 @@ export default function SignupCard() {
 
   return (
     <Page
-      path="/signup"
-      title="Doupi - Criar conta"
-      description="App para para gestão de agenda!"
+      path='/signup'
+      title='Doupi - Criar conta'
+      description='App para para gestão de agenda!'
     >
       <Flex
-        align={"center"}
-        justify={"center"}
-        bg={useColorModeValue("gray.50", "gray.800")}
+        align={'center'}
+        justify={'center'}
+        bg={useColorModeValue('gray.50', 'gray.800')}
       >
         <Formik
           initialValues={{
-            companyName: "",
-            userName: "",
-            type: "Beleza",
-            phone: "",
-            email: "",
-            password: "",
-            confirmPassword: "",
+            companyName: '',
+            userName: '',
+            type: 'Beleza',
+            phone: '',
+            email: '',
+            password: '',
+            confirmPassword: '',
           }}
           validationSchema={SignupSchema}
           onSubmit={onSubmit}
         >
           {({ handleSubmit, errors, touched }) => (
             <Form onSubmit={handleSubmit}>
-              <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
-                <Stack align={"center"}>
-                  <Heading fontSize={"4xl"} textAlign={"center"}>
+              <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
+                <Stack align={'center'}>
+                  <Heading fontSize={'4xl'} textAlign={'center'}>
                     Nova conta
                   </Heading>
-                  <Text fontSize={"lg"} color={"#3e4d92"}>
+                  <Text fontSize={'lg'} color={'#3e4d92'}>
                     Crie sua conta, é simples e rápido ✌️
                   </Text>
                 </Stack>
                 <Box
-                  rounded={"lg"}
-                  bg={useColorModeValue("white", "gray.700")}
-                  boxShadow={"lg"}
+                  rounded={'lg'}
+                  bg={useColorModeValue('white', 'gray.700')}
+                  boxShadow={'lg'}
                   p={7}
                 >
                   <Stack spacing={4} mb={5}>
                     <HStack>
                       <FormControl
-                        id="companyName"
+                        id='companyName'
                         isRequired
                         isInvalid={!!errors.companyName && touched.companyName}
                       >
                         <FormLabel>Nome da Empresa</FormLabel>
-                        <Field as={Input} type="text" name="companyName" />
+                        <Field as={Input} type='text' name='companyName' />
                       </FormControl>
 
                       <FormControl
-                        id="userName"
+                        id='userName'
                         isRequired
                         isInvalid={!!errors.userName && touched.userName}
                       >
                         <FormLabel>Seu Nome</FormLabel>
-                        <Field as={Input} type="text" name="userName" />
+                        <Field as={Input} type='text' name='userName' />
                       </FormControl>
                     </HStack>
                   </Stack>
@@ -185,45 +185,45 @@ export default function SignupCard() {
                     <HStack>
                       <Box>
                         <FormControl
-                          id="type"
+                          id='type'
                           isRequired
                           isInvalid={!!errors.type && touched.type}
                         >
                           <FormLabel>Ramo da sua empresa</FormLabel>
-                          <Field as={Select} type="text" name="type">
-                            <option value="Beleza">Beleza</option>
-                            <option value="Clínica">Clínica</option>
+                          <Field as={Select} type='text' name='type'>
+                            <option value='Beleza'>Beleza</option>
+                            <option value='Clínica'>Clínica</option>
                           </Field>
                         </FormControl>
                       </Box>
 
                       <Box>
                         <FormControl
-                          id="phone"
+                          id='phone'
                           isRequired
                           isInvalid={!!errors.phone && touched.phone}
                         >
                           <FormLabel>Telefone de contato </FormLabel>
-                          <Field as={PhoneInput} type="text" name="phone" />
+                          <Field as={PhoneInput} type='text' name='phone' />
                         </FormControl>
                       </Box>
                     </HStack>
 
                     <FormControl
                       mb={5}
-                      id="email"
+                      id='email'
                       isRequired
                       isInvalid={!!errors.email && touched.email}
                     >
                       <FormLabel>Email para contato e login</FormLabel>
-                      <Field as={Input} type="email" name="email" />
+                      <Field as={Input} type='email' name='email' />
                     </FormControl>
 
                     <Stack spacing={4} mb={5}>
                       <HStack>
                         <Box>
                           <FormControl
-                            id="password"
+                            id='password'
                             isRequired
                             isInvalid={!!errors.password && touched.password}
                           >
@@ -231,12 +231,12 @@ export default function SignupCard() {
                             <InputGroup>
                               <Field
                                 as={Input}
-                                type={showPassword ? "text" : "password"}
-                                name="password"
+                                type={showPassword ? 'text' : 'password'}
+                                name='password'
                               />
-                              <InputRightElement h={"full"}>
+                              <InputRightElement h={'full'}>
                                 <Button
-                                  variant={"ghost"}
+                                  variant={'ghost'}
                                   onClick={() =>
                                     setShowPassword(
                                       (showPassword) => !showPassword
@@ -250,7 +250,7 @@ export default function SignupCard() {
                                   )}
                                 </Button>
                               </InputRightElement>
-                              <FormErrorMessage position={"absolute"} top={8}>
+                              <FormErrorMessage position={'absolute'} top={8}>
                                 {errors.password}
                               </FormErrorMessage>
                             </InputGroup>
@@ -259,7 +259,7 @@ export default function SignupCard() {
 
                         <Box>
                           <FormControl
-                            id="confirmPassword"
+                            id='confirmPassword'
                             isRequired
                             isInvalid={
                               !!errors.confirmPassword &&
@@ -270,10 +270,10 @@ export default function SignupCard() {
                             <InputGroup>
                               <Field
                                 as={Input}
-                                type={showPassword ? "text" : "password"}
-                                name="confirmPassword"
+                                type={showPassword ? 'text' : 'password'}
+                                name='confirmPassword'
                               />
-                              <FormErrorMessage position={"absolute"} top={8}>
+                              <FormErrorMessage position={'absolute'} top={8}>
                                 {errors.confirmPassword}
                               </FormErrorMessage>
                             </InputGroup>
@@ -284,20 +284,20 @@ export default function SignupCard() {
 
                     <Stack spacing={10} pt={2}>
                       <Button
-                        type="submit"
-                        loadingText="Submitting"
-                        size="lg"
-                        color={useColorModeValue("#fff", "#fff")}
-                        bg={useColorModeValue("#ffc03f", "#ffc03f")}
-                        _hover={{ filter: "brightness(110%)" }}
+                        type='submit'
+                        loadingText='Submitting'
+                        size='lg'
+                        color={useColorModeValue('#fff', '#fff')}
+                        bg={useColorModeValue('#ffc03f', '#ffc03f')}
+                        _hover={{ filter: 'brightness(110%)' }}
                       >
                         Cadastrar
                       </Button>
                     </Stack>
                     <Stack pt={6}>
-                      <Text align={"center"}>
-                        Já é cadastrado?{" "}
-                        <Link as={NextLink} href="./signin" color={"#ffc03f"}>
+                      <Text align={'center'}>
+                        Já é cadastrado?{' '}
+                        <Link as={NextLink} href='./signin' color={'#ffc03f'}>
                           Entrar
                         </Link>
                       </Text>

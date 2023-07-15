@@ -1,13 +1,12 @@
-import { useContext, useEffect } from "react";
-import { AppContext } from "@/contexts/app";
-import { useRouter } from "next/router";
-import { AuthContext } from "@/contexts/auth";
-import InputMask from "react-input-mask";
-import Page from "@/components/Page";
-import { IUser } from "@/types/api/User";
-import { AxiosInstance } from "axios";
-import { getAxiosInstance } from "@/services/api";
-import { useState } from "react";
+import { useContext, useEffect } from 'react';
+import { AppContext } from '@/contexts/app';
+import { useRouter } from 'next/router';
+import InputMask from 'react-input-mask';
+import Page from '@/components/Page';
+import { IUser } from '@/types/api/User';
+import { AxiosInstance } from 'axios';
+import { getAxiosInstance } from '@/services/api';
+import { useState } from 'react';
 import {
   Accordion,
   AccordionItem,
@@ -39,20 +38,20 @@ import {
   Tag,
   TagLabel,
   TagCloseButton,
-} from "@chakra-ui/react";
-import makeAnimated from "react-select/animated";
-import Select from "react-select";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import { AddIcon } from "@chakra-ui/icons";
-import { isSameDay } from "date-fns";
-import { sumHours } from "@/utils/time";
-
-const mockAgenda = [
-  { horario: "09:00", cliente: "João" },
-  { horario: "10:00", cliente: "Maria" },
-  { horario: "13:00", cliente: "Pedro" },
-];
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from '@chakra-ui/react';
+import makeAnimated from 'react-select/animated';
+import Select from 'react-select';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { AddIcon } from '@chakra-ui/icons';
+import { sumHours } from '@/utils/time';
+import AvailableTimesList from '@/components/AvailableTimesList';
 
 let user: IUser;
 let api: AxiosInstance;
@@ -67,6 +66,8 @@ export default function Panel() {
   const [data, setData] = useState([]);
   const [services, setServices] = useState([]);
   const [professionals, setProfessionals] = useState([]);
+  const [selected, setSelected] = useState({});
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const {
     isOpen: formIsOpen,
@@ -75,7 +76,7 @@ export default function Panel() {
   } = useDisclosure();
 
   useEffect(() => {
-    user = JSON.parse(String(localStorage.getItem("user")));
+    user = JSON.parse(String(localStorage.getItem('user')));
     api = getAxiosInstance(user);
     getData();
   }, []);
@@ -99,19 +100,19 @@ export default function Panel() {
       formOnClose();
       await getSchedules();
       toast({
-        title: "Sucesso!",
-        description: "Os dados foram salvos!",
-        status: "success",
-        position: "top-right",
+        title: 'Sucesso!',
+        description: 'Os dados foram salvos!',
+        status: 'success',
+        position: 'top-right',
         duration: 9000,
         isClosable: true,
       });
     } catch (error: any) {
       toast({
-        title: "Houve um erro",
+        title: 'Houve um erro',
         description: error.Message,
-        status: "error",
-        position: "top-right",
+        status: 'error',
+        position: 'top-right',
         duration: 9000,
         isClosable: true,
       });
@@ -131,13 +132,13 @@ export default function Panel() {
 
   const formik = useFormik({
     initialValues: {
-      name: "",
-      phone: "",
-      duration: "",
-      professional: "",
+      name: '',
+      phone: '',
+      duration: '',
+      professional: '',
       services: [],
       date: new Date(),
-      time: "",
+      time: '',
     },
     validationSchema: schema,
     onSubmit: onSubmit,
@@ -168,7 +169,7 @@ export default function Panel() {
 
       setProfessionals(professionals);
 
-      formik.setFieldValue("professioanl", professionals[0]._id);
+      formik.setFieldValue('professioanl', professionals[0]._id);
       getServicesPerProfessional(professionals[0]._id);
 
       appContext.onCloseLoading();
@@ -191,34 +192,34 @@ export default function Panel() {
           return s;
         })
       );
-      formik.setFieldValue("services", []);
+      formik.setFieldValue('services', []);
     }
   };
 
   return (
     <Page
-      path="/private"
-      title="Doupi - Painel Geral"
-      description="App para genciamento de agendamentos"
+      path='/private'
+      title='Doupi - Painel Geral'
+      description='App para genciamento de agendamentos'
     >
-      <Box h={"full"} m={5}>
+      <Box h={'full'} m={5}>
         <Accordion>
           {data.map((item: any) => (
             <AccordionItem roundedTop={10} key={item._id}>
               <AccordionButton
-                _expanded={{ bg: "#3E4D92", color: "white" }}
+                _expanded={{ bg: '#3E4D92', color: 'white' }}
                 roundedTop={10}
               >
-                <Box as="span" flex="1" textAlign="left" fontWeight="bold">
-                  <Flex alignItems={"center"} gap={3}>
+                <Box as='span' flex='1' textAlign='left' fontWeight='bold'>
+                  <Flex alignItems={'center'} gap={3}>
                     <ChakraImage
                       src={item.professional.photo}
-                      alt="Foto"
-                      rounded={"full"}
+                      alt='Foto'
+                      rounded={'full'}
                       style={{
-                        objectFit: "cover",
-                        width: "50px",
-                        height: "50px",
+                        objectFit: 'cover',
+                        width: '50px',
+                        height: '50px',
                       }}
                     />
                     {item && item.professional && item.professional.name}
@@ -228,16 +229,16 @@ export default function Panel() {
               </AccordionButton>
               <AccordionPanel
                 pb={4}
-                backgroundColor="#3e4e9209"
+                backgroundColor='#3e4e9209'
                 roundedBottom={10}
               >
                 <Box>
                   <Grid
                     templateColumns={[
-                      "repeat(2, 1fr)",
-                      "repeat(4, 1fr)",
-                      "repeat(6, 1fr)",
-                      "repeat(10, 1fr)",
+                      'repeat(2, 1fr)',
+                      'repeat(4, 1fr)',
+                      'repeat(6, 1fr)',
+                      'repeat(10, 1fr)',
                     ]}
                     gap={[2, 2, 2, 2]}
                     mt={1}
@@ -246,43 +247,41 @@ export default function Panel() {
                       item.schedules &&
                       item.schedules.map((schedule: any) => (
                         <GridItem
-                          cursor={"pointer"}
-                          key={schedule._id}
-                          colSpan={1}
-                          h={"100px"}
-                          _hover={{
-                            bgColor: "#3E4D92",
-                            color: "white",
+                          onClick={() => {
+                            setSelected(schedule);
+                            onOpen();
                           }}
-                          border={"1px solid #ccc"}
+                          cursor={'pointer'}
+                          key={schedule._id}
+                          border={`1px solid ${
+                            colorMode === 'dark' ? '#cccccc3f' : '#cccccc'
+                          }`}
+                          _hover={{
+                            bgColor: '#3E4D92',
+                            color: 'white',
+                          }}
                           p={2}
-                          textAlign={"center"}
-                          borderRadius="md"
+                          textAlign={'center'}
+                          borderRadius='md'
                         >
-                          <Text fontWeight="bold">{schedule.time}</Text>
-                          <Text noOfLines={1}>
+                          <Text fontWeight='bold'>{schedule.time}</Text>
+                          <Text noOfLines={1} mb={1}>
                             {schedule &&
                               schedule.client &&
                               schedule.client.name}
                           </Text>
-                          <Flex
-                            bgColor={'red'}
-                          >
+                          <HStack justifyContent='center'>
                             {schedule.services.map((s: any, i: number) => (
                               <Tag
-                                alignItems={'end'}
+                                size={'sm'}
                                 key={i}
-                                size="sm"
-                                noOfLines={1}
-                                borderRadius="full"
-                                textAlign="center"
+                                variant='subtle'
+                                colorScheme='blue'
                               >
-                                <TagLabel textAlign="center">
-                                  {s.name}
-                                </TagLabel>
+                                <TagLabel>{s.name}</TagLabel>
                               </Tag>
                             ))}
-                          </Flex>
+                          </HStack>
                         </GridItem>
                       ))}
                   </Grid>
@@ -293,13 +292,13 @@ export default function Panel() {
         </Accordion>
       </Box>
 
-      <Box position="fixed" bottom={{ base: "120px", md: "80px" }} right={4}>
+      <Box position='fixed' bottom={{ base: '120px', md: '80px' }} right={4}>
         <IconButton
-          colorScheme="blue"
+          colorScheme='blue'
           icon={<AddIcon />}
           isRound
-          size="lg"
-          aria-label="Adicionar"
+          size='lg'
+          aria-label='Adicionar'
           onClick={() => {
             formik.resetForm();
             setIsEditing(false);
@@ -311,51 +310,51 @@ export default function Panel() {
 
       <Drawer
         isOpen={formIsOpen}
-        placement="right"
-        size={"xl"}
+        placement='right'
+        size={'xl'}
         onClose={() => 1}
       >
         <DrawerOverlay />
         <DrawerContent>
-          <DrawerHeader borderBottomWidth="1px">Agendamento</DrawerHeader>
+          <DrawerHeader borderBottomWidth='1px'>Agendamento</DrawerHeader>
 
           <DrawerBody>
-            <HStack>
+            <HStack alignItems={'top'}>
               <FormControl
                 mb={3}
-                id="name"
+                id='name'
                 isRequired
                 isInvalid={!!formik.errors.name && formik.touched.name}
               >
                 <FormLabel>Nome do Cliente</FormLabel>
                 <Input
-                  type="text"
-                  name="name"
+                  type='text'
+                  name='name'
                   value={formik.values.name}
                   onChange={formik.handleChange}
                 />
               </FormControl>
 
               <FormControl
-                id="phone"
+                id='phone'
                 isRequired
                 isInvalid={!!formik.errors.phone && formik.touched.phone}
               >
                 <FormLabel>Telefone </FormLabel>
                 <Input
-                  name="phone"
+                  name='phone'
                   as={InputMask}
                   value={formik.values.phone}
                   onChange={formik.handleChange}
-                  mask="(99) 9 9999-9999"
+                  mask='(99) 9 9999-9999'
                 />
               </FormControl>
             </HStack>
 
-            <HStack>
+            <HStack alignItems={'top'}>
               <FormControl
                 mb={3}
-                id="professional"
+                id='professional'
                 isRequired
                 //@ts-ignore
                 isInvalid={
@@ -364,11 +363,11 @@ export default function Panel() {
               >
                 <FormLabel> Profissional </FormLabel>
                 <ChakraSelect
-                  name="professional"
+                  name='professional'
                   value={formik.values.professional}
                   onChange={(e: any) => {
                     getServicesPerProfessional(e.target.value);
-                    formik.setFieldValue("professional", e.target.value);
+                    formik.setFieldValue('professional', e.target.value);
                   }}
                   //@ts-ignore
                   closeMenuOnSelect={false}
@@ -383,22 +382,29 @@ export default function Panel() {
 
               <FormControl
                 mb={3}
-                id="services"
+                id='services'
                 isRequired
                 //@ts-ignore
                 isInvalid={!!formik.errors.services && formik.touched.services}
               >
-                <FormLabel> Serviços </FormLabel>
+                <HStack alignContent={'center'}>
+                  <FormLabel> Serviços </FormLabel>
+                  <Text color={'blue.500'}>
+                    {' '}
+                    {formik.values.duration &&
+                      'Duração: ' + formik.values.duration}{' '}
+                  </Text>
+                </HStack>
                 <Select
-                  name="services"
+                  name='services'
                   value={formik.values.services}
                   onChange={(e: any) => {
-                    formik.setFieldValue("services", e);
+                    formik.setFieldValue('services', e);
                   }}
                   onBlur={() => {
                     if (formik.values.services.length > 0)
                       formik.setFieldValue(
-                        "duration",
+                        'duration',
                         sumHours(
                           formik.values.services.map((s: any) => s.duration)
                         )
@@ -411,47 +417,46 @@ export default function Panel() {
                   styles={{
                     control: (baseStyles, state) => ({
                       ...baseStyles,
-                      backgroundColor: "transparent",
+                      backgroundColor: 'transparent',
                     }),
                     menuList: (baseStyles, state) =>
-                      colorMode === "dark"
+                      colorMode === 'dark'
                         ? {
                             ...baseStyles,
-                            backgroundColor: "#2D3748",
+                            backgroundColor: '#2D3748',
                           }
                         : {
                             ...baseStyles,
-                            backgroundColor: "white",
+                            backgroundColor: 'white',
                           },
                     multiValue: (baseStyles, state) =>
-                      colorMode === "dark"
+                      colorMode === 'dark'
                         ? {
                             ...baseStyles,
-                            backgroundColor: "#a09dff",
-                            color: "red",
+                            backgroundColor: '#a09dff',
+                            color: 'red',
                           }
                         : {
                             ...baseStyles,
-                            backgroundColor: "ButtonShadow",
+                            backgroundColor: 'ButtonShadow',
                           },
                   }}
                 />
-                {formik.values.duration}
               </FormControl>
             </HStack>
 
-            <HStack>
+            <HStack alignItems={'top'}>
               <FormControl
                 mb={3}
-                id="date"
+                id='date'
                 isRequired
                 //@ts-ignore
                 isInvalid={!!formik.errors.date && formik.touched.date}
               >
                 <FormLabel>Data</FormLabel>
                 <Input
-                  type="date"
-                  name="date"
+                  type='date'
+                  name='date'
                   //@ts-ignore
                   value={formik.values.date}
                   onChange={formik.handleChange}
@@ -459,25 +464,42 @@ export default function Panel() {
               </FormControl>
 
               <FormControl
-                id="time"
+                id='time'
                 isRequired
                 isInvalid={!!formik.errors.time && formik.touched.time}
               >
                 <FormLabel>Horário</FormLabel>
-                <Input
-                  name="time"
-                  as={InputMask}
+                <AvailableTimesList
+                  handleSelectTime={(time: string) =>
+                    formik.setFieldValue('time', time)
+                  }
                   value={formik.values.time}
-                  onChange={formik.handleChange}
-                  mask="99:99"
+                  date={formik.values.date}
+                  durationToTest={formik.values.duration}
+                  invalidAppointments={[
+                    {
+                      start: '08:00',
+                      end: '09:00',
+                    },
+                  ]}
+                  workPeriods={[
+                    {
+                      start: '08:00',
+                      end: '12:00',
+                    },
+                    {
+                      start: '14:00',
+                      end: '18:00',
+                    },
+                  ]}
                 />
               </FormControl>
             </HStack>
           </DrawerBody>
 
-          <DrawerFooter borderTopWidth="1px">
+          <DrawerFooter borderTopWidth='1px'>
             <Button
-              variant="outline"
+              variant='outline'
               mr={3}
               onClick={() => {
                 setIsEditing(false);
@@ -487,7 +509,7 @@ export default function Panel() {
               Cancel
             </Button>
             <Button
-              colorScheme="blue"
+              colorScheme='blue'
               //@ts-ignore
               onClick={formik.handleSubmit}
             >
@@ -496,6 +518,22 @@ export default function Panel() {
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Opções do Agendamento</ModalHeader>
+          <ModalBody>
+            <Text> </Text>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme='blue' mr={3} onClick={onClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Page>
   );
 }

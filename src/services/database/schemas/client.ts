@@ -1,15 +1,15 @@
-import Mongoose from "mongoose";
+import Mongoose from 'mongoose';
 
 export let ClientSchema: Mongoose.Schema;
 try {
-  ClientSchema = Mongoose.model("Client").schema;
+  ClientSchema = Mongoose.model('Client').schema;
 } catch (error) {
   ClientSchema = new Mongoose.Schema(
     {
       companyId: {
         type: Mongoose.Schema.Types.ObjectId,
         ref: 'Company',
-        required: true
+        required: true,
       },
       name: {
         type: String,
@@ -22,9 +22,9 @@ try {
       active: {
         type: Boolean,
         required: true,
-        default: true
+        default: true,
       },
     },
-    { collection: "clients", timestamps: true }
+    { collection: 'clients', timestamps: true }
   );
 }

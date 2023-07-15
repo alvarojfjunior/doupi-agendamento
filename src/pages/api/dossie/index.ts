@@ -1,15 +1,15 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import { Dossie } from "../../../services/database";
-import { authenticate } from "@/utils/apiAuth";
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { Dossie } from '../../../services/database';
+import { authenticate } from '@/utils/apiAuth';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   try {
-    if (req.method === "GET") {
+    if (req.method === 'GET') {
       if (!authenticate(req))
-        return res.status(401).json({ message: "Unauthorized" });
+        return res.status(401).json({ message: 'Unauthorized' });
 
       const query = JSON.parse(JSON.stringify(req.query));
       const orders = await Dossie.find(query);

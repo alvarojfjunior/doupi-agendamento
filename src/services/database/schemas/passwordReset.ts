@@ -1,16 +1,16 @@
 // models/token.model.js
-import Mongoose from "mongoose";
+import Mongoose from 'mongoose';
 
 export let PasswordResetSchema: Mongoose.Schema;
 try {
-  PasswordResetSchema = Mongoose.model("PasswordReset").schema;
+  PasswordResetSchema = Mongoose.model('PasswordReset').schema;
 } catch (error) {
   PasswordResetSchema = new Mongoose.Schema(
     {
       userId: {
         type: Mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
+        required: true,
       },
       token: {
         type: String,
@@ -22,6 +22,6 @@ try {
         expires: 3600, // this is the expiry time in seconds
       },
     },
-    { collection: "passwordreset", timestamps: true }
+    { collection: 'passwordreset', timestamps: true }
   );
 }

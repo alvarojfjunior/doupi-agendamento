@@ -1,9 +1,9 @@
-import type { NextApiRequest } from "next";
-import jwt from "jsonwebtoken";
-import { IUser } from "@/types/api/User";
+import type { NextApiRequest } from 'next';
+import jwt from 'jsonwebtoken';
+import { IUser } from '@/types/api/User';
 
 export const authenticate = (req: NextApiRequest): IUser | undefined => {
-  const token = req.headers["authorization"]?.replace("Bearer ", "");
+  const token = req.headers['authorization']?.replace('Bearer ', '');
 
   if (!token) {
     return undefined;
@@ -22,7 +22,7 @@ export const authenticate = (req: NextApiRequest): IUser | undefined => {
       email: decoded.email,
       token: decoded.token,
       type: decoded.type,
-    }
+    };
 
     //@ts-ignore
     return user;

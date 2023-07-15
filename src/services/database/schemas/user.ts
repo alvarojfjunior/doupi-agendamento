@@ -1,8 +1,8 @@
-import Mongoose from "mongoose";
+import Mongoose from 'mongoose';
 
 export let UserSchema: Mongoose.Schema;
 try {
-  UserSchema = Mongoose.model("User").schema;
+  UserSchema = Mongoose.model('User').schema;
 } catch (error) {
   UserSchema = new Mongoose.Schema(
     {
@@ -35,6 +35,6 @@ try {
         default: 1,
       },
     },
-    { collection: "users", timestamps: true }
+    { collection: 'users', timestamps: true }
   );
 }

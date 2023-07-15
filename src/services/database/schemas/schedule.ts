@@ -1,30 +1,32 @@
-import Mongoose from "mongoose";
+import Mongoose from 'mongoose';
 
 export let ScheduleSchemaSchema: Mongoose.Schema;
 try {
-  ScheduleSchemaSchema = Mongoose.model("Schedule").schema;
+  ScheduleSchemaSchema = Mongoose.model('Schedule').schema;
 } catch (error) {
   ScheduleSchemaSchema = new Mongoose.Schema(
     {
       companyId: {
         type: Mongoose.Schema.Types.ObjectId,
         ref: 'Company',
-        required: true
+        required: true,
       },
       clientID: {
         type: Mongoose.Schema.Types.ObjectId,
         ref: 'Client',
-        required: true
+        required: true,
       },
       professionalId: {
         type: Mongoose.Schema.Types.ObjectId,
         ref: 'Professional',
-        required: true
+        required: true,
       },
-      serviceIds: [{
-        type: Mongoose.Schema.Types.ObjectId,
-        ref: 'Service'
-      }],
+      serviceIds: [
+        {
+          type: Mongoose.Schema.Types.ObjectId,
+          ref: 'Service',
+        },
+      ],
       date: {
         type: Date,
         required: true,
@@ -38,6 +40,6 @@ try {
         required: true,
       },
     },
-    { collection: "schedules", timestamps: true }
+    { collection: 'schedules', timestamps: true }
   );
 }

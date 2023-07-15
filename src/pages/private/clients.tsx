@@ -26,20 +26,20 @@ import {
   Input,
   DrawerFooter,
   Button,
-} from "@chakra-ui/react";
-import makeAnimated from "react-select/animated";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import { useContext, useEffect, useState } from "react";
-import { AppContext } from "@/contexts/app";
-import InputMask from "react-input-mask";
-import { useRouter } from "next/router";
-import Page from "@/components/Page";
-import { IUser } from "@/types/api/User";
-import { AxiosInstance } from "axios";
-import { getAxiosInstance } from "@/services/api";
-import DeleteConfirmationModal from "../../components/DeleteConfirmationModal";
-import { AddIcon, EditIcon } from "@chakra-ui/icons";
+} from '@chakra-ui/react';
+import makeAnimated from 'react-select/animated';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { useContext, useEffect, useState } from 'react';
+import { AppContext } from '@/contexts/app';
+import InputMask from 'react-input-mask';
+import { useRouter } from 'next/router';
+import Page from '@/components/Page';
+import { IUser } from '@/types/api/User';
+import { AxiosInstance } from 'axios';
+import { getAxiosInstance } from '@/services/api';
+import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
+import { AddIcon, EditIcon } from '@chakra-ui/icons';
 
 let user: IUser;
 let api: AxiosInstance;
@@ -61,8 +61,7 @@ export default function Clients() {
       appContext.onOpenLoading();
       let res: any;
 
-      values.companyId = user.companyId
-
+      values.companyId = user.companyId;
 
       if (isEditing) res = await api.put(`/api/clients`, values);
       else res = await api.post(`/api/clients`, values);
@@ -70,10 +69,10 @@ export default function Clients() {
       updateData(res.data);
       appContext.onCloseLoading();
       toast({
-        title: "Sucesso!",
-        description: "Os dados foram salvos!",
-        status: "success",
-        position: "top-right",
+        title: 'Sucesso!',
+        description: 'Os dados foram salvos!',
+        status: 'success',
+        position: 'top-right',
         duration: 9000,
         isClosable: true,
       });
@@ -81,10 +80,10 @@ export default function Clients() {
       formOnClose();
     } catch (error: any) {
       toast({
-        title: "Houve um erro",
+        title: 'Houve um erro',
         description: error.Message,
-        status: "error",
-        position: "top-right",
+        status: 'error',
+        position: 'top-right',
         duration: 9000,
         isClosable: true,
       });
@@ -94,8 +93,8 @@ export default function Clients() {
 
   const formik = useFormik({
     initialValues: {
-      name: "",
-      phone: "",
+      name: '',
+      phone: '',
     },
     validationSchema: Yup.object().shape({
       name: Yup.string().min(2).max(50).required(),
@@ -105,7 +104,7 @@ export default function Clients() {
   });
 
   useEffect(() => {
-    user = JSON.parse(String(localStorage.getItem("user")));
+    user = JSON.parse(String(localStorage.getItem('user')));
     api = getAxiosInstance(user);
     getData();
   }, []);
@@ -155,16 +154,16 @@ export default function Clients() {
   };
   return (
     <Page
-      path="/client"
-      title="Doupi - Cadastro de profissionais"
-      description="App para genciamento de agendamentos"
+      path='/client'
+      title='Doupi - Cadastro de profissionais'
+      description='App para genciamento de agendamentos'
     >
-      <Stack h={"full"} m={5}>
-        <Heading mb={5} fontSize={"2xl"} textAlign={"center"}>
+      <Stack h={'full'} m={5}>
+        <Heading mb={5} fontSize={'2xl'} textAlign={'center'}>
           Cadastro de Clientes
         </Heading>
-        <TableContainer shadow={"#cccccc4e 0px 0px 2px 1px"} rounded={20}>
-          <Table variant="striped">
+        <TableContainer shadow={'#cccccc4e 0px 0px 2px 1px'} rounded={20}>
+          <Table variant='striped'>
             <Thead>
               <Tr>
                 <Th>Nome</Th>
@@ -175,18 +174,16 @@ export default function Clients() {
             <Tbody>
               {data.map((item: any) => (
                 <Tr key={item._id}>
-                  <Td>
-                    {item.name}
-                  </Td>
+                  <Td>{item.name}</Td>
 
                   <Td>{item.phone}</Td>
 
                   <Td>
                     <IconButton
-                      size={"sm"}
+                      size={'sm'}
                       icon={<EditIcon />}
-                      colorScheme="blue"
-                      aria-label="Editar"
+                      colorScheme='blue'
+                      aria-label='Editar'
                       mr={1}
                       onClick={() => {
                         formik.setValues(item);
@@ -203,13 +200,13 @@ export default function Clients() {
             </Tbody>
           </Table>
         </TableContainer>
-        <Box position="fixed" bottom={{ base: "120px", md: "80px" }} right={4}>
+        <Box position='fixed' bottom={{ base: '120px', md: '80px' }} right={4}>
           <IconButton
-            colorScheme="blue"
+            colorScheme='blue'
             icon={<AddIcon />}
             isRound
-            size="lg"
-            aria-label="Adicionar"
+            size='lg'
+            aria-label='Adicionar'
             onClick={() => {
               formik.resetForm();
               setIsEditing(false);
@@ -221,49 +218,49 @@ export default function Clients() {
 
       <Drawer
         isOpen={formIsOpen}
-        placement="right"
-        size={"xl"}
+        placement='right'
+        size={'xl'}
         onClose={() => 1}
       >
         <DrawerOverlay />
         <DrawerContent>
-          <DrawerHeader borderBottomWidth="1px">Serviço</DrawerHeader>
+          <DrawerHeader borderBottomWidth='1px'>Serviço</DrawerHeader>
 
           <DrawerBody>
             <FormControl
               mb={3}
-              id="name"
+              id='name'
               isRequired
               isInvalid={!!formik.errors.name && formik.touched.name}
             >
               <FormLabel>Nome</FormLabel>
               <Input
-                type="text"
-                name="name"
+                type='text'
+                name='name'
                 value={formik.values.name}
                 onChange={formik.handleChange}
               />
             </FormControl>
 
             <FormControl
-              id="phone"
+              id='phone'
               isRequired
               isInvalid={!!formik.errors.phone && formik.touched.phone}
             >
               <FormLabel>Telefone </FormLabel>
               <Input
-                name="phone"
+                name='phone'
                 as={InputMask}
                 value={formik.values.phone}
                 onChange={formik.handleChange}
-                mask="(99) 9 9999-9999"
+                mask='(99) 9 9999-9999'
               />
             </FormControl>
           </DrawerBody>
 
-          <DrawerFooter borderTopWidth="1px">
+          <DrawerFooter borderTopWidth='1px'>
             <Button
-              variant="outline"
+              variant='outline'
               mr={3}
               onClick={() => {
                 setIsEditing(false);
@@ -273,7 +270,7 @@ export default function Clients() {
               Cancel
             </Button>
             <Button
-              colorScheme="blue"
+              colorScheme='blue'
               //@ts-ignore
               onClick={formik.handleSubmit}
             >

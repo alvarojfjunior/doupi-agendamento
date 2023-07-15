@@ -1,15 +1,15 @@
-import Mongoose from "mongoose";
+import Mongoose from 'mongoose';
 
 export let DossieSchema: Mongoose.Schema;
 try {
-  DossieSchema = Mongoose.model("Dossie").schema;
+  DossieSchema = Mongoose.model('Dossie').schema;
 } catch (error) {
   DossieSchema = new Mongoose.Schema(
     {
       userId: {
         type: Mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
+        required: true,
       },
       action: {
         type: String,
@@ -20,6 +20,6 @@ try {
         required: true,
       },
     },
-    { collection: "dossie", timestamps: true }
+    { collection: 'dossie', timestamps: true }
   );
 }

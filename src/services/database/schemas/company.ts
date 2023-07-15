@@ -1,8 +1,8 @@
-import Mongoose from "mongoose";
+import Mongoose from 'mongoose';
 
 export let CompanySchema: Mongoose.Schema;
 try {
-  CompanySchema = Mongoose.model("Company").schema;
+  CompanySchema = Mongoose.model('Company').schema;
 } catch (error) {
   CompanySchema = new Mongoose.Schema(
     {
@@ -33,7 +33,7 @@ try {
       email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
       },
       phone: {
         type: String,
@@ -50,9 +50,9 @@ try {
       active: {
         type: Boolean,
         required: true,
-        default: true
+        default: true,
       },
     },
-    { collection: "companies", timestamps: true }
+    { collection: 'companies', timestamps: true }
   );
 }

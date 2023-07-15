@@ -11,19 +11,19 @@ import {
   useColorModeValue,
   HStack,
   useToast,
-} from "@chakra-ui/react";
-import InputColor from "react-input-color";
-import { useContext, useEffect } from "react";
-import * as Yup from "yup";
-import InputMask from "react-input-mask";
-import { useFormik } from "formik";
-import { AppContext } from "@/contexts/app";
-import Page from "@/components/Page";
-import { AxiosInstance } from "axios";
-import { IUser } from "@/types/api/User";
-import { getAxiosInstance } from "@/services/api";
-import { useRouter } from "next/router";
-import { defaultCoverImage } from "@/utils/images";
+} from '@chakra-ui/react';
+import InputColor from 'react-input-color';
+import { useContext, useEffect } from 'react';
+import * as Yup from 'yup';
+import InputMask from 'react-input-mask';
+import { useFormik } from 'formik';
+import { AppContext } from '@/contexts/app';
+import Page from '@/components/Page';
+import { AxiosInstance } from 'axios';
+import { IUser } from '@/types/api/User';
+import { getAxiosInstance } from '@/services/api';
+import { useRouter } from 'next/router';
+import { defaultCoverImage } from '@/utils/images';
 
 let user: IUser;
 let api: AxiosInstance;
@@ -37,22 +37,22 @@ export default function Panel() {
       appContext.onOpenLoading();
       const { data } = await api.put(`/api/companies`, values);
       appContext.onCloseLoading();
-      router.push("/private");
+      router.push('/private');
       toast({
-        title: "Sucesso!",
-        description: "Os dados da sua empresa foram alterados!",
-        status: "success",
-        position: "top-right",
+        title: 'Sucesso!',
+        description: 'Os dados da sua empresa foram alterados!',
+        status: 'success',
+        position: 'top-right',
         duration: 9000,
         isClosable: true,
       });
     } catch (error: any) {
       console.log(error);
       toast({
-        title: "Houve um erro",
+        title: 'Houve um erro',
         description: error.Message,
-        status: "error",
-        position: "top-right",
+        status: 'error',
+        position: 'top-right',
         duration: 9000,
         isClosable: true,
       });
@@ -63,14 +63,14 @@ export default function Panel() {
   const formik = useFormik({
     initialValues: {
       coverImage: defaultCoverImage,
-      name: "",
-      responsableName: "",
-      businessType: "Beleza",
-      color: "",
-      phone: "",
-      whatsapp: "",
-      email: "",
-      document: "",
+      name: '',
+      responsableName: '',
+      businessType: 'Beleza',
+      color: '',
+      phone: '',
+      whatsapp: '',
+      email: '',
+      document: '',
     },
     validationSchema: Yup.object().shape({
       coverImage: Yup.string().min(100).required(),
@@ -86,7 +86,7 @@ export default function Panel() {
   });
 
   useEffect(() => {
-    user = JSON.parse(String(localStorage.getItem("user")));
+    user = JSON.parse(String(localStorage.getItem('user')));
     api = getAxiosInstance(user);
     getCompanyData();
     appContext.onCloseLoading();
@@ -99,14 +99,13 @@ export default function Panel() {
         formik.setValues(data[0]);
         appContext.onCloseLoading();
       } else {
-        router.push("/");
+        router.push('/');
       }
     } catch (error) {
       console.log(error);
       appContext.onCloseLoading();
     }
   };
-
 
   function handleImageChange(e: any) {
     const file = e.target.files[0];
@@ -118,8 +117,8 @@ export default function Panel() {
       image.src = reader.result;
 
       image.onload = () => {
-        const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d");
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
 
         // Define a largura e altura máximas para a imagem
         const maxWidth = 800;
@@ -145,7 +144,7 @@ export default function Panel() {
         const dataURL = canvas.toDataURL(file.type, 1);
 
         // Define a melhor resolução e qualidade da imagem no state (setImageAvatar)
-        formik.setFieldValue("coverImage", dataURL);
+        formik.setFieldValue('coverImage', dataURL);
       };
     };
 
@@ -153,102 +152,107 @@ export default function Panel() {
       return;
     }
 
-    if (file.type === "image/png" || file.type === "image/jpeg") {
+    if (file.type === 'image/png' || file.type === 'image/jpeg') {
       reader.readAsDataURL(file);
-      formik.setFieldValue("coverImage", URL.createObjectURL(e.target.files[0]));
+      formik.setFieldValue(
+        'coverImage',
+        URL.createObjectURL(e.target.files[0])
+      );
     }
   }
 
   return (
     <Page
-      path="/private/company"
-      title="Doupi - Configurações da Empresa"
-      description="App para genciamento de agendamentos"
+      path='/private/company'
+      title='Doupi - Configurações da Empresa'
+      description='App para genciamento de agendamentos'
     >
       <form onSubmit={formik.handleSubmit}>
-        <Box p={4} maxWidth="700px" mx="auto">
-          <Heading mb={5} fontSize={"2xl"} textAlign={"center"}>
+        <Box p={4} maxWidth='700px' mx='auto'>
+          <Heading mb={5} fontSize={'2xl'} textAlign={'center'}>
             Configurações da empresa
           </Heading>
-          <VStack spacing={4} align="stretch">
+          <VStack spacing={4} align='stretch'>
             <FormControl
-              id="coverImage"
+              id='coverImage'
               isRequired
-              isInvalid={!!formik.errors.coverImage && formik.touched.coverImage}
+              isInvalid={
+                !!formik.errors.coverImage && formik.touched.coverImage
+              }
             >
               <FormLabel>Imagem de Capa</FormLabel>
               <Box
-                position="relative"
-                display="inline-block"
-                width={"100%"}
+                position='relative'
+                display='inline-block'
+                width={'100%'}
                 height={250}
-                overflow="hidden"
-                justifyContent="center"
-                alignItems="center"
+                overflow='hidden'
+                justifyContent='center'
+                alignItems='center'
               >
                 <ChakraImage
                   src={formik.values.coverImage}
-                  alt="Imagem de Capa"
+                  alt='Imagem de Capa'
                   mb={2}
                   rounded={10}
                   style={{
-                    objectFit: "cover",
-                    width: "100%",
-                    height: "100%",
+                    objectFit: 'cover',
+                    width: '100%',
+                    height: '100%',
                   }}
                 />
                 <Input
-                  type="file"
-                  accept="image/*"
-                  name="coverPreview"
+                  type='file'
+                  accept='image/*'
+                  name='coverPreview'
                   onChange={handleImageChange}
-                  position="absolute"
+                  position='absolute'
                   top={0}
                   left={0}
                   opacity={0}
-                  width="100%"
-                  height="100%"
-                  cursor="pointer"
+                  width='100%'
+                  height='100%'
+                  cursor='pointer'
                   zIndex={1}
                   required={false}
                 />
               </Box>
             </FormControl>
             <FormControl
-              id="color"
+              id='color'
               isRequired
               isInvalid={!!formik.errors.color && formik.touched.color}
             >
               <FormLabel>Cor tema</FormLabel>
               <InputColor
-                placement="left"
+                placement='left'
                 //@ts-ignore
                 style={{
-                  width: "100%",
+                  width: '100%',
                   height: 70,
                 }}
                 initialValue={formik.values.color}
-                onChange={(e: any) => formik.setFieldValue("color", e.hex)}
+                onChange={(e: any) => formik.setFieldValue('color', e.hex)}
               />
             </FormControl>
 
             <HStack>
               <FormControl
-                id="name"
+                id='name'
                 isRequired
                 isInvalid={!!formik.errors.name && formik.touched.name}
               >
                 <FormLabel>Nome da empresa</FormLabel>
                 <Input
-                  type="text"
-                  name="name"
+                  type='text'
+                  name='name'
                   value={formik.values.name}
                   onChange={formik.handleChange}
                 />
               </FormControl>
 
               <FormControl
-                id="responsableName"
+                id='responsableName'
                 isRequired
                 isInvalid={
                   !!formik.errors.responsableName &&
@@ -257,8 +261,8 @@ export default function Panel() {
               >
                 <FormLabel>Nome da responsável</FormLabel>
                 <Input
-                  type="text"
-                  name="responsableName"
+                  type='text'
+                  name='responsableName'
                   value={formik.values.responsableName}
                   onChange={formik.handleChange}
                 />
@@ -266,7 +270,7 @@ export default function Panel() {
             </HStack>
             <HStack>
               <FormControl
-                id="businessType"
+                id='businessType'
                 isRequired
                 isInvalid={
                   !!formik.errors.businessType && formik.touched.businessType
@@ -274,25 +278,25 @@ export default function Panel() {
               >
                 <FormLabel>Ramo da sua empresa</FormLabel>
                 <Select
-                  name="businessType"
-                  id="businessType"
+                  name='businessType'
+                  id='businessType'
                   value={formik.values.businessType}
                   onChange={formik.handleChange}
                 >
-                  <option value="Beleza">Beleza</option>
-                  <option value="Clínica">Clínica</option>
+                  <option value='Beleza'>Beleza</option>
+                  <option value='Clínica'>Clínica</option>
                 </Select>
               </FormControl>
 
               <FormControl
-                id="document"
+                id='document'
                 isRequired
                 isInvalid={!!formik.errors.document && formik.touched.document}
               >
                 <FormLabel> Documento (CNPJ ou CPF) </FormLabel>
                 <Input
-                  type="string"
-                  name="document"
+                  type='string'
+                  name='document'
                   value={formik.values.document}
                   onChange={formik.handleChange}
                 />
@@ -301,47 +305,47 @@ export default function Panel() {
 
             <HStack>
               <FormControl
-                id="phone"
+                id='phone'
                 isRequired
                 isInvalid={!!formik.errors.phone && formik.touched.phone}
               >
                 <FormLabel>Telefone de contato </FormLabel>
                 <Input
-                  name="phone"
+                  name='phone'
                   as={InputMask}
                   value={formik.values.phone}
                   onChange={formik.handleChange}
-                  mask="(99) 9 9999-9999"
+                  mask='(99) 9 9999-9999'
                 />
               </FormControl>
 
               <FormControl
-                id="whatsapp"
+                id='whatsapp'
                 isRequired
                 isInvalid={!!formik.errors.whatsapp && formik.touched.whatsapp}
               >
                 <FormLabel> Whatsapp </FormLabel>
 
                 <Input
-                  name="whatsapp"
+                  name='whatsapp'
                   as={InputMask}
                   value={formik.values.whatsapp}
                   onChange={formik.handleChange}
-                  mask="(99) 9 9999-9999"
+                  mask='(99) 9 9999-9999'
                 />
               </FormControl>
             </HStack>
 
             <HStack>
               <FormControl
-                id="email"
+                id='email'
                 isRequired
                 isInvalid={!!formik.errors.email && formik.touched.email}
               >
                 <FormLabel> Email </FormLabel>
                 <Input
-                  type="email"
-                  name="email"
+                  type='email'
+                  name='email'
                   value={formik.values.email}
                   onChange={formik.handleChange}
                 />
@@ -349,10 +353,10 @@ export default function Panel() {
             </HStack>
 
             <Button
-              color={useColorModeValue("#fff", "#fff")}
-              bg={useColorModeValue("#ffc03f", "#ffc03f")}
-              _hover={{ filter: "brightness(110%)" }}
-              type={"submit"}
+              color={useColorModeValue('#fff', '#fff')}
+              bg={useColorModeValue('#ffc03f', '#ffc03f')}
+              _hover={{ filter: 'brightness(110%)' }}
+              type={'submit'}
             >
               Salvar
             </Button>

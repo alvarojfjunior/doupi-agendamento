@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Button,
   Modal,
@@ -9,8 +9,8 @@ import {
   ModalBody,
   useDisclosure,
   IconButton,
-} from "@chakra-ui/react";
-import { DeleteIcon } from "@chakra-ui/icons";
+} from '@chakra-ui/react';
+import { DeleteIcon } from '@chakra-ui/icons';
 
 export default function DeleteConfirmationModal({ onDelete }: any) {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -23,10 +23,10 @@ export default function DeleteConfirmationModal({ onDelete }: any) {
   return (
     <>
       <IconButton
-        size={"sm"}
+        size={'sm'}
         icon={<DeleteIcon />}
-        colorScheme="red"
-        aria-label="Apagar"
+        colorScheme='red'
+        aria-label='Apagar'
         onClick={onOpen}
       />
 
@@ -38,10 +38,10 @@ export default function DeleteConfirmationModal({ onDelete }: any) {
             Tem certeza de que deseja excluir este registro?
           </ModalBody>
           <ModalFooter>
-            <Button variant="ghost" onClick={onClose}>
+            <Button variant='ghost' onClick={onClose}>
               Cancelar
             </Button>
-            <Button colorScheme="red" ml={3} onClick={handleDelete}>
+            <Button colorScheme='red' ml={3} onClick={handleDelete}>
               Excluir
             </Button>
           </ModalFooter>

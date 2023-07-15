@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from 'axios';
 
 export const getAxiosInstance = (user?: any) => {
   //const url = process.env.NEXT_PUBLIC_API_URL;
@@ -9,7 +9,7 @@ export const getAxiosInstance = (user?: any) => {
         baseURL: url,
         headers: {
           Authorization: `Bearer ${user.token}`,
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       });
     } else {

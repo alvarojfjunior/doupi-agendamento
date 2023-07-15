@@ -1,15 +1,15 @@
-import Mongoose from "mongoose";
+import Mongoose from 'mongoose';
 
 export let ServiceSchema: Mongoose.Schema;
 try {
-  ServiceSchema = Mongoose.model("Service").schema;
+  ServiceSchema = Mongoose.model('Service').schema;
 } catch (error) {
   ServiceSchema = new Mongoose.Schema(
     {
       companyId: {
         type: Mongoose.Schema.Types.ObjectId,
         ref: 'Company',
-        required: true
+        required: true,
       },
       image: {
         type: String,
@@ -27,17 +27,17 @@ try {
         type: String,
         required: true,
       },
-      duration : {
+      duration: {
         type: String,
         required: true,
-        default: '01:00'
+        default: '01:00',
       },
       active: {
         type: Boolean,
         required: true,
-        default: true
+        default: true,
       },
     },
-    { collection: "services", timestamps: true }
+    { collection: 'services', timestamps: true }
   );
 }

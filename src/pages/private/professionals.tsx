@@ -26,23 +26,23 @@ import {
   Input,
   DrawerFooter,
   Button,
-} from "@chakra-ui/react";
-import Select from "react-select";
-import makeAnimated from "react-select/animated";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import { useContext, useEffect, useState } from "react";
-import { AppContext } from "@/contexts/app";
-import InputMask from "react-input-mask";
-import { useRouter } from "next/router";
-import Page from "@/components/Page";
-import { IUser } from "@/types/api/User";
-import { AxiosInstance } from "axios";
-import { getAxiosInstance } from "@/services/api";
-import DeleteConfirmationModal from "../../components/DeleteConfirmationModal";
-import { AddIcon, EditIcon } from "@chakra-ui/icons";
-import SchedulesInput from "@/components/SchedulesInput";
-import { defaultLogoImage, profissionalPhoto } from "@/utils/images";
+} from '@chakra-ui/react';
+import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { useContext, useEffect, useState } from 'react';
+import { AppContext } from '@/contexts/app';
+import InputMask from 'react-input-mask';
+import { useRouter } from 'next/router';
+import Page from '@/components/Page';
+import { IUser } from '@/types/api/User';
+import { AxiosInstance } from 'axios';
+import { getAxiosInstance } from '@/services/api';
+import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
+import { AddIcon, EditIcon } from '@chakra-ui/icons';
+import SchedulesInput from '@/components/SchedulesInput';
+import { defaultLogoImage, profissionalPhoto } from '@/utils/images';
 
 let user: IUser;
 let api: AxiosInstance;
@@ -78,10 +78,10 @@ export default function Professionals() {
       getData();
       appContext.onCloseLoading();
       toast({
-        title: "Sucesso!",
-        description: "Os dados foram salvos!",
-        status: "success",
-        position: "top-right",
+        title: 'Sucesso!',
+        description: 'Os dados foram salvos!',
+        status: 'success',
+        position: 'top-right',
         duration: 9000,
         isClosable: true,
       });
@@ -89,10 +89,10 @@ export default function Professionals() {
       formOnClose();
     } catch (error: any) {
       toast({
-        title: "Houve um erro",
+        title: 'Houve um erro',
         description: error.Message,
-        status: "error",
-        position: "top-right",
+        status: 'error',
+        position: 'top-right',
         duration: 9000,
         isClosable: true,
       });
@@ -103,71 +103,71 @@ export default function Professionals() {
   const formik = useFormik({
     initialValues: {
       photo: profissionalPhoto,
-      name: "",
-      description: "",
-      phone: "",
-      whatsapp: "",
+      name: '',
+      description: '',
+      phone: '',
+      whatsapp: '',
       services: [],
       defaultSchedule: [
         {
-          day: "segunda",
-          end: "12:00",
-          start: "08:00",
+          day: 'segunda',
+          end: '12:00',
+          start: '08:00',
         },
         {
-          day: "segunda",
-          end: "14:00",
-          start: "18:00",
-        },
-
-        {
-          day: "terca",
-          end: "12:00",
-          start: "08:00",
-        },
-        {
-          day: "terca",
-          end: "14:00",
-          start: "18:00",
+          day: 'segunda',
+          end: '14:00',
+          start: '18:00',
         },
 
         {
-          day: "quarta",
-          end: "12:00",
-          start: "08:00",
+          day: 'terca',
+          end: '12:00',
+          start: '08:00',
         },
         {
-          day: "quarta",
-          end: "14:00",
-          start: "18:00",
-        },
-
-        {
-          day: "quinta",
-          end: "12:00",
-          start: "08:00",
-        },
-        {
-          day: "quinta",
-          end: "14:00",
-          start: "18:00",
+          day: 'terca',
+          end: '14:00',
+          start: '18:00',
         },
 
         {
-          day: "sexta",
-          end: "12:00",
-          start: "08:00",
+          day: 'quarta',
+          end: '12:00',
+          start: '08:00',
         },
         {
-          day: "sexta",
-          end: "14:00",
-          start: "18:00",
+          day: 'quarta',
+          end: '14:00',
+          start: '18:00',
         },
 
         {
-          day: "sabado",
-          end: "12:00",
-          start: "08:00",
+          day: 'quinta',
+          end: '12:00',
+          start: '08:00',
+        },
+        {
+          day: 'quinta',
+          end: '14:00',
+          start: '18:00',
+        },
+
+        {
+          day: 'sexta',
+          end: '12:00',
+          start: '08:00',
+        },
+        {
+          day: 'sexta',
+          end: '14:00',
+          start: '18:00',
+        },
+
+        {
+          day: 'sabado',
+          end: '12:00',
+          start: '08:00',
         },
       ],
     },
@@ -182,7 +182,7 @@ export default function Professionals() {
   });
 
   useEffect(() => {
-    user = JSON.parse(String(localStorage.getItem("user")));
+    user = JSON.parse(String(localStorage.getItem('user')));
     api = getAxiosInstance(user);
     getData();
   }, []);
@@ -252,8 +252,8 @@ export default function Professionals() {
       image.src = reader.result;
 
       image.onload = () => {
-        const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d");
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
 
         // Define a largura e altura máximas para a imagem
         const maxWidth = 800;
@@ -279,7 +279,7 @@ export default function Professionals() {
         const dataURL = canvas.toDataURL(file.type, 1);
 
         // Define a melhor resolução e qualidade da imagem no state (setImageAvatar)
-        formik.setFieldValue("photo", dataURL);
+        formik.setFieldValue('photo', dataURL);
       };
     };
 
@@ -287,24 +287,24 @@ export default function Professionals() {
       return;
     }
 
-    if (file.type === "image/png" || file.type === "image/jpeg") {
+    if (file.type === 'image/png' || file.type === 'image/jpeg') {
       reader.readAsDataURL(file);
-      formik.setFieldValue("photo", URL.createObjectURL(e.target.files[0]));
+      formik.setFieldValue('photo', URL.createObjectURL(e.target.files[0]));
     }
   }
 
   return (
     <Page
-      path="/professional"
-      title="Doupi - Cadastro de profissionais"
-      description="App para genciamento de agendamentos"
+      path='/professional'
+      title='Doupi - Cadastro de profissionais'
+      description='App para genciamento de agendamentos'
     >
-      <Stack h={"full"} m={5}>
-        <Heading mb={5} fontSize={"2xl"} textAlign={"center"}>
+      <Stack h={'full'} m={5}>
+        <Heading mb={5} fontSize={'2xl'} textAlign={'center'}>
           Cadastro de Profissionais
         </Heading>
-        <TableContainer shadow={"#cccccc4e 0px 0px 2px 1px"} rounded={20}>
-          <Table variant="striped">
+        <TableContainer shadow={'#cccccc4e 0px 0px 2px 1px'} rounded={20}>
+          <Table variant='striped'>
             <Thead>
               <Tr>
                 <Th>Nome</Th>
@@ -315,14 +315,14 @@ export default function Professionals() {
             <Tbody>
               {data.map((item: any) => (
                 <Tr key={item._id}>
-                  <Td display={"flex"} alignItems={"center"}>
+                  <Td display={'flex'} alignItems={'center'}>
                     <ChakraImage
                       src={item.photo}
-                      alt="Imagem de Capa"
+                      alt='Imagem de Capa'
                       m={2}
                       rounded={10}
                       style={{
-                        objectFit: "cover",
+                        objectFit: 'cover',
                         width: 50,
                         height: 50,
                       }}
@@ -334,10 +334,10 @@ export default function Professionals() {
 
                   <Td>
                     <IconButton
-                      size={"sm"}
+                      size={'sm'}
                       icon={<EditIcon />}
-                      colorScheme="blue"
-                      aria-label="Editar"
+                      colorScheme='blue'
+                      aria-label='Editar'
                       mr={1}
                       onClick={() => {
                         formik.setValues(item);
@@ -354,13 +354,13 @@ export default function Professionals() {
             </Tbody>
           </Table>
         </TableContainer>
-        <Box position="fixed" bottom={{ base: "120px", md: "80px" }} right={4}>
+        <Box position='fixed' bottom={{ base: '120px', md: '80px' }} right={4}>
           <IconButton
-            colorScheme="blue"
+            colorScheme='blue'
             icon={<AddIcon />}
             isRound
-            size="lg"
-            aria-label="Adicionar"
+            size='lg'
+            aria-label='Adicionar'
             onClick={() => {
               formik.resetForm();
               setIsEditing(false);
@@ -372,58 +372,58 @@ export default function Professionals() {
 
       <Drawer
         isOpen={formIsOpen}
-        placement="right"
-        size={"xl"}
+        placement='right'
+        size={'xl'}
         onClose={() => 1}
       >
         <DrawerOverlay />
         <DrawerContent>
-          <DrawerHeader borderBottomWidth="1px">Profissional</DrawerHeader>
+          <DrawerHeader borderBottomWidth='1px'>Profissional</DrawerHeader>
 
           <DrawerBody>
             <FormControl
               mb={3}
-              id="coverImage"
-              textAlign={"center"}
+              id='coverImage'
+              textAlign={'center'}
               isRequired
               isInvalid={!!formik.errors.photo && formik.touched.photo}
             >
               <FormLabel>Foto</FormLabel>
               <Box
-                position="relative"
-                display="inline-block"
-                border={"1px solid #ccc"}
-                rounded={"full"}
+                position='relative'
+                display='inline-block'
+                border={'1px solid #ccc'}
+                rounded={'full'}
                 width={100}
                 height={100}
-                overflow="hidden"
-                justifyContent="center"
-                alignItems="center"
+                overflow='hidden'
+                justifyContent='center'
+                alignItems='center'
               >
                 <ChakraImage
                   src={
-                    formik.values.photo ? formik.values.photo : "/avatar.png"
+                    formik.values.photo ? formik.values.photo : '/avatar.png'
                   }
-                  alt="Foto"
+                  alt='Foto'
                   mb={2}
                   style={{
-                    objectFit: "cover",
-                    width: "100%",
-                    height: "100%",
+                    objectFit: 'cover',
+                    width: '100%',
+                    height: '100%',
                   }}
                 />
                 <Input
-                  type="file"
-                  accept="image/*"
-                  name="coverPreview"
+                  type='file'
+                  accept='image/*'
+                  name='coverPreview'
                   onChange={handleImageChange}
-                  position="absolute"
+                  position='absolute'
                   top={0}
                   left={0}
                   opacity={0}
-                  width="100%"
-                  height="100%"
-                  cursor="pointer"
+                  width='100%'
+                  height='100%'
+                  cursor='pointer'
                   zIndex={1}
                   required={false}
                 />
@@ -432,14 +432,14 @@ export default function Professionals() {
 
             <FormControl
               mb={3}
-              id="name"
+              id='name'
               isRequired
               isInvalid={!!formik.errors.name && formik.touched.name}
             >
               <FormLabel>Nome</FormLabel>
               <Input
-                type="text"
-                name="name"
+                type='text'
+                name='name'
                 value={formik.values.name}
                 onChange={formik.handleChange}
               />
@@ -447,7 +447,7 @@ export default function Professionals() {
 
             <FormControl
               mb={3}
-              id="description"
+              id='description'
               isRequired
               isInvalid={
                 !!formik.errors.description && formik.touched.description
@@ -455,8 +455,8 @@ export default function Professionals() {
             >
               <FormLabel>Descrição</FormLabel>
               <Input
-                type="text"
-                name="description"
+                type='text'
+                name='description'
                 value={formik.values.description}
                 onChange={formik.handleChange}
               />
@@ -464,49 +464,49 @@ export default function Professionals() {
 
             <FormControl
               mb={3}
-              id="phone"
+              id='phone'
               isRequired
               isInvalid={!!formik.errors.phone && formik.touched.phone}
             >
               <FormLabel>Telefone </FormLabel>
               <Input
-                name="phone"
+                name='phone'
                 as={InputMask}
                 value={formik.values.phone}
                 onChange={formik.handleChange}
-                mask="(99) 9 9999-9999"
+                mask='(99) 9 9999-9999'
               />
             </FormControl>
 
             <FormControl
               mb={3}
-              id="whatsapp"
+              id='whatsapp'
               isRequired
               isInvalid={!!formik.errors.whatsapp && formik.touched.whatsapp}
             >
               <FormLabel> Whatsapp </FormLabel>
 
               <Input
-                name="whatsapp"
+                name='whatsapp'
                 as={InputMask}
                 value={formik.values.whatsapp}
                 onChange={formik.handleChange}
-                mask="(99) 9 9999-9999"
+                mask='(99) 9 9999-9999'
               />
             </FormControl>
 
             <FormControl
               mb={3}
-              id="services"
+              id='services'
               isRequired
               //@ts-ignore
               isInvalid={!!formik.errors.services && formik.touched.services}
             >
               <FormLabel> Serviços </FormLabel>
               <Select
-                name="services"
+                name='services'
                 value={formik.values.services}
-                onChange={(e: any) => formik.setFieldValue("services", e)}
+                onChange={(e: any) => formik.setFieldValue('services', e)}
                 closeMenuOnSelect={false}
                 components={animatedComponents}
                 isMulti
@@ -514,28 +514,28 @@ export default function Professionals() {
                 styles={{
                   control: (baseStyles, state) => ({
                     ...baseStyles,
-                    backgroundColor: "transparent",
+                    backgroundColor: 'transparent',
                   }),
                   menuList: (baseStyles, state) =>
-                    colorMode === "dark"
+                    colorMode === 'dark'
                       ? {
                           ...baseStyles,
-                          backgroundColor: "#2D3748",
+                          backgroundColor: '#2D3748',
                         }
                       : {
                           ...baseStyles,
-                          backgroundColor: "white",
+                          backgroundColor: 'white',
                         },
                   multiValue: (baseStyles, state) =>
-                    colorMode === "dark"
+                    colorMode === 'dark'
                       ? {
                           ...baseStyles,
-                          backgroundColor: "#a09dff",
-                          color: "red",
+                          backgroundColor: '#a09dff',
+                          color: 'red',
                         }
                       : {
                           ...baseStyles,
-                          backgroundColor: "ButtonShadow",
+                          backgroundColor: 'ButtonShadow',
                         },
                 }}
               />
@@ -543,7 +543,7 @@ export default function Professionals() {
 
             <FormControl
               mb={3}
-              id="defaultSchedule"
+              id='defaultSchedule'
               isRequired
               //@ts-ignore
               isInvalid={
@@ -555,15 +555,15 @@ export default function Professionals() {
               <SchedulesInput
                 schedules={formik.values.defaultSchedule}
                 onChange={(value: any) =>
-                  formik.setFieldValue("defaultSchedule", value)
+                  formik.setFieldValue('defaultSchedule', value)
                 }
               />
             </FormControl>
           </DrawerBody>
 
-          <DrawerFooter borderTopWidth="1px">
+          <DrawerFooter borderTopWidth='1px'>
             <Button
-              variant="outline"
+              variant='outline'
               mr={3}
               onClick={() => {
                 setIsEditing(false);
@@ -573,7 +573,7 @@ export default function Professionals() {
               Cancel
             </Button>
             <Button
-              colorScheme="blue"
+              colorScheme='blue'
               //@ts-ignore
               onClick={formik.handleSubmit}
             >

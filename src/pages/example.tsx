@@ -29,7 +29,8 @@ const BarberSchedule = () => {
     // Verificar se o horário está dentro do horário de trabalho do barbeiro
     const horarioInicio = horario.getHours() * 60 + horario.getMinutes();
     if (
-      (horarioInicio >= horarioInicioManha && horarioInicio < horarioFimManha) ||
+      (horarioInicio >= horarioInicioManha &&
+        horarioInicio < horarioFimManha) ||
       (horarioInicio >= horarioInicioTarde && horarioInicio < horarioFimTarde)
     ) {
       return true;
@@ -45,7 +46,9 @@ const BarberSchedule = () => {
       //@ts-ignore
       const duracao = servicos[tipoServico];
       const horarioFim = new Date(horario.getTime() + duracao * 60000);
-      console.log(`Serviço agendado: ${tipoServico} - Horário: ${horario} - Término: ${horarioFim}`);
+      console.log(
+        `Serviço agendado: ${tipoServico} - Horário: ${horario} - Término: ${horarioFim}`
+      );
     } else {
       console.log(`Horário não disponível: ${horario}`);
     }
@@ -57,17 +60,20 @@ const BarberSchedule = () => {
       <div>
         <label>Horário:</label>
         <input
-          type="datetime-local"
+          type='datetime-local'
           value={horarioAgendado}
           onChange={(e) => setHorarioAgendado(e.target.value)}
         />
       </div>
       <div>
         <label>Tipo de Serviço:</label>
-        <select value={tipoServicoAgendado} onChange={(e) => setTipoServicoAgendado(e.target.value)}>
-          <option value="">Selecione</option>
-          <option value="barba">Barba</option>
-          <option value="cabelo">Cabelo</option>
+        <select
+          value={tipoServicoAgendado}
+          onChange={(e) => setTipoServicoAgendado(e.target.value)}
+        >
+          <option value=''>Selecione</option>
+          <option value='barba'>Barba</option>
+          <option value='cabelo'>Cabelo</option>
         </select>
       </div>
       <button onClick={agendarServico}>Agendar</button>

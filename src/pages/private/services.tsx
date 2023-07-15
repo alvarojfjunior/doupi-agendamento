@@ -26,22 +26,22 @@ import {
   Input,
   DrawerFooter,
   Button,
-} from "@chakra-ui/react";
-import Select from "react-select";
-import makeAnimated from "react-select/animated";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import { useContext, useEffect, useState } from "react";
-import { AppContext } from "@/contexts/app";
-import InputMask from "react-input-mask";
-import { useRouter } from "next/router";
-import Page from "@/components/Page";
-import { IUser } from "@/types/api/User";
-import { AxiosInstance } from "axios";
-import { getAxiosInstance } from "@/services/api";
-import DeleteConfirmationModal from "../../components/DeleteConfirmationModal";
-import { AddIcon, EditIcon } from "@chakra-ui/icons";
-import { serviceImage } from "@/utils/images";
+} from '@chakra-ui/react';
+import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { useContext, useEffect, useState } from 'react';
+import { AppContext } from '@/contexts/app';
+import InputMask from 'react-input-mask';
+import { useRouter } from 'next/router';
+import Page from '@/components/Page';
+import { IUser } from '@/types/api/User';
+import { AxiosInstance } from 'axios';
+import { getAxiosInstance } from '@/services/api';
+import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
+import { AddIcon, EditIcon } from '@chakra-ui/icons';
+import { serviceImage } from '@/utils/images';
 
 let user: IUser;
 let api: AxiosInstance;
@@ -74,10 +74,10 @@ export default function Services() {
       updateData(res.data);
       appContext.onCloseLoading();
       toast({
-        title: "Sucesso!",
-        description: "Os dados foram salvos!",
-        status: "success",
-        position: "top-right",
+        title: 'Sucesso!',
+        description: 'Os dados foram salvos!',
+        status: 'success',
+        position: 'top-right',
         duration: 9000,
         isClosable: true,
       });
@@ -85,10 +85,10 @@ export default function Services() {
       formOnClose();
     } catch (error: any) {
       toast({
-        title: "Houve um erro",
+        title: 'Houve um erro',
         description: error.Message,
-        status: "error",
-        position: "top-right",
+        status: 'error',
+        position: 'top-right',
         duration: 9000,
         isClosable: true,
       });
@@ -99,10 +99,10 @@ export default function Services() {
   const formik = useFormik({
     initialValues: {
       image: serviceImage,
-      name: "",
-      description: "",
-      duration: "",
-      price: "",
+      name: '',
+      description: '',
+      duration: '',
+      price: '',
     },
     validationSchema: Yup.object().shape({
       name: Yup.string().min(2).max(50).required(),
@@ -114,7 +114,7 @@ export default function Services() {
   });
 
   useEffect(() => {
-    user = JSON.parse(String(localStorage.getItem("user")));
+    user = JSON.parse(String(localStorage.getItem('user')));
     api = getAxiosInstance(user);
     getData();
   }, []);
@@ -173,8 +173,8 @@ export default function Services() {
       image.src = reader.result;
 
       image.onload = () => {
-        const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d");
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
 
         // Define a largura e altura máximas para a imagem
         const maxWidth = 800;
@@ -200,7 +200,7 @@ export default function Services() {
         const dataURL = canvas.toDataURL(file.type, 1);
 
         // Define a melhor resolução e qualidade da imagem no state (setImageAvatar)
-        formik.setFieldValue("image", dataURL);
+        formik.setFieldValue('image', dataURL);
       };
     };
 
@@ -208,24 +208,24 @@ export default function Services() {
       return;
     }
 
-    if (file.type === "image/png" || file.type === "image/jpeg") {
+    if (file.type === 'image/png' || file.type === 'image/jpeg') {
       reader.readAsDataURL(file);
-      formik.setFieldValue("image", URL.createObjectURL(e.target.files[0]));
+      formik.setFieldValue('image', URL.createObjectURL(e.target.files[0]));
     }
   }
 
   return (
     <Page
-      path="/service"
-      title="Doupi - Cadastro de profissionais"
-      description="App para genciamento de agendamentos"
+      path='/service'
+      title='Doupi - Cadastro de profissionais'
+      description='App para genciamento de agendamentos'
     >
-      <Stack h={"full"} m={5}>
-        <Heading mb={5} fontSize={"2xl"} textAlign={"center"}>
+      <Stack h={'full'} m={5}>
+        <Heading mb={5} fontSize={'2xl'} textAlign={'center'}>
           Cadastro de Serviços
         </Heading>
-        <TableContainer shadow={"#cccccc4e 0px 0px 2px 1px"} rounded={20}>
-          <Table variant="striped">
+        <TableContainer shadow={'#cccccc4e 0px 0px 2px 1px'} rounded={20}>
+          <Table variant='striped'>
             <Thead>
               <Tr>
                 <Th>Nome</Th>
@@ -236,14 +236,14 @@ export default function Services() {
             <Tbody>
               {data.map((item: any) => (
                 <Tr key={item._id}>
-                  <Td display={"flex"} alignItems={"center"}>
+                  <Td display={'flex'} alignItems={'center'}>
                     <ChakraImage
                       src={item.image}
-                      alt="Imagem de Capa"
+                      alt='Imagem de Capa'
                       m={2}
                       rounded={10}
                       style={{
-                        objectFit: "cover",
+                        objectFit: 'cover',
                         width: 50,
                         height: 50,
                       }}
@@ -255,10 +255,10 @@ export default function Services() {
 
                   <Td>
                     <IconButton
-                      size={"sm"}
+                      size={'sm'}
                       icon={<EditIcon />}
-                      colorScheme="blue"
-                      aria-label="Editar"
+                      colorScheme='blue'
+                      aria-label='Editar'
                       mr={1}
                       onClick={() => {
                         formik.setValues(item);
@@ -275,13 +275,13 @@ export default function Services() {
             </Tbody>
           </Table>
         </TableContainer>
-        <Box position="fixed" bottom={{ base: "120px", md: "80px" }} right={4}>
+        <Box position='fixed' bottom={{ base: '120px', md: '80px' }} right={4}>
           <IconButton
-            colorScheme="blue"
+            colorScheme='blue'
             icon={<AddIcon />}
             isRound
-            size="lg"
-            aria-label="Adicionar"
+            size='lg'
+            aria-label='Adicionar'
             onClick={() => {
               formik.resetForm();
               setIsEditing(false);
@@ -293,56 +293,56 @@ export default function Services() {
 
       <Drawer
         isOpen={formIsOpen}
-        placement="right"
-        size={"xl"}
+        placement='right'
+        size={'xl'}
         onClose={() => 1}
       >
         <DrawerOverlay />
         <DrawerContent>
-          <DrawerHeader borderBottomWidth="1px">Serviço</DrawerHeader>
+          <DrawerHeader borderBottomWidth='1px'>Serviço</DrawerHeader>
 
           <DrawerBody>
             <FormControl
               mb={3}
-              id="image"
-              textAlign={"center"}
+              id='image'
+              textAlign={'center'}
               isRequired
               isInvalid={!!formik.errors.image && formik.touched.image}
             >
               <FormLabel>Imagem</FormLabel>
               <Box
-                position="relative"
-                display="inline-block"
-                border={"1px solid #ccc"}
+                position='relative'
+                display='inline-block'
+                border={'1px solid #ccc'}
                 rounded={20}
                 width={100}
                 height={100}
-                overflow="hidden"
-                justifyContent="center"
-                alignItems="center"
+                overflow='hidden'
+                justifyContent='center'
+                alignItems='center'
               >
                 <ChakraImage
                   src={formik.values.image}
-                  alt="Imagem"
+                  alt='Imagem'
                   mb={2}
                   style={{
-                    objectFit: "cover",
-                    width: "100%",
-                    height: "100%",
+                    objectFit: 'cover',
+                    width: '100%',
+                    height: '100%',
                   }}
                 />
                 <Input
-                  type="file"
-                  accept="image/*"
-                  name="image"
+                  type='file'
+                  accept='image/*'
+                  name='image'
                   onChange={handleImageChange}
-                  position="absolute"
+                  position='absolute'
                   top={0}
                   left={0}
                   opacity={0}
-                  width="100%"
-                  height="100%"
-                  cursor="pointer"
+                  width='100%'
+                  height='100%'
+                  cursor='pointer'
                   zIndex={1}
                   required={false}
                 />
@@ -351,14 +351,14 @@ export default function Services() {
 
             <FormControl
               mb={3}
-              id="name"
+              id='name'
               isRequired
               isInvalid={!!formik.errors.name && formik.touched.name}
             >
               <FormLabel>Nome</FormLabel>
               <Input
-                type="text"
-                name="name"
+                type='text'
+                name='name'
                 value={formik.values.name}
                 onChange={formik.handleChange}
               />
@@ -366,7 +366,7 @@ export default function Services() {
 
             <FormControl
               mb={3}
-              id="description"
+              id='description'
               isRequired
               isInvalid={
                 !!formik.errors.description && formik.touched.description
@@ -374,8 +374,8 @@ export default function Services() {
             >
               <FormLabel>Descrição</FormLabel>
               <Input
-                type="text"
-                name="description"
+                type='text'
+                name='description'
                 value={formik.values.description}
                 onChange={formik.handleChange}
               />
@@ -384,43 +384,43 @@ export default function Services() {
             <HStack spacing={4}>
               <FormControl
                 mb={3}
-                id="price"
+                id='price'
                 isRequired
                 isInvalid={!!formik.errors.price && formik.touched.price}
               >
                 <FormLabel>Preço </FormLabel>
                 <Input
-                  name="price"
+                  name='price'
                   as={InputMask}
                   value={formik.values.price}
                   onChange={formik.handleChange}
-                  mask="99,99"
+                  mask='99,99'
                 />
               </FormControl>
 
               <FormControl
                 mb={3}
-                id="duration"
+                id='duration'
                 isRequired
                 isInvalid={!!formik.errors.duration && formik.touched.duration}
               >
                 <FormLabel> Duração do Serviço </FormLabel>
 
                 <Input
-                  name="duration"
+                  name='duration'
                   as={InputMask}
                   value={formik.values.duration}
                   onChange={formik.handleChange}
-                  defaultValue={"01:00"}
-                  mask="99:99"
+                  defaultValue={'01:00'}
+                  mask='99:99'
                 />
               </FormControl>
             </HStack>
           </DrawerBody>
 
-          <DrawerFooter borderTopWidth="1px">
+          <DrawerFooter borderTopWidth='1px'>
             <Button
-              variant="outline"
+              variant='outline'
               mr={3}
               onClick={() => {
                 setIsEditing(false);
@@ -430,7 +430,7 @@ export default function Services() {
               Cancel
             </Button>
             <Button
-              colorScheme="blue"
+              colorScheme='blue'
               //@ts-ignore
               onClick={formik.handleSubmit}
             >

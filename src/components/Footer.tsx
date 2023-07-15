@@ -7,11 +7,11 @@ import {
   Text,
   useColorModeValue,
   VisuallyHidden,
-} from "@chakra-ui/react";
-import { ReactNode, useContext } from "react";
-import Logo from "@/components/Logo";
-import { useRouter } from "next/router";
-import { AuthContext } from "@/contexts/auth";
+} from '@chakra-ui/react';
+import { ReactNode, useContext } from 'react';
+import Logo from '@/components/Logo';
+import { useRouter } from 'next/router';
+import { AuthContext } from '@/contexts/auth';
 
 const SocialButton = ({
   children,
@@ -24,18 +24,18 @@ const SocialButton = ({
 }) => {
   return (
     <chakra.button
-      rounded={"full"}
+      rounded={'full'}
       w={8}
       h={8}
-      cursor={"pointer"}
-      as={"a"}
+      cursor={'pointer'}
+      as={'a'}
       href={href}
-      display={"inline-flex"}
-      alignItems={"center"}
-      justifyContent={"center"}
-      transition={"background 0.3s ease"}
-      bg={useColorModeValue("blackAlpha.100", "whiteAlpha.100")}
-      _hover={{ filter: "brightness(110%)" }}
+      display={'inline-flex'}
+      alignItems={'center'}
+      justifyContent={'center'}
+      transition={'background 0.3s ease'}
+      bg={useColorModeValue('blackAlpha.100', 'whiteAlpha.100')}
+      _hover={{ filter: 'brightness(110%)' }}
     >
       <VisuallyHidden>{label}</VisuallyHidden>
       {children}
@@ -48,26 +48,25 @@ export default function SmallWithLogoLeft() {
   const { isAuth, users } = useContext(AuthContext);
   return (
     <Box
-      w="full"
-      bg={useColorModeValue("gray.50", "gray.900")}
-      color={useColorModeValue("gray.700", "gray.200")}
+      w='full'
+      bg={useColorModeValue('gray.50', 'gray.900')}
+      color={useColorModeValue('gray.700', 'gray.200')}
     >
       <Container
         as={Stack}
-        maxW={"6xl"}
+        maxW={'6xl'}
         py={4}
-        direction={{ base: "column", md: "row" }}
+        direction={{ base: 'column', md: 'row' }}
         spacing={4}
-        justify={{ base: "center", md: "space-between" }}
-        align={{ base: "center", md: "center" }}
+        justify={{ base: 'center', md: 'space-between' }}
+        align={{ base: 'center', md: 'center' }}
       >
-        <Flex 
-        alignItems={"center"} 
-        cursor={"pointer"}
-        onClick={() =>
-          isAuth ? router.push("private") : router.push("/")
-        }>
-          <Logo color={"dark"} height={32} />
+        <Flex
+          alignItems={'center'}
+          cursor={'pointer'}
+          onClick={() => (isAuth ? router.push('private') : router.push('/'))}
+        >
+          <Logo color={'dark'} height={32} />
         </Flex>
         <Text>© 2023 Doupi. Developed with love ❤️ </Text>
       </Container>

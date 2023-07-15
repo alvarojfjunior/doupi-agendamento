@@ -1,25 +1,25 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import { User } from "@/services/database";
-import { authenticate } from "@/utils/apiAuth";
-import { createDossie } from "@/utils/createDossie";
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { User } from '@/services/database';
+import { authenticate } from '@/utils/apiAuth';
+import { createDossie } from '@/utils/createDossie';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   try {
-    if (req.method === "GET") {
+    if (req.method === 'GET') {
       if (!authenticate(req))
-        return res.status(401).json({ message: "Unauthorized" });
+        return res.status(401).json({ message: 'Unauthorized' });
 
       const query = JSON.parse(JSON.stringify(req.query));
       const orders = await User.find(query);
       return res.status(200).json(orders);
     }
 
-    if (req.method === "PUT") {
+    if (req.method === 'PUT') {
       const auth = authenticate(req);
-      if (!auth) return res.status(401).json({ message: "Unauthorized" });
+      if (!auth) return res.status(401).json({ message: 'Unauthorized' });
 
       const body = JSON.parse(JSON.stringify(req.body));
 
@@ -31,7 +31,7 @@ export default async function handler(
       await createDossie({
         userId: auth._id,
         action: 'update',
-        identfier: 'user'
+        identfier: 'user',
       });
 
       if (modifiedCount > 0) {

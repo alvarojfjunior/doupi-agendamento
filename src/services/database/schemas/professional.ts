@@ -1,15 +1,15 @@
-import Mongoose from "mongoose";
+import Mongoose from 'mongoose';
 
 export let ProfessionalSchema: Mongoose.Schema;
 try {
-  ProfessionalSchema = Mongoose.model("Professional").schema;
+  ProfessionalSchema = Mongoose.model('Professional').schema;
 } catch (error) {
   ProfessionalSchema = new Mongoose.Schema(
     {
       companyId: {
         type: Mongoose.Schema.Types.ObjectId,
         ref: 'Company',
-        required: true
+        required: true,
       },
       name: {
         type: String,
@@ -35,16 +35,18 @@ try {
         type: Object,
         required: true,
       },
-      serviceIds: [{
-        type: Mongoose.Schema.Types.ObjectId,
-        ref: 'Service'
-      }],
+      serviceIds: [
+        {
+          type: Mongoose.Schema.Types.ObjectId,
+          ref: 'Service',
+        },
+      ],
       active: {
         type: Boolean,
         required: true,
-        default: true
+        default: true,
       },
     },
-    { collection: "professionals", timestamps: true }
+    { collection: 'professionals', timestamps: true }
   );
 }
