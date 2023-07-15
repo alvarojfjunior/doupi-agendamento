@@ -9,6 +9,7 @@ try {
       companyId: {
         type: Mongoose.Schema.Types.ObjectId,
         ref: 'Company',
+        index: true,
         required: true,
       },
       name: {

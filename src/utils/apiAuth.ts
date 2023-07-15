@@ -18,6 +18,7 @@ export const authenticate = (req: NextApiRequest): IUser | undefined => {
 
     const user = {
       _id: decoded._id,
+      companyId: decoded.companyId,
       name: decoded.name,
       email: decoded.email,
       token: decoded.token,

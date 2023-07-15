@@ -23,12 +23,11 @@ import { AxiosInstance } from 'axios';
 import { IUser } from '@/types/api/User';
 import { getAxiosInstance } from '@/services/api';
 import { useRouter } from 'next/router';
-import { defaultCoverImage } from '@/utils/images';
 import { withIronSessionSsr } from 'iron-session/next';
+import { handleImageImageAndUpload } from '@/utils/upload';
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req, res }) => {
-
     if (!('user' in req.session))
       return {
         redirect: {
@@ -36,7 +35,6 @@ export const getServerSideProps = withIronSessionSsr(
           permanent: false,
         },
       };
-
 
     const user = req.session.user;
     return {
@@ -92,7 +90,7 @@ export default function Panel() {
 
   const formik = useFormik({
     initialValues: {
-      coverImage: defaultCoverImage,
+      coverImage: '',
       name: '',
       responsableName: '',
       businessType: 'Beleza',
@@ -103,7 +101,7 @@ export default function Panel() {
       document: '',
     },
     validationSchema: Yup.object().shape({
-      coverImage: Yup.string().min(100).required(),
+      coverImage: Yup.string().min(50).required(),
       name: Yup.string().min(2).max(50).required(),
       document: Yup.string().min(2).max(50).required(),
       color: Yup.string().min(2).max(10).required(),
@@ -136,60 +134,6 @@ export default function Panel() {
       appContext.onCloseLoading();
     }
   };
-
-  function handleImageChange(e: any) {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-
-    reader.onloadend = () => {
-      const image = new Image();
-      //@ts-ignore
-      image.src = reader.result;
-
-      image.onload = () => {
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-
-        // Define a largura e altura máximas para a imagem
-        const maxWidth = 800;
-        const maxHeight = 800;
-
-        let width = image.width;
-        let height = image.height;
-
-        // Redimensiona a imagem se a largura ou altura excederem os limites máximos
-        if (width > maxWidth || height > maxHeight) {
-          const ratio = Math.min(maxWidth / width, maxHeight / height);
-          width *= ratio;
-          height *= ratio;
-        }
-
-        // Desenha a imagem redimensionada no canvas
-        canvas.width = width;
-        canvas.height = height;
-        //@ts-ignore
-        context.drawImage(image, 0, 0, width, height);
-
-        // Converte o conteúdo do canvas em uma URL de dados com a melhor qualidade
-        const dataURL = canvas.toDataURL(file.type, 1);
-
-        // Define a melhor resolução e qualidade da imagem no state (setImageAvatar)
-        formik.setFieldValue('coverImage', dataURL);
-      };
-    };
-
-    if (!e.target.files) {
-      return;
-    }
-
-    if (file.type === 'image/png' || file.type === 'image/jpeg') {
-      reader.readAsDataURL(file);
-      formik.setFieldValue(
-        'coverImage',
-        URL.createObjectURL(e.target.files[0])
-      );
-    }
-  }
 
   return (
     <Page
@@ -235,7 +179,11 @@ export default function Panel() {
                   type='file'
                   accept='image/*'
                   name='coverPreview'
-                  onChange={handleImageChange}
+                  onChange={(event) =>
+                    handleImageImageAndUpload(event, (url: string) =>
+                      formik.setFieldValue('coverImage', url)
+                    )
+                  }
                   position='absolute'
                   top={0}
                   left={0}

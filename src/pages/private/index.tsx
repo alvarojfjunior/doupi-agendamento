@@ -37,13 +37,13 @@ import {
   Button,
   Tag,
   TagLabel,
-  TagCloseButton,
   Modal,
   ModalOverlay,
   ModalContent,
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Heading,
 } from '@chakra-ui/react';
 import makeAnimated from 'react-select/animated';
 import Select from 'react-select';
@@ -53,10 +53,12 @@ import { AddIcon } from '@chakra-ui/icons';
 import { sumHours } from '@/utils/time';
 import AvailableTimesList from '@/components/AvailableTimesList';
 import { withIronSessionSsr } from 'iron-session/next';
+import { Professional, Schedule } from '@/services/database';
+import mongoose from 'mongoose';
+import moment from 'moment';
 
 export const getServerSideProps = withIronSessionSsr(
-  async ({ req, res }) => {
-
+  async ({ req }) => {
     if (!('user' in req.session))
       return {
         redirect: {
@@ -64,12 +66,91 @@ export const getServerSideProps = withIronSessionSsr(
           permanent: false,
         },
       };
+    const user: any = req.session.user;
 
+    let schedules = await Schedule.aggregate([
+      {
+        $addFields: {
+          newDate: {
+            $dateToString: {
+              format: '%Y-%m-%d',
+              date: '$date'
+            }
+          }
+        }
+      },
+      {
+        $match: {
+          companyId: new mongoose.Types.ObjectId(user.companyId),
+          newDate: moment().format('YYYY-MM-DD')
+        }
+      },
+      {
+        $lookup: {
+          from: 'services', // Nome da coleção de serviços
+          let: { serviceIds: '$serviceIds' }, // Array de IDs de serviço da entidade principal
+          pipeline: [
+            {
+              $match: {
+                $expr: { $in: ['$_id', '$$serviceIds'] }, // Filtra os documentos onde o _id está presente no array de IDs
+              },
+            },
+            // Outras etapas do pipeline, se necessário
+          ],
+          as: 'services', // Nome do array no qual os documentos vinculados serão armazenados
+        },
+      },
+      {
+        $lookup: {
+          from: 'professionals',
+          localField: 'professionalId',
+          foreignField: '_id',
+          as: 'professional',
+        },
+      },
+      {
+        $unwind: '$professional',
+      },
+      {
+        $lookup: {
+          from: 'clients',
+          localField: 'clientID',
+          foreignField: '_id',
+          as: 'client',
+        },
+      },
+      {
+        $unwind: '$client',
+      },
+      {
+        $group: {
+          _id: '$professionalId',
+          schedules: { $push: '$$ROOT' },
+        },
+      },
+    ]);
 
-    const user = req.session.user;
+    schedules = schedules.map((s: any) => {
+      const newArr:any = {};
+      newArr.professional = s.schedules[0].professional;
+      newArr.schedules = s.schedules;
+      return newArr;
+    });
+
+    const professionals = await Professional.find({
+      companyId: new mongoose.Types.ObjectId(user.companyId),
+    })
+      .populate({
+        path: 'serviceIds',
+        select: '-image',
+      })
+      .lean();
+
     return {
       props: {
-        user: user,
+        user,
+        schedules: JSON.parse(JSON.stringify(schedules)),
+        professionals: JSON.parse(JSON.stringify(professionals)),
       },
     };
   },
@@ -85,18 +166,16 @@ export const getServerSideProps = withIronSessionSsr(
 
 let user: IUser;
 let api: AxiosInstance;
-export default function Panel() {
+export default function Panel({ schedules, professionals }: any) {
   const appContext = useContext(AppContext);
   const { colorMode } = useColorMode();
   const animatedComponents = makeAnimated();
   const toast = useToast();
-  const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [data, setData] = useState([]);
+  const [data, setData] = useState(schedules);
   const [services, setServices] = useState([]);
-  const [professionals, setProfessionals] = useState([]);
   const [selected, setSelected] = useState({});
+  const [date, setDate] = useState(moment().format('YYYY-MM-DD'));
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const {
@@ -108,14 +187,13 @@ export default function Panel() {
   useEffect(() => {
     user = JSON.parse(String(localStorage.getItem('user')));
     api = getAxiosInstance(user);
-    getData();
+    appContext.onCloseLoading();
   }, []);
 
   const onSubmit = async (values: any) => {
     try {
-      appContext.onOpenLoading();
       let res: any;
-
+      appContext.onOpenLoading();
       values.companyId = user.companyId;
       values.professionalId = values.professional;
       values.serviceIds = values.services.map((s: any) => s.value);
@@ -128,7 +206,7 @@ export default function Panel() {
 
       setIsEditing(false);
       formOnClose();
-      await getSchedules();
+      getSchedules();
       toast({
         title: 'Sucesso!',
         description: 'Os dados foram salvos!',
@@ -137,6 +215,7 @@ export default function Panel() {
         duration: 9000,
         isClosable: true,
       });
+      appContext.onCloseLoading();
     } catch (error: any) {
       toast({
         title: 'Houve um erro',
@@ -174,56 +253,40 @@ export default function Panel() {
     onSubmit: onSubmit,
   });
 
-  const getSchedules = async () => {
+  const getSchedules = async (date?: string) => {
     try {
+      const d = date || moment().format('YYYY-MM-DD');
       const { data } = await api.get(
-        `/api/schedules?companyId=${user.companyId}`
+        `/api/schedules?companyId=${user.companyId}&date=${d}`
       );
       console.log(data);
       setData(data);
-      appContext.onCloseLoading();
     } catch (error) {
       console.log(error);
       appContext.onCloseLoading();
     }
   };
 
-  const getData = async () => {
-    try {
-      appContext.onOpenLoading();
-      await getSchedules();
-
-      const { data: professionals } = await api.get(
-        `/api/professionals?companyId=${user.companyId}`
-      );
-
-      setProfessionals(professionals);
-
-      formik.setFieldValue('professioanl', professionals[0]._id);
-      getServicesPerProfessional(professionals[0]._id);
-
-      appContext.onCloseLoading();
-    } catch (error) {
-      console.log(error);
-      appContext.onCloseLoading();
-    }
-  };
-
-  const getServicesPerProfessional = async (professionalId: string) => {
-    const professional = professionals.find(
-      (p: any) => p._id === professionalId
+  const getServicesPerProfessional = async () => {
+    let professional = professionals.find(
+      (p: any) => p._id === formik.values.professional
     );
-    if (professional) {
-      setServices(
-        //@ts-ignore
-        professional.serviceIds.map((s) => {
-          s.value = s._id;
-          s.label = s.name;
-          return s;
-        })
-      );
-      formik.setFieldValue('services', []);
+
+    if (!professional) {
+      formik.setFieldValue('professional', professionals._id);
+      professional = professionals[0];
     }
+
+    setServices(
+      //@ts-ignore
+      professional.serviceIds.map((s) => {
+        s.value = s._id;
+        s.label = s.name;
+        return s;
+      })
+    );
+
+    formik.setFieldValue('services', []);
   };
 
   return (
@@ -233,9 +296,23 @@ export default function Panel() {
       description='App para genciamento de agendamentos'
     >
       <Box h={'full'} m={5}>
+        <Box textAlign={'center'} mb={10}>
+          <Heading mb={5} fontSize={'2xl'} textAlign={'center'}>
+            Sua Agenda do dia
+          </Heading>
+          <Input
+            w={200}
+            type='date'
+            value={date}
+            onChange={(e: any) => {
+              setDate(e.target.value);
+              getSchedules(e.target.value);
+            }}
+          />
+        </Box>
         <Accordion>
-          {data.map((item: any) => (
-            <AccordionItem roundedTop={10} key={item._id}>
+          {data.map((item: any, ii:number) => (
+            <AccordionItem roundedTop={10} key={ii}>
               <AccordionButton
                 _expanded={{ bg: '#3E4D92', color: 'white' }}
                 roundedTop={10}
@@ -277,11 +354,13 @@ export default function Panel() {
                       item.schedules &&
                       item.schedules.map((schedule: any) => (
                         <GridItem
+                          key={schedule._id}
                           onClick={() => {
                             setSelected(schedule);
                             onOpen();
                           }}
                           cursor={'pointer'}
+                          //@ts-ignore
                           key={schedule._id}
                           border={`1px solid ${
                             colorMode === 'dark' ? '#cccccc3f' : '#cccccc'
@@ -332,7 +411,9 @@ export default function Panel() {
           onClick={() => {
             formik.resetForm();
             setIsEditing(false);
-            setServices([]);
+            getServicesPerProfessional();
+            formik.setFieldValue('professional', professionals[0]._id);
+            formik.setFieldValue('date', moment().format('YYYY-MM-DD'));
             formOnOpen();
           }}
         />
@@ -396,8 +477,8 @@ export default function Panel() {
                   name='professional'
                   value={formik.values.professional}
                   onChange={(e: any) => {
-                    getServicesPerProfessional(e.target.value);
                     formik.setFieldValue('professional', e.target.value);
+                    getServicesPerProfessional();
                   }}
                   //@ts-ignore
                   closeMenuOnSelect={false}
@@ -432,7 +513,7 @@ export default function Panel() {
                     formik.setFieldValue('services', e);
                   }}
                   onBlur={() => {
-                    if (formik.values.services.length > 0)
+                    if (formik.values.services && formik.values.services.length > 0)
                       formik.setFieldValue(
                         'duration',
                         sumHours(

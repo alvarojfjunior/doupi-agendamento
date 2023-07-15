@@ -41,8 +41,8 @@ import { AxiosInstance } from 'axios';
 import { getAxiosInstance } from '@/services/api';
 import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
 import { AddIcon, EditIcon } from '@chakra-ui/icons';
-import { serviceImage } from '@/utils/images';
 import { withIronSessionSsr } from 'iron-session/next';
+import { handleImageImageAndUpload } from '@/utils/upload';
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req, res }) => {
@@ -93,7 +93,6 @@ export default function Services() {
     try {
       appContext.onOpenLoading();
 
-      if (!values.image) values.image = serviceImage;
       values.companyId = user.companyId;
 
       let res: any;
@@ -128,7 +127,7 @@ export default function Services() {
 
   const formik = useFormik({
     initialValues: {
-      image: serviceImage,
+      image: 'http://res.cloudinary.com/dovvizyxg/image/upload/v1689457590/hairdresser-using-drier-hair-client_pkgttk.jpg',
       name: '',
       description: '',
       duration: '',
@@ -193,56 +192,6 @@ export default function Services() {
     }
   };
 
-  function handleImageChange(e: any) {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-
-    reader.onloadend = () => {
-      const image = new Image();
-      //@ts-ignore
-      image.src = reader.result;
-
-      image.onload = () => {
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-
-        // Define a largura e altura máximas para a imagem
-        const maxWidth = 800;
-        const maxHeight = 800;
-
-        let width = image.width;
-        let height = image.height;
-
-        // Redimensiona a imagem se a largura ou altura excederem os limites máximos
-        if (width > maxWidth || height > maxHeight) {
-          const ratio = Math.min(maxWidth / width, maxHeight / height);
-          width *= ratio;
-          height *= ratio;
-        }
-
-        // Desenha a imagem redimensionada no canvas
-        canvas.width = width;
-        canvas.height = height;
-        //@ts-ignore
-        context.drawImage(image, 0, 0, width, height);
-
-        // Converte o conteúdo do canvas em uma URL de dados com a melhor qualidade
-        const dataURL = canvas.toDataURL(file.type, 1);
-
-        // Define a melhor resolução e qualidade da imagem no state (setImageAvatar)
-        formik.setFieldValue('image', dataURL);
-      };
-    };
-
-    if (!e.target.files) {
-      return;
-    }
-
-    if (file.type === 'image/png' || file.type === 'image/jpeg') {
-      reader.readAsDataURL(file);
-      formik.setFieldValue('image', URL.createObjectURL(e.target.files[0]));
-    }
-  }
 
   return (
     <Page
@@ -345,8 +294,8 @@ export default function Services() {
                 display='inline-block'
                 border={'1px solid #ccc'}
                 rounded={20}
-                width={100}
-                height={100}
+                width={200}
+                height={150}
                 overflow='hidden'
                 justifyContent='center'
                 alignItems='center'
@@ -365,7 +314,9 @@ export default function Services() {
                   type='file'
                   accept='image/*'
                   name='image'
-                  onChange={handleImageChange}
+                  onChange={(event) => handleImageImageAndUpload(event, (url: string) =>
+                    formik.setFieldValue('image', url)
+                  )}
                   position='absolute'
                   top={0}
                   left={0}

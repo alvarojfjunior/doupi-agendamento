@@ -4,16 +4,18 @@ import {
   Heading,
   Stack,
   Text,
+  Input,
   useBreakpointValue,
   useColorModeValue,
 } from '@chakra-ui/react';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { withIronSessionSsr } from 'iron-session/next';
+import { handleImageImageAndUpload } from '@/utils/upload';
 
 export const getServerSideProps = withIronSessionSsr(
   ({ req }) => {
-
-    if (('user' in req.session))
+    if ('user' in req.session)
       return {
         redirect: {
           destination: '/private',
@@ -37,11 +39,25 @@ export const getServerSideProps = withIronSessionSsr(
   }
 );
 
+//CLOUD NAME = dovvizyxg
+//API SECRET = 6B0yUi53AguKw7BpYvdWvOKXugY
+//API KEY = 655772814277416
+//api base url = CLOUDINARY_URL=cloudinary://655772814277416:6B0yUi53AguKw7BpYvdWvOKXugY@dovvizyxg
+
 export default function Home({ data }: any) {
+  const [image, setImage] = useState(
+    'https://i.ytimg.com/vi/paiO6M2wBqE/maxresdefault.jpg'
+  );
   const router = useRouter();
 
   return (
     <Stack h={'full'} direction={{ base: 'column', md: 'row' }}>
+      <Input
+        type='file'
+        accept='image/*'
+        onChange={(e) => handleImageImageAndUpload(e, (url: any)=> setImage(url))}
+      />
+      <img src={image} />
       <Flex p={8} flex={1} align={'center'} justify={'center'}>
         <Stack spacing={6} w={'full'} maxW={'lg'}>
           <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }}>

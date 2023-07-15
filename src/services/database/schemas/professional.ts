@@ -10,6 +10,7 @@ try {
         type: Mongoose.Schema.Types.ObjectId,
         ref: 'Company',
         required: true,
+        index: true,
       },
       name: {
         type: String,

@@ -8,6 +8,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
+
     if (req.method === 'GET') {
       const auth: any = authenticate(req);
       if (!auth) return res.status(401).json({ message: 'Unauthorized' });
@@ -19,24 +20,54 @@ export default async function handler(
       }).lean();
 
       return res.status(200).json(result);
-    } else if (req.method === 'POST') {
+    }
+
+
+    else if (req.method === 'POST') {
+      const auth: any = authenticate(req);
+      if (!auth) return res.status(401).json({ message: 'Unauthorized' });
+
       const body = JSON.parse(JSON.stringify(req.body));
 
-      const client = new Client(body);
 
-      await client.save();
+      let client: any;
+
+      const clienteData = {
+        companyId: auth.companyId,
+        name: body.name,
+        phone: body.phone,
+      };
+
+      const isClientExist = await Client.findOne({
+        companyId: auth.companyId,
+        phone: body.phone,
+      }).lean();
+
+      if (isClientExist) {
+        client = await Client.findByIdAndUpdate(
+          isClientExist._id,
+          clienteData,
+          { new: true }
+        ).lean();
+      } else {
+        client = new Client(clienteData);
+        await client.save();
+      }
 
       createDossie({
-        userId: 'own',
+        userId: auth._id,
         action: 'new',
         identfier: 'client',
       });
 
       return res.status(201).json(client);
-    } else if (req.method === 'PUT') {
-      const body = JSON.parse(JSON.stringify(req.body));
+    }
 
-      body._v++;
+    else if (req.method === 'PUT') {
+      const auth = authenticate(req);
+      if (!auth) return res.status(401).json({ message: 'Unauthorized' });
+
+      const body = JSON.parse(JSON.stringify(req.body));
 
       const _id = body._id;
       delete body._id;
@@ -46,16 +77,19 @@ export default async function handler(
       const { modifiedCount } = await Client.updateOne({ _id }, body).lean();
 
       await createDossie({
-        userId: 'own',
+        userId: _id,
         action: 'update',
         identfier: 'client',
       });
 
       if (modifiedCount > 0) {
-        const clientRes = await Client.findOne({ _id }).lean();
-        return res.status(200).json(clientRes);
+        const companyRes = await Client.findOne({ _id }).lean();
+        return res.status(200).json(companyRes);
       } else return res.status(500);
-    } else if (req.method === 'DELETE') {
+    }
+
+
+    else if (req.method === 'DELETE') {
       const auth: any = authenticate(req);
       if (!auth) return res.status(401).json({ message: 'Unauthorized' });
 

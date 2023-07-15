@@ -19,7 +19,10 @@ export default async function handler(
       }).lean();
 
       return res.status(200).json(result);
-    } else if (req.method === 'POST') {
+    }
+
+
+    else if (req.method === 'POST') {
       const auth: any = authenticate(req);
       if (!auth) return res.status(401).json({ message: 'Unauthorized' });
 
@@ -30,7 +33,7 @@ export default async function handler(
       await service.save();
 
       createDossie({
-        userId: 'own',
+        userId: auth._id,
         action: 'new',
         identfier: 'service',
       });

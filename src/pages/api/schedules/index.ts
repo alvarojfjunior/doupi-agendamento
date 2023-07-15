@@ -3,6 +3,7 @@ import { Client, Schedule } from '../../../services/database';
 import { authenticate } from '@/utils/apiAuth';
 import { createDossie } from '@/utils/createDossie';
 import mongoose from 'mongoose';
+import moment from 'moment'
 
 export default async function handler(
   req: NextApiRequest,
@@ -16,7 +17,22 @@ export default async function handler(
       const query = JSON.parse(JSON.stringify(req.query));
 
       let schedules = await Schedule.aggregate([
-        { $match: { companyId: new mongoose.Types.ObjectId(query.companyId) } },
+        {
+          $addFields: {
+            newDate: {
+              $dateToString: {
+                format: '%Y-%m-%d',
+                date: '$date'
+              }
+            }
+          }
+        },
+        {
+          $match: {
+            companyId: new mongoose.Types.ObjectId(query.companyId),
+            newDate: moment(query.date).format('YYYY-MM-DD')
+          }
+        },
         {
           $lookup: {
             from: 'services', // Nome da coleção de serviços
@@ -63,7 +79,7 @@ export default async function handler(
       ]);
 
       schedules = schedules.map((s: any) => {
-        const newArr: any = {};
+        const newArr:any = {};
         newArr.professional = s.schedules[0].professional;
         newArr.schedules = s.schedules;
         return newArr;
@@ -77,7 +93,7 @@ export default async function handler(
       const body = JSON.parse(JSON.stringify(req.body));
 
       const clienteData = {
-        companyId: auth._id,
+        companyId: body.companyId,
         name: body.name,
         phone: body.phone,
       };
@@ -85,7 +101,7 @@ export default async function handler(
       let client;
 
       const isClientExist = await Client.findOne({
-        companyId: auth._id,
+        companyId: body.companyId,
         phone: body.phone,
       }).lean();
 

@@ -9,6 +9,7 @@ try {
       companyId: {
         type: String,
         required: true,
+        index: true,
       },
       name: {
         type: String,

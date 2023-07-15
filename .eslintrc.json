@@ -15,6 +15,7 @@
     "@typescript-eslint/ban-ts-comment": "off",
     "react/react-in-jsx-scope": "off",
     "@typescript-eslint/no-unused-vars": "off",
+    "react/jsx-no-duplicate-props": "off",
     "@typescript-eslint/ban-types": "off",
     "react/prop-types": "off",
     "no-undef": "off"

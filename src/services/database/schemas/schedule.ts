@@ -10,16 +10,19 @@ try {
         type: Mongoose.Schema.Types.ObjectId,
         ref: 'Company',
         required: true,
+        index: true,
       },
       clientID: {
         type: Mongoose.Schema.Types.ObjectId,
         ref: 'Client',
         required: true,
+        index: true,
       },
       professionalId: {
         type: Mongoose.Schema.Types.ObjectId,
         ref: 'Professional',
         required: true,
+        index: true,
       },
       serviceIds: [
         {
@@ -41,5 +44,6 @@ try {
       },
     },
     { collection: 'schedules', timestamps: true }
-  );
+  )
+  ScheduleSchemaSchema.index({ serviceIds: 1 })
 }

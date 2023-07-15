@@ -2,7 +2,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { Company, User } from '../../../services/database';
 import bcrypt from 'bcrypt';
 import { createDossie } from '@/utils/createDossie';
-import { defaultCoverImage, defaultLogoImage } from '@/utils/images';
 
 export default async function handler(
   req: NextApiRequest,
@@ -15,10 +14,10 @@ export default async function handler(
       const newCompany = {
         name: body.companyName,
         color: '#2D4356',
+        coverImage: 'http://res.cloudinary.com/dovvizyxg/image/upload/v1689457021/barber-shop-design-template-a5839e60d342e6dafe51cf9a413870ee_screen_pzaim3.jpg',
+        logoImage: 'http://res.cloudinary.com/dovvizyxg/image/upload/v1689457382/logoipsum-285_y7nomd.png',
         businessType: body.type,
         responsableName: body.userName,
-        logoImage: defaultLogoImage,
-        coverImage: defaultCoverImage,
         email: body.email,
         phone: body.phone,
         whatsapp: body.phone,

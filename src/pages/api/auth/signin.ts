@@ -45,6 +45,7 @@ export default withIronSessionApiRoute(
 
           req.session.user = {
             _id: user._id,
+            companyId: user.companyId,
             name: user.name,
             email: user.email,
           };

@@ -42,8 +42,8 @@ import { getAxiosInstance } from '@/services/api';
 import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
 import { AddIcon, EditIcon } from '@chakra-ui/icons';
 import SchedulesInput from '@/components/SchedulesInput';
-import { profissionalPhoto } from '@/utils/images';
 import { withIronSessionSsr } from 'iron-session/next';
+import { handleImageImageAndUpload } from '@/utils/upload';
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req, res }) => {
@@ -95,7 +95,6 @@ export default function Professionals() {
     try {
       appContext.onOpenLoading();
 
-      if (!values.photo) values.photo = profissionalPhoto;
       values.companyId = user.companyId;
       values.serviceIds = values.services.map((s: any) => s.value);
       delete values.services;
@@ -132,7 +131,7 @@ export default function Professionals() {
 
   const formik = useFormik({
     initialValues: {
-      photo: profissionalPhoto,
+      photo: 'http://res.cloudinary.com/dovvizyxg/image/upload/v1689457969/barber-shop-mens-haircut-vintage-barbershop-shaving-barber-scissors-barber-straight-razor-scissors-over-blue-background-215247336_rtkpq7.webp',
       name: '',
       description: '',
       phone: '',
@@ -432,7 +431,7 @@ export default function Professionals() {
               >
                 <ChakraImage
                   src={
-                    formik.values.photo ? formik.values.photo : '/avatar.png'
+                    formik.values.photo
                   }
                   alt='Foto'
                   mb={2}
@@ -446,7 +445,9 @@ export default function Professionals() {
                   type='file'
                   accept='image/*'
                   name='coverPreview'
-                  onChange={handleImageChange}
+                  onChange={(event)=> handleImageImageAndUpload(event, (url: string) =>
+                    formik.setFieldValue('photo', url)
+                  )}
                   position='absolute'
                   top={0}
                   left={0}
