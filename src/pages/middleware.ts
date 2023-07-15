@@ -14,6 +14,7 @@ export const middleware = async (req: NextRequest) => {
     },
   });
 
+  //@ts-ignore
   const { user } = session;
 
   console.log("from middleware", { user });

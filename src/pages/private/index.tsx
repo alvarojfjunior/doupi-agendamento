@@ -56,21 +56,22 @@ import { withIronSessionSsr } from 'iron-session/next';
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req, res }) => {
-    const user = req.session.user;
-    if (!user) {
+
+    if (!('user' in req.session))
       return {
         redirect: {
           destination: '/signin',
           permanent: false,
         },
       };
-    } else {
-      return {
-        props: {
-          user: user,
-        },
-      };
-    }
+
+
+    const user = req.session.user;
+    return {
+      props: {
+        user: user,
+      },
+    };
   },
   {
     cookieName: 'doupi_cookie',
