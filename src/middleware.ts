@@ -17,8 +17,6 @@ export const middleware = async (req: NextRequest) => {
   //@ts-ignore
   const { user } = session;
 
-  console.log("from middleware", { user });
-
   if (!user) {
     return NextResponse.redirect(new URL('/', req.url))
   }
