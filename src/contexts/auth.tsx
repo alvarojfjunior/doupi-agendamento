@@ -35,14 +35,6 @@ export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
       }
     }
 
-    const isAuthRoute = router.pathname.indexOf('private') > -1;
-
-    if (!auth && isAuthRoute) {
-      router.push('signin');
-    } else if (auth && !isAuthRoute) {
-      router.push('private');
-    }
-
     setIsAuth(auth);
   }, [router]);
 

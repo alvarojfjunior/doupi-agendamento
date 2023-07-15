@@ -19,6 +19,34 @@ import { Formik, Form, Field } from 'formik';
 import { useRouter } from 'next/router';
 import { getAxiosInstance } from '@/services/api';
 import { AppContext } from '@/contexts/app';
+import { withIronSessionSsr } from 'iron-session/next';
+
+export const getServerSideProps = withIronSessionSsr(
+  ({ req }) => {
+
+    if (('user' in req.session))
+      return {
+        redirect: {
+          destination: '/private',
+          permanent: false,
+        },
+      };
+    else
+      return {
+        props: {
+          user: null,
+        },
+      };
+  },
+  {
+    cookieName: 'doupi_cookie',
+    //@ts-ignore
+    password: process.env.SESSION_SECRET,
+    cookieOptions: {
+      secure: process.env.NODE_ENV === 'production',
+    },
+  }
+);
 
 export default function ResetPasswordForm(): JSX.Element {
   const toast = useToast();

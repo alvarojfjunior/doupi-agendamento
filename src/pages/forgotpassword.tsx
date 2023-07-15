@@ -19,6 +19,34 @@ import { useContext, useEffect } from 'react';
 import { useToast } from '@chakra-ui/react';
 import * as Yup from 'yup';
 import { getAxiosInstance } from '@/services/api';
+import { withIronSessionSsr } from 'iron-session/next';
+
+export const getServerSideProps = withIronSessionSsr(
+  ({ req }) => {
+
+    if (('user' in req.session))
+      return {
+        redirect: {
+          destination: '/private',
+          permanent: false,
+        },
+      };
+    else
+      return {
+        props: {
+          user: null,
+        },
+      };
+  },
+  {
+    cookieName: 'doupi_cookie',
+    //@ts-ignore
+    password: process.env.SESSION_SECRET,
+    cookieOptions: {
+      secure: process.env.NODE_ENV === 'production',
+    },
+  }
+);
 
 export default function ForgotPasswordForm(): JSX.Element {
   const router = useRouter();

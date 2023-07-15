@@ -52,6 +52,35 @@ import * as Yup from 'yup';
 import { AddIcon } from '@chakra-ui/icons';
 import { sumHours } from '@/utils/time';
 import AvailableTimesList from '@/components/AvailableTimesList';
+import { withIronSessionSsr } from 'iron-session/next';
+
+export const getServerSideProps = withIronSessionSsr(
+  async ({ req, res }) => {
+    const user = req.session.user;
+    if (!user) {
+      return {
+        redirect: {
+          destination: '/signin',
+          permanent: false,
+        },
+      };
+    } else {
+      return {
+        props: {
+          user: user,
+        },
+      };
+    }
+  },
+  {
+    cookieName: 'doupi_cookie',
+    //@ts-ignore
+    password: process.env.SESSION_SECRET,
+    cookieOptions: {
+      secure: process.env.NODE_ENV === 'production',
+    },
+  }
+);
 
 let user: IUser;
 let api: AxiosInstance;

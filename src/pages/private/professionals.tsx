@@ -42,7 +42,36 @@ import { getAxiosInstance } from '@/services/api';
 import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
 import { AddIcon, EditIcon } from '@chakra-ui/icons';
 import SchedulesInput from '@/components/SchedulesInput';
-import { defaultLogoImage, profissionalPhoto } from '@/utils/images';
+import { profissionalPhoto } from '@/utils/images';
+import { withIronSessionSsr } from 'iron-session/next';
+
+export const getServerSideProps = withIronSessionSsr(
+  async ({ req, res }) => {
+    const user = req.session.user;
+    if (!user) {
+      return {
+        redirect: {
+          destination: '/signin',
+          permanent: false,
+        },
+      };
+    } else {
+      return {
+        props: {
+          user: user,
+        },
+      };
+    }
+  },
+  {
+    cookieName: 'doupi_cookie',
+    //@ts-ignore
+    password: process.env.SESSION_SECRET,
+    cookieOptions: {
+      secure: process.env.NODE_ENV === 'production',
+    },
+  }
+);
 
 let user: IUser;
 let api: AxiosInstance;

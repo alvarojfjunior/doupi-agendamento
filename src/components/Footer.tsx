@@ -45,7 +45,7 @@ const SocialButton = ({
 
 export default function SmallWithLogoLeft() {
   const router = useRouter();
-  const { isAuth, users } = useContext(AuthContext);
+  const { isAuth } = useContext(AuthContext);
   return (
     <Box
       w='full'

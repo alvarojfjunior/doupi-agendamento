@@ -43,7 +43,11 @@ export default withIronSessionApiRoute(
             identfier: 'user',
           });
 
-          req.session.user = user;
+          req.session.user = {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+          };
           await req.session.save();
           return res.status(200).json(user);
         }
@@ -60,7 +64,6 @@ export default withIronSessionApiRoute(
     cookieName: 'doupi_cookie',
     //@ts-ignore
     password: process.env.SESSION_SECRET,
-    // secure: true should be used in production (HTTPS) but can't be used in development (HTTP)
     cookieOptions: {
       secure: process.env.NODE_ENV === 'production',
     },
