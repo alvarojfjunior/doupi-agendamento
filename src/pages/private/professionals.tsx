@@ -417,7 +417,7 @@ export default function Professionals() {
               isRequired
               isInvalid={!!formik.errors.photo && formik.touched.photo}
             >
-              <FormLabel>Foto</FormLabel>
+              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Foto</FormLabel>
               <Box
                 position='relative'
                 display='inline-block'
@@ -467,7 +467,7 @@ export default function Professionals() {
               isRequired
               isInvalid={!!formik.errors.name && formik.touched.name}
             >
-              <FormLabel>Nome</FormLabel>
+              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Nome</FormLabel>
               <Input
                 type='text'
                 name='name'
@@ -484,7 +484,7 @@ export default function Professionals() {
                 !!formik.errors.description && formik.touched.description
               }
             >
-              <FormLabel>Descrição</FormLabel>
+              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Descrição</FormLabel>
               <Input
                 type='text'
                 name='description'
@@ -499,7 +499,7 @@ export default function Professionals() {
               isRequired
               isInvalid={!!formik.errors.phone && formik.touched.phone}
             >
-              <FormLabel>Telefone </FormLabel>
+              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Telefone </FormLabel>
               <Input
                 name='phone'
                 as={InputMask}
@@ -515,7 +515,7 @@ export default function Professionals() {
               isRequired
               isInvalid={!!formik.errors.whatsapp && formik.touched.whatsapp}
             >
-              <FormLabel> Whatsapp </FormLabel>
+              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}> Whatsapp </FormLabel>
 
               <Input
                 name='whatsapp'
@@ -533,7 +533,7 @@ export default function Professionals() {
               //@ts-ignore
               isInvalid={!!formik.errors.services && formik.touched.services}
             >
-              <FormLabel> Serviços </FormLabel>
+              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}> Serviços </FormLabel>
               <Select
                 name='services'
                 value={formik.values.services}
@@ -582,7 +582,7 @@ export default function Professionals() {
                 formik.touched.defaultSchedule
               }
             >
-              <FormLabel> Períodos de Trabalho Padrão </FormLabel>
+              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}> Períodos de Trabalho Padrão </FormLabel>
               <SchedulesInput
                 schedules={formik.values.defaultSchedule}
                 onChange={(value: any) =>

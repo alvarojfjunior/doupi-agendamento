@@ -18,8 +18,6 @@ export default async function handler(
         ...query,
       }).lean();
 
-      console.log(result)
-
       return res.status(200).json(result);
     }
 

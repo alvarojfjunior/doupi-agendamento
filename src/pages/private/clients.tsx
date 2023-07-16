@@ -263,7 +263,7 @@ export default function Clients() {
               isRequired
               isInvalid={!!formik.errors.name && formik.touched.name}
             >
-              <FormLabel>Nome</FormLabel>
+              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Nome</FormLabel>
               <Input
                 type='text'
                 name='name'
@@ -277,7 +277,7 @@ export default function Clients() {
               isRequired
               isInvalid={!!formik.errors.phone && formik.touched.phone}
             >
-              <FormLabel>Telefone </FormLabel>
+              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Telefone </FormLabel>
               <Input
                 name='phone'
                 as={InputMask}

@@ -158,7 +158,7 @@ export default function SignIn() {
                       id='email'
                       isInvalid={!!errors.email && touched.email}
                     >
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Email</FormLabel>
                       <Field as={Input} name='email' />
                       <FormErrorMessage>{errors.email}</FormErrorMessage>
                     </FormControl>
@@ -167,7 +167,7 @@ export default function SignIn() {
                       id='password'
                       isInvalid={!!errors.password && touched.password}
                     >
-                      <FormLabel>Senha</FormLabel>
+                      <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Senha</FormLabel>
                       <InputGroup>
                         <Field
                           as={Input}

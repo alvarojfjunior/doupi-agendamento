@@ -27,7 +27,6 @@ import {
   DrawerFooter,
   Button,
 } from '@chakra-ui/react';
-import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -288,7 +287,7 @@ export default function Services() {
               isRequired
               isInvalid={!!formik.errors.image && formik.touched.image}
             >
-              <FormLabel>Imagem</FormLabel>
+              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Imagem</FormLabel>
               <Box
                 position='relative'
                 display='inline-block'
@@ -336,7 +335,7 @@ export default function Services() {
               isRequired
               isInvalid={!!formik.errors.name && formik.touched.name}
             >
-              <FormLabel>Nome</FormLabel>
+              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Nome</FormLabel>
               <Input
                 type='text'
                 name='name'
@@ -353,7 +352,7 @@ export default function Services() {
                 !!formik.errors.description && formik.touched.description
               }
             >
-              <FormLabel>Descrição</FormLabel>
+              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Descrição</FormLabel>
               <Input
                 type='text'
                 name='description'
@@ -369,7 +368,7 @@ export default function Services() {
                 isRequired
                 isInvalid={!!formik.errors.price && formik.touched.price}
               >
-                <FormLabel>Preço </FormLabel>
+                <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Preço </FormLabel>
                 <Input
                   name='price'
                   as={InputMask}
@@ -385,7 +384,7 @@ export default function Services() {
                 isRequired
                 isInvalid={!!formik.errors.duration && formik.touched.duration}
               >
-                <FormLabel> Duração do Serviço </FormLabel>
+                <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}> Duração do Serviço </FormLabel>
 
                 <Input
                   name='duration'

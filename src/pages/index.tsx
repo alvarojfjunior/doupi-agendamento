@@ -7,6 +7,7 @@ import {
   Input,
   useBreakpointValue,
   useColorModeValue,
+  Image,
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
@@ -39,28 +40,22 @@ export const getServerSideProps = withIronSessionSsr(
   }
 );
 
-//CLOUD NAME = dovvizyxg
-//API SECRET = 6B0yUi53AguKw7BpYvdWvOKXugY
-//API KEY = 655772814277416
-//api base url = CLOUDINARY_URL=cloudinary://655772814277416:6B0yUi53AguKw7BpYvdWvOKXugY@dovvizyxg
 
 export default function Home({ data }: any) {
-  const [image, setImage] = useState(
-    'https://i.ytimg.com/vi/paiO6M2wBqE/maxresdefault.jpg'
-  );
   const router = useRouter();
 
   return (
     <Stack h={'full'} direction={{ base: 'column', md: 'row' }}>
-      <Input
-        type='file'
-        accept='image/*'
-        onChange={(e) => handleImageImageAndUpload(e, (url: any)=> setImage(url))}
-      />
-      <img src={image} />
       <Flex p={8} flex={1} align={'center'} justify={'center'}>
         <Stack spacing={6} w={'full'} maxW={'lg'}>
           <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }}>
+            <Text
+              color={useColorModeValue('#3e4d92', '#3e4d92')}
+              as={'span'}
+              textAlign={'center'}
+            >
+              Diga adeus a bagunça e dê olá para a
+            </Text>{' '}
             <Text
               as={'span'}
               position={'relative'}
@@ -79,40 +74,38 @@ export default function Home({ data }: any) {
               Doupi
             </Text>
             <br />{' '}
-            <Text
-              color={useColorModeValue('#3e4d92', '#3e4d92')}
-              as={'span'}
-              textAlign={'center'}
-            >
-              Gerencie todo o seu negócio com o Doupi!
-            </Text>{' '}
           </Heading>
-          <Text fontSize={{ base: 'md', lg: 'lg' }} color={'gray.500'}>
-            Com o Doupi, você consegue controlar todos os agendamentos do seu
-            negócio e se tornar cada vez mais profissional e competitivo!
+          <Text fontSize={{ base: 'md', lg: 'lg' }} textAlign={'justify'} color={'gray.500'}>
+            Bem-vindo à Doupi, onde a simplicidade e a praticidade são nossas
+            maiores prioridades. Nós entendemos as dores e frustrações de lidar
+            com agenda desorganizada, compromissos perdidos e o estresse que
+            acompanha essa desorganização. É por isso que estamos aqui para
+            ajudar!
           </Text>
           <Stack direction={{ base: 'column', md: 'row' }} spacing={4}>
             <Button
               rounded={'full'}
               bg={useColorModeValue('#ffc03f', '#3e4d92')}
+              size={"lg"}
               color={'white'}
               _hover={{ filter: 'brightness(110%)' }}
               onClick={() => router.push('/signup')}
             >
-              Testar Grátis!
-            </Button>
-            <Button rounded={'full'} onClick={() => router.push('/signin')}>
-              Entrar
+              Saiba mais
             </Button>
           </Stack>
         </Stack>
       </Flex>
-      <Flex
-        flex={1}
-        alignItems={'center'}
-        justifyContent={'center'}
-        flexDir={'column'}
-      ></Flex>
+
+      <Flex w={{ md: '50%' }}>
+        <Image
+          alt={'main image'}
+          margin={'auto'}
+          textAlign={'center'}
+          src={'home-image.png'}
+          maxH={400}
+        />
+      </Flex>
     </Stack>
   );
 }

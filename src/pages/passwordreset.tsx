@@ -153,7 +153,7 @@ export default function ResetPasswordForm(): JSX.Element {
                 isRequired
                 isInvalid={!!errors.newPassword && touched.newPassword}
               >
-                <FormLabel>Nova senha</FormLabel>
+                <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Nova senha</FormLabel>
                 <InputGroup>
                   <Field
                     placeholder='Nova senha'
@@ -179,7 +179,7 @@ export default function ResetPasswordForm(): JSX.Element {
                 id='confirmPassword'
                 isInvalid={!!errors.confirmPassword && touched.confirmPassword}
               >
-                <FormLabel>Confirme a nova senha</FormLabel>
+                <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Confirme a nova senha</FormLabel>
                 <InputGroup>
                   <Field
                     placeholder='Confirme a senha'

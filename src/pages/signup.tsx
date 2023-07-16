@@ -194,7 +194,7 @@ export default function SignupCard() {
                         isRequired
                         isInvalid={!!errors.companyName && touched.companyName}
                       >
-                        <FormLabel>Nome da Empresa</FormLabel>
+                        <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Nome da Empresa</FormLabel>
                         <Field as={Input} type='text' name='companyName' />
                       </FormControl>
 
@@ -217,7 +217,7 @@ export default function SignupCard() {
                           isRequired
                           isInvalid={!!errors.type && touched.type}
                         >
-                          <FormLabel>Ramo da sua empresa</FormLabel>
+                          <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Ramo da sua empresa</FormLabel>
                           <Field as={Select} type='text' name='type'>
                             <option value='Beleza'>Beleza</option>
                             <option value='Clínica'>Clínica</option>
@@ -243,7 +243,7 @@ export default function SignupCard() {
                       isRequired
                       isInvalid={!!errors.email && touched.email}
                     >
-                      <FormLabel>Email para contato e login</FormLabel>
+                      <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Email para contato e login</FormLabel>
                       <Field as={Input} type='email' name='email' />
                     </FormControl>
 
@@ -255,7 +255,7 @@ export default function SignupCard() {
                             isRequired
                             isInvalid={!!errors.password && touched.password}
                           >
-                            <FormLabel>Senha</FormLabel>
+                            <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Senha</FormLabel>
                             <InputGroup>
                               <Field
                                 as={Input}
@@ -294,7 +294,7 @@ export default function SignupCard() {
                               touched.confirmPassword
                             }
                           >
-                            <FormLabel>Confirme a Senha</FormLabel>
+                            <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Confirme a Senha</FormLabel>
                             <InputGroup>
                               <Field
                                 as={Input}

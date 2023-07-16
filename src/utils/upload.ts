@@ -1,6 +1,5 @@
 import axios from "axios";
 
-
 //CLOUD NAME = dovvizyxg
 //API SECRET = 6B0yUi53AguKw7BpYvdWvOKXugY
 //API KEY = 655772814277416

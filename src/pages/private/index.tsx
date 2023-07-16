@@ -298,7 +298,7 @@ export default function Panel({ schedules, professionals }: any) {
       <Box h={'full'} m={5}>
         <Box textAlign={'center'} mb={10}>
           <Heading mb={5} fontSize={'2xl'} textAlign={'center'}>
-            Sua Agenda do dia
+            Agenda do dia
           </Heading>
           <Input
             w={200}
@@ -437,7 +437,7 @@ export default function Panel({ schedules, professionals }: any) {
                 isRequired
                 isInvalid={!!formik.errors.name && formik.touched.name}
               >
-                <FormLabel>Nome do Cliente</FormLabel>
+                <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Nome do Cliente</FormLabel>
                 <Input
                   type='text'
                   name='name'
@@ -451,7 +451,7 @@ export default function Panel({ schedules, professionals }: any) {
                 isRequired
                 isInvalid={!!formik.errors.phone && formik.touched.phone}
               >
-                <FormLabel>Telefone </FormLabel>
+                <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Telefone </FormLabel>
                 <Input
                   name='phone'
                   as={InputMask}
@@ -499,7 +499,7 @@ export default function Panel({ schedules, professionals }: any) {
                 isInvalid={!!formik.errors.services && formik.touched.services}
               >
                 <HStack alignContent={'center'}>
-                  <FormLabel> Serviços </FormLabel>
+                  <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}> Serviços </FormLabel>
                   <Text color={'blue.500'}>
                     {' '}
                     {formik.values.duration &&
@@ -564,7 +564,7 @@ export default function Panel({ schedules, professionals }: any) {
                 //@ts-ignore
                 isInvalid={!!formik.errors.date && formik.touched.date}
               >
-                <FormLabel>Data</FormLabel>
+                <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Data</FormLabel>
                 <Input
                   type='date'
                   name='date'
@@ -579,7 +579,7 @@ export default function Panel({ schedules, professionals }: any) {
                 isRequired
                 isInvalid={!!formik.errors.time && formik.touched.time}
               >
-                <FormLabel>Horário</FormLabel>
+                <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Horário</FormLabel>
                 <AvailableTimesList
                   handleSelectTime={(time: string) =>
                     formik.setFieldValue('time', time)

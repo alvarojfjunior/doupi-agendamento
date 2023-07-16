@@ -146,7 +146,7 @@ export default function ForgotPasswordForm(): JSX.Element {
                     id='email'
                     isInvalid={!!errors.email && touched.email}
                   >
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Email</FormLabel>
                     <Field as={Input} name='email' />
                     <FormErrorMessage>{errors.email}</FormErrorMessage>
                   </FormControl>

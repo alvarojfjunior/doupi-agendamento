@@ -88,6 +88,8 @@ export default function Navbar() {
             icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
             aria-label={'Open Menu'}
             display={{ md: 'none' }}
+            //@ts-ignore
+            visibility={ !isAuth && "hidden"}
             onClick={isOpen ? onClose : onOpen}
           />
           <HStack spacing={8} alignItems={'center'}>
@@ -133,6 +135,7 @@ export default function Navbar() {
                   >
                     {router.pathname.indexOf('signup') <= -1 && (
                       <Button
+                        display={{ base: 'none', md: 'block', lg: 'block' }}
                         variant={'solid'}
                         fontSize={{ base: 15, md: 15, lg: 15 }}
                         color={useColorModeValue('#fff', '#fff')}
@@ -148,7 +151,6 @@ export default function Navbar() {
                     {router.pathname.indexOf('signin') <= -1 && (
                       <Button
                         mt={{ base: 2, md: 0, lg: 0 }}
-                        display={{ base: 'none', md: 'block', lg: 'block' }}
                         variant={'solid'}
                         bgColor={'#3e4d92'}
                         color={'#fff'}
@@ -224,7 +226,10 @@ export default function Navbar() {
                     color='white'
                     colorScheme='whiteAlpha'
                     variant='ghost'
-                    onClick={() => router.push(link.route)}
+                    onClick={() => {
+                      onClose()
+                      router.push(link.route)
+                    }}
                   >
                     {link.text}
                   </Button>
