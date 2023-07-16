@@ -5,8 +5,8 @@ import axios from "axios";
 //API KEY = 655772814277416
 //api base url = CLOUDINARY_URL=cloudinary://655772814277416:6B0yUi53AguKw7BpYvdWvOKXugY@dovvizyxg
 
-export const handleImageImageAndUpload = async (event: any, callback: Function) => {
-  const file = await compactImage(event.target.files[0]);
+export const handleImageImageAndUpload = async (event: any, quality: number,  callback: Function) => {
+  const file = await compactImage(event.target.files[0], quality);
 
   const formData = new FormData();
   formData.append('file', file);
@@ -24,7 +24,7 @@ export const handleImageImageAndUpload = async (event: any, callback: Function) 
 };
 
 
-async function compactImage(imagem: File): Promise<File> {
+async function compactImage(imagem: File, percent: number): Promise<File> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
@@ -34,7 +34,7 @@ async function compactImage(imagem: File): Promise<File> {
       img.onload = function () {
         const canvas = document.createElement('canvas');
         const ctx:any = canvas.getContext('2d');
-        const quality = 0.4; // qualidade de compressão (80%)
+        const quality = 0.4;
 
         canvas.width = img.width;
         canvas.height = img.height;

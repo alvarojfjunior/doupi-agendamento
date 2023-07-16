@@ -20,6 +20,7 @@ import {
   Center,
   Text,
 } from '@chakra-ui/react';
+import { useState } from 'react';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 import { useRouter } from 'next/router';
 import { AuthContext } from '@/contexts/auth';
@@ -37,21 +38,6 @@ const Links = [
   { route: '/private/services', text: 'Serviços' },
 ];
 
-const NavLink = ({ children }: { children: ReactNode }) => (
-  <Link
-    px={2}
-    py={1}
-    rounded={'md'}
-    _hover={{
-      textDecoration: 'none',
-      bg: useColorModeValue('gray.200', 'gray.700'),
-    }}
-    href={'#'}
-  >
-    {children}
-  </Link>
-);
-
 let user: IUser;
 let api: AxiosInstance;
 export default function Navbar() {
@@ -59,6 +45,7 @@ export default function Navbar() {
   const appContext = useContext(AppContext);
   const { colorMode, toggleColorMode } = useColorMode();
   const router = useRouter();
+  const isCompanyPage = router.asPath.indexOf('/d/') >= 0;
 
   useEffect(() => {
     user = JSON.parse(String(localStorage.getItem('user')));
@@ -81,7 +68,7 @@ export default function Navbar() {
 
   return (
     <>
-      <Box bg={'#3e4d92'} px={4}>
+      <Box bg={'#3e4d92'} px={4} display={isCompanyPage ? 'none' : 'block'}>
         <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
           <IconButton
             size={'md'}
@@ -89,7 +76,7 @@ export default function Navbar() {
             aria-label={'Open Menu'}
             display={{ md: 'none' }}
             //@ts-ignore
-            visibility={ !isAuth && "hidden"}
+            visibility={!isAuth && 'hidden'}
             onClick={isOpen ? onClose : onOpen}
           />
           <HStack spacing={8} alignItems={'center'}>
@@ -227,8 +214,8 @@ export default function Navbar() {
                     colorScheme='whiteAlpha'
                     variant='ghost'
                     onClick={() => {
-                      onClose()
-                      router.push(link.route)
+                      onClose();
+                      router.push(link.route);
                     }}
                   >
                     {link.text}

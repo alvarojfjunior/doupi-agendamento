@@ -445,7 +445,7 @@ export default function Professionals() {
                   type='file'
                   accept='image/*'
                   name='coverPreview'
-                  onChange={(event)=> handleImageImageAndUpload(event, (url: string) =>
+                  onChange={(event)=> handleImageImageAndUpload(event, 0.5, (url: string) =>
                     formik.setFieldValue('photo', url)
                   )}
                   position='absolute'

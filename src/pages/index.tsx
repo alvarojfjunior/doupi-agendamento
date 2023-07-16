@@ -4,15 +4,12 @@ import {
   Heading,
   Stack,
   Text,
-  Input,
   useBreakpointValue,
   useColorModeValue,
   Image,
 } from '@chakra-ui/react';
-import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { withIronSessionSsr } from 'iron-session/next';
-import { handleImageImageAndUpload } from '@/utils/upload';
 
 export const getServerSideProps = withIronSessionSsr(
   ({ req }) => {

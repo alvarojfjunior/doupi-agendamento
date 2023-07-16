@@ -313,7 +313,7 @@ export default function Services() {
                   type='file'
                   accept='image/*'
                   name='image'
-                  onChange={(event) => handleImageImageAndUpload(event, (url: string) =>
+                  onChange={(event) => handleImageImageAndUpload(event, 0.5, (url: string) =>
                     formik.setFieldValue('image', url)
                   )}
                   position='absolute'

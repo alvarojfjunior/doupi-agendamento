@@ -25,6 +25,7 @@ import { getAxiosInstance } from '@/services/api';
 import { useRouter } from 'next/router';
 import { withIronSessionSsr } from 'iron-session/next';
 import { handleImageImageAndUpload } from '@/utils/upload';
+import Link from 'next/link';
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req, res }) => {
@@ -146,6 +147,18 @@ export default function Panel() {
           <Heading mb={5} fontSize={'2xl'} textAlign={'center'}>
             Configurações da empresa
           </Heading>
+          <Box mb={5}>
+            <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+              Link de agendamento
+            </FormLabel>
+            <Link href={`/d/${formik.values.name.replaceAll(' ', '-')}`}>
+              {' '}
+              https://doupi.com.br/d/{formik.values.name.replaceAll(
+                ' ',
+                '-'
+              )}{' '}
+            </Link>
+          </Box>
           <VStack spacing={4} align='stretch'>
             <FormControl
               id='coverImage'
@@ -154,7 +167,9 @@ export default function Panel() {
                 !!formik.errors.coverImage && formik.touched.coverImage
               }
             >
-              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Imagem de Capa</FormLabel>
+              <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                Imagem de Capa
+              </FormLabel>
               <Box
                 position='relative'
                 display='inline-block'
@@ -180,7 +195,7 @@ export default function Panel() {
                   accept='image/*'
                   name='coverPreview'
                   onChange={(event) =>
-                    handleImageImageAndUpload(event, (url: string) =>
+                    handleImageImageAndUpload(event, 0.3, (url: string) =>
                       formik.setFieldValue('coverImage', url)
                     )
                   }
@@ -201,7 +216,9 @@ export default function Panel() {
               isRequired
               isInvalid={!!formik.errors.color && formik.touched.color}
             >
-              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Cor tema</FormLabel>
+              <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                Cor tema
+              </FormLabel>
               <InputColor
                 placement='left'
                 //@ts-ignore
@@ -237,7 +254,9 @@ export default function Panel() {
                   formik.touched.responsableName
                 }
               >
-                <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Nome do responsável</FormLabel>
+                <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                  Nome do responsável
+                </FormLabel>
                 <Input
                   type='text'
                   name='responsableName'
@@ -254,7 +273,9 @@ export default function Panel() {
                   !!formik.errors.businessType && formik.touched.businessType
                 }
               >
-                <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Ramo da empresa</FormLabel>
+                <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                  Ramo da empresa
+                </FormLabel>
                 <Select
                   name='businessType'
                   id='businessType'
@@ -271,7 +292,10 @@ export default function Panel() {
                 isRequired
                 isInvalid={!!formik.errors.document && formik.touched.document}
               >
-                <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}> Documento</FormLabel>
+                <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                  {' '}
+                  Documento
+                </FormLabel>
                 <Input
                   type='string'
                   name='document'
@@ -287,7 +311,9 @@ export default function Panel() {
                 isRequired
                 isInvalid={!!formik.errors.phone && formik.touched.phone}
               >
-                <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Telefone de contato </FormLabel>
+                <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                  Telefone de contato{' '}
+                </FormLabel>
                 <Input
                   name='phone'
                   as={InputMask}
@@ -302,7 +328,10 @@ export default function Panel() {
                 isRequired
                 isInvalid={!!formik.errors.whatsapp && formik.touched.whatsapp}
               >
-                <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}> Whatsapp </FormLabel>
+                <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                  {' '}
+                  Whatsapp{' '}
+                </FormLabel>
 
                 <Input
                   name='whatsapp'
@@ -320,7 +349,10 @@ export default function Panel() {
                 isRequired
                 isInvalid={!!formik.errors.email && formik.touched.email}
               >
-                <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}> Email </FormLabel>
+                <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                  {' '}
+                  Email{' '}
+                </FormLabel>
                 <Input
                   type='email'
                   name='email'

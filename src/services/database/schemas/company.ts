@@ -9,6 +9,7 @@ try {
       name: {
         type: String,
         required: true,
+        unique: true,
       },
       responsableName: {
         type: String,
