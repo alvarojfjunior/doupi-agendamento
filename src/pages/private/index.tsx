@@ -33,6 +33,7 @@ import {
   FormLabel,
   FormControl,
   Input,
+  Checkbox,
   DrawerFooter,
   Button,
   Tag,
@@ -56,6 +57,7 @@ import { withIronSessionSsr } from 'iron-session/next';
 import { Professional, Schedule } from '@/services/database';
 import mongoose from 'mongoose';
 import moment from 'moment';
+import { getScheduleNotification } from '@/utils/notificarions';
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req }) => {
@@ -74,16 +76,16 @@ export const getServerSideProps = withIronSessionSsr(
           newDate: {
             $dateToString: {
               format: '%Y-%m-%d',
-              date: '$date'
-            }
-          }
-        }
+              date: '$date',
+            },
+          },
+        },
       },
       {
         $match: {
           companyId: new mongoose.Types.ObjectId(user.companyId),
-          newDate: moment().format('YYYY-MM-DD')
-        }
+          newDate: moment().format('YYYY-MM-DD'),
+        },
       },
       {
         $lookup: {
@@ -131,7 +133,7 @@ export const getServerSideProps = withIronSessionSsr(
     ]);
 
     schedules = schedules.map((s: any) => {
-      const newArr:any = {};
+      const newArr: any = {};
       newArr.professional = s.schedules[0].professional;
       newArr.schedules = s.schedules;
       return newArr;
@@ -177,6 +179,7 @@ export default function Panel({ schedules, professionals }: any) {
   const [selected, setSelected] = useState({});
   const [date, setDate] = useState(moment().format('YYYY-MM-DD'));
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isNotify, setIsNotify] = useState(true);
 
   const {
     isOpen: formIsOpen,
@@ -194,6 +197,11 @@ export default function Panel({ schedules, professionals }: any) {
     try {
       let res: any;
       appContext.onOpenLoading();
+
+      const serviceNames = values.services.map((s: any) => s.name);
+      const professional = professionals.find(
+        (p: any) => p._id === values.professional
+      );
       values.companyId = user.companyId;
       values.professionalId = values.professional;
       values.serviceIds = values.services.map((s: any) => s.value);
@@ -215,6 +223,30 @@ export default function Panel({ schedules, professionals }: any) {
         duration: 9000,
         isClosable: true,
       });
+
+      console.log(user)
+
+      if (isNotify) {
+        const notidy = getScheduleNotification(
+          res.data._id,
+          values.name,
+          professional.name,
+          user.companyName,
+          serviceNames,
+          moment(date).format('DD/MM/YYYY'),
+          values.time
+        );
+        const message = encodeURIComponent(notidy);
+        const phone = String(values.phone)
+          .replaceAll(' ', '')
+          .replaceAll('(', '')
+          .replaceAll(')', '')
+          .replaceAll('-', '');
+        window.open(
+          `https://api.whatsapp.com/send?phone=${phone}&text=${message}`,
+          '_blank'
+        );
+      }
       appContext.onCloseLoading();
     } catch (error: any) {
       toast({
@@ -311,7 +343,7 @@ export default function Panel({ schedules, professionals }: any) {
           />
         </Box>
         <Accordion>
-          {data.map((item: any, ii:number) => (
+          {data.map((item: any, ii: number) => (
             <AccordionItem roundedTop={10} key={ii}>
               <AccordionButton
                 _expanded={{ bg: '#3E4D92', color: 'white' }}
@@ -437,7 +469,9 @@ export default function Panel({ schedules, professionals }: any) {
                 isRequired
                 isInvalid={!!formik.errors.name && formik.touched.name}
               >
-                <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Nome do Cliente</FormLabel>
+                <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                  Nome do Cliente
+                </FormLabel>
                 <Input
                   type='text'
                   name='name'
@@ -451,7 +485,9 @@ export default function Panel({ schedules, professionals }: any) {
                 isRequired
                 isInvalid={!!formik.errors.phone && formik.touched.phone}
               >
-                <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Telefone </FormLabel>
+                <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                  Telefone{' '}
+                </FormLabel>
                 <Input
                   name='phone'
                   as={InputMask}
@@ -499,7 +535,10 @@ export default function Panel({ schedules, professionals }: any) {
                 isInvalid={!!formik.errors.services && formik.touched.services}
               >
                 <HStack alignContent={'center'}>
-                  <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}> Serviços </FormLabel>
+                  <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                    {' '}
+                    Serviços{' '}
+                  </FormLabel>
                   <Text color={'blue.500'}>
                     {' '}
                     {formik.values.duration &&
@@ -513,7 +552,10 @@ export default function Panel({ schedules, professionals }: any) {
                     formik.setFieldValue('services', e);
                   }}
                   onBlur={() => {
-                    if (formik.values.services && formik.values.services.length > 0)
+                    if (
+                      formik.values.services &&
+                      formik.values.services.length > 0
+                    )
                       formik.setFieldValue(
                         'duration',
                         sumHours(
@@ -556,7 +598,7 @@ export default function Panel({ schedules, professionals }: any) {
               </FormControl>
             </HStack>
 
-            <HStack alignItems={'top'}>
+            <HStack alignItems={'flex-end'}>
               <FormControl
                 mb={3}
                 id='date'
@@ -564,7 +606,9 @@ export default function Panel({ schedules, professionals }: any) {
                 //@ts-ignore
                 isInvalid={!!formik.errors.date && formik.touched.date}
               >
-                <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Data</FormLabel>
+                <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                  Data
+                </FormLabel>
                 <Input
                   type='date'
                   name='date'
@@ -574,38 +618,52 @@ export default function Panel({ schedules, professionals }: any) {
                 />
               </FormControl>
 
-              <FormControl
-                id='time'
-                isRequired
-                isInvalid={!!formik.errors.time && formik.touched.time}
-              >
-                <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Horário</FormLabel>
-                <AvailableTimesList
-                  handleSelectTime={(time: string) =>
-                    formik.setFieldValue('time', time)
-                  }
-                  value={formik.values.time}
-                  date={formik.values.date}
-                  durationToTest={formik.values.duration}
-                  invalidAppointments={[
-                    {
-                      start: '08:00',
-                      end: '09:00',
-                    },
-                  ]}
-                  workPeriods={[
-                    {
-                      start: '08:00',
-                      end: '12:00',
-                    },
-                    {
-                      start: '14:00',
-                      end: '18:00',
-                    },
-                  ]}
-                />
+              <FormControl mb={5}>
+                <Checkbox
+                  m={'auto'}
+                  size={'md'}
+                  fontWeight={'medium'}
+                  checked={isNotify}
+                  onChange={(e: any) => setIsNotify(e.target.checked)}
+                >
+                  {' '}
+                  Notificar por whatsapp{' '}
+                </Checkbox>
               </FormControl>
             </HStack>
+            <FormControl
+              id='time'
+              isRequired
+              isInvalid={!!formik.errors.time && formik.touched.time}
+            >
+              <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                Horário
+              </FormLabel>
+              <AvailableTimesList
+                handleSelectTime={(time: string) =>
+                  formik.setFieldValue('time', time)
+                }
+                value={formik.values.time}
+                date={formik.values.date}
+                durationToTest={formik.values.duration}
+                invalidAppointments={[
+                  {
+                    start: '08:00',
+                    end: '09:00',
+                  },
+                ]}
+                workPeriods={[
+                  {
+                    start: '08:00',
+                    end: '12:00',
+                  },
+                  {
+                    start: '14:00',
+                    end: '18:00',
+                  },
+                ]}
+              />
+            </FormControl>
           </DrawerBody>
 
           <DrawerFooter borderTopWidth='1px'>

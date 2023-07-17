@@ -17,7 +17,10 @@ export default withIronSessionApiRoute(
           return res.status(400).send('All input is required');
         }
 
-        const user = await User.findOne({ email }).lean();
+        const user = await User.findOne({ email }).populate({
+          path: 'companyId',
+          select: 'name'
+        }).lean();
 
         if (!user) return res.status(401).send('Invalid Credentials');
 
@@ -43,14 +46,18 @@ export default withIronSessionApiRoute(
             identfier: 'user',
           });
 
-          req.session.user = {
+          const response = {
             _id: user._id,
-            companyId: user.companyId,
+            companyId: user.companyId._id,
+            companyName: user.companyId.name,
+            token: user.token,
             name: user.name,
             email: user.email,
           };
+
+          req.session.user = response
           await req.session.save();
-          return res.status(200).json(user);
+          return res.status(200).json(response);
         }
         return res.status(401).send('Invalid Credentials');
       }

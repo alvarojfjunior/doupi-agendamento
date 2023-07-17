@@ -7,7 +7,8 @@ try {
   UserSchema = new Mongoose.Schema(
     {
       companyId: {
-        type: String,
+        type: Mongoose.Schema.Types.ObjectId,
+        ref: 'Company',
         required: true,
         index: true,
       },
