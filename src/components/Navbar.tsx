@@ -86,9 +86,7 @@ export default function Navbar() {
               justifyContent={'flex-start'}
               marginLeft={15}
               cursor={'pointer'}
-              onClick={() =>
-                isAuth ? router.push('private') : router.push('/')
-              }
+              onClick={() => router.push('/')}
             >
               <Logo width={120} />
             </Flex>

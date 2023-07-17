@@ -4,13 +4,13 @@ const config: DefaultSeoProps = {
   openGraph: {
     type: 'website',
     locale: 'pt-BR',
-    url: 'https://www.fluencychat.com/',
-    siteName: 'FluencyChat',
+    url: 'https://www.doupi.com/',
+    siteName: 'doupi',
   },
   twitter: {
     handle: '@handle',
     site: '@site',
-    cardType: 'summary_large_image',
+    cardType: 'share-image.jpg',
   },
 };
 
