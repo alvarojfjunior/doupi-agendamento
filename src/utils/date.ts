@@ -22,3 +22,15 @@ export const formatDateForUser = (data: string) => {
   const dataFormatada = `${dia}/${mes}/${ano} ${hora}:${minuto}`;
   return dataFormatada;
 };
+
+
+
+export function getDayOfWeekInPortuguese(date: Date) {
+  const daysOfWeekInPortuguese = [
+    'domingo', 'segunda', 'terca', 'quarta',
+    'quinta', 'sexta', 'sabado'
+  ];
+
+  const dayIndex = date.getDay();
+  return daysOfWeekInPortuguese[dayIndex];
+}

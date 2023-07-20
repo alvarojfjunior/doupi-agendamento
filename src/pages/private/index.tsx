@@ -52,12 +52,13 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { AddIcon } from '@chakra-ui/icons';
 import { sumHours } from '@/utils/time';
-import AvailableTimesList from '@/components/AvailableTimesList';
 import { withIronSessionSsr } from 'iron-session/next';
 import { Professional, Schedule } from '@/services/database';
 import mongoose from 'mongoose';
 import moment from 'moment';
 import { getScheduleNotification } from '@/utils/notificarions';
+import ScheduleAvailability from '@/components/ScheduleAvailability';
+import { getDayOfWeekInPortuguese } from '@/utils/date';
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req }) => {
@@ -180,6 +181,8 @@ export default function Panel({ schedules, professionals }: any) {
   const [date, setDate] = useState(moment().format('YYYY-MM-DD'));
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isNotify, setIsNotify] = useState(true);
+  const [workPeriods, setWorkPeriods] = useState([]);
+  const [selectedDateSchedules, setSelectedDateSchedules] = useState([]);
 
   const {
     isOpen: formIsOpen,
@@ -220,11 +223,11 @@ export default function Panel({ schedules, professionals }: any) {
         description: 'Os dados foram salvos!',
         status: 'success',
         position: 'top-right',
-        duration: 9000,
+        duration: 5000,
         isClosable: true,
       });
 
-      console.log(user)
+      console.log(user);
 
       if (isNotify) {
         const notidy = getScheduleNotification(
@@ -254,7 +257,7 @@ export default function Panel({ schedules, professionals }: any) {
         description: error.Message,
         status: 'error',
         position: 'top-right',
-        duration: 9000,
+        duration: 5000,
         isClosable: true,
       });
       appContext.onCloseLoading();
@@ -275,7 +278,7 @@ export default function Panel({ schedules, professionals }: any) {
     initialValues: {
       name: '',
       phone: '',
-      duration: '',
+      duration: '00:00',
       professional: '',
       services: [],
       date: new Date(),
@@ -291,7 +294,6 @@ export default function Panel({ schedules, professionals }: any) {
       const { data } = await api.get(
         `/api/schedules?companyId=${user.companyId}&date=${d}`
       );
-      console.log(data);
       setData(data);
     } catch (error) {
       console.log(error);
@@ -299,15 +301,49 @@ export default function Panel({ schedules, professionals }: any) {
     }
   };
 
-  const getServicesPerProfessional = async () => {
-    let professional = professionals.find(
-      (p: any) => p._id === formik.values.professional
-    );
+  const getSelectedSchedules = async (date: string) => {
+    try {
+      appContext.onOpenLoading()
+      if (!formik.values.professional) {
+        setSelectedDateSchedules([]);
+        return;
+      }
+
+      const { data } = await api.get(
+        `/api/schedules?companyId=${user.companyId}&date=${date}`
+      );
+
+      let newSchedules: any = [];
+
+      data.forEach((d: any) => {
+        if (d.professional._id === formik.values.professional)
+          newSchedules = d.schedules;
+      });
+
+      if (newSchedules) setSelectedDateSchedules(newSchedules);
+      else setSelectedDateSchedules([]);
+      appContext.onCloseLoading()
+    } catch (error) {
+      console.log(error);
+      appContext.onCloseLoading();
+    }
+  };
+
+  const getServicesPerProfessional = async (professionalId: string) => {
+    let professional = professionals.find((p: any) => p._id === professionalId);
 
     if (!professional) {
-      formik.setFieldValue('professional', professionals._id);
+      formik.setFieldValue('professional', professionals[0]._id);
       professional = professionals[0];
     }
+
+    setWorkPeriods(
+      professional.defaultSchedule.filter(
+        (s: any) =>
+          s.day ===
+          getDayOfWeekInPortuguese(moment(formik.values.date).toDate())
+      )
+    );
 
     setServices(
       //@ts-ignore
@@ -443,7 +479,8 @@ export default function Panel({ schedules, professionals }: any) {
           onClick={() => {
             formik.resetForm();
             setIsEditing(false);
-            getServicesPerProfessional();
+            getServicesPerProfessional(professionals[0]._id);
+            getSelectedSchedules(moment().format('YYYY-MM-DD'));
             formik.setFieldValue('professional', professionals[0]._id);
             formik.setFieldValue('date', moment().format('YYYY-MM-DD'));
             formOnOpen();
@@ -508,13 +545,16 @@ export default function Panel({ schedules, professionals }: any) {
                   !!formik.errors.professional && formik.touched.professional
                 }
               >
-                <FormLabel> Profissional </FormLabel>
+                <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                  {' '}
+                  Profissional{' '}
+                </FormLabel>
                 <ChakraSelect
                   name='professional'
                   value={formik.values.professional}
                   onChange={(e: any) => {
                     formik.setFieldValue('professional', e.target.value);
-                    getServicesPerProfessional();
+                    getServicesPerProfessional(e.target.value);
                   }}
                   //@ts-ignore
                   closeMenuOnSelect={false}
@@ -534,22 +574,27 @@ export default function Panel({ schedules, professionals }: any) {
                 //@ts-ignore
                 isInvalid={!!formik.errors.services && formik.touched.services}
               >
-                <HStack alignContent={'center'}>
+                <Flex>
                   <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
                     {' '}
                     Serviços{' '}
                   </FormLabel>
-                  <Text color={'blue.500'}>
+                  <Text color={'blue.500'} fontSize={'sm'}>
                     {' '}
-                    {formik.values.duration &&
-                      'Duração: ' + formik.values.duration}{' '}
+                    {formik.values.duration}{' '}
                   </Text>
-                </HStack>
+                </Flex>
                 <Select
                   name='services'
                   value={formik.values.services}
                   onChange={(e: any) => {
                     formik.setFieldValue('services', e);
+                    formik.setFieldValue(
+                      'duration',
+                      sumHours(
+                        formik.values.services.map((s: any) => s.duration)
+                      )
+                    );
                   }}
                   onBlur={() => {
                     if (
@@ -562,6 +607,9 @@ export default function Panel({ schedules, professionals }: any) {
                           formik.values.services.map((s: any) => s.duration)
                         )
                       );
+
+                    //Busca os agendamento
+                    getSelectedSchedules(moment().format('YYYY-MM-DD'));
                   }}
                   closeMenuOnSelect={false}
                   components={animatedComponents}
@@ -614,7 +662,12 @@ export default function Panel({ schedules, professionals }: any) {
                   name='date'
                   //@ts-ignore
                   value={formik.values.date}
-                  onChange={formik.handleChange}
+                  onChange={(e) => {
+                    formik.handleChange(e);
+                    getSelectedSchedules(
+                      moment(e.target.value).format('YYYY-MM-DD')
+                    );
+                  }}
                 />
               </FormControl>
 
@@ -637,31 +690,17 @@ export default function Panel({ schedules, professionals }: any) {
               isInvalid={!!formik.errors.time && formik.touched.time}
             >
               <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
-                Horário
+                Horários Disponíveis
               </FormLabel>
-              <AvailableTimesList
-                handleSelectTime={(time: string) =>
-                  formik.setFieldValue('time', time)
-                }
-                value={formik.values.time}
-                date={formik.values.date}
-                durationToTest={formik.values.duration}
-                invalidAppointments={[
-                  {
-                    start: '08:00',
-                    end: '09:00',
-                  },
-                ]}
-                workPeriods={[
-                  {
-                    start: '08:00',
-                    end: '12:00',
-                  },
-                  {
-                    start: '14:00',
-                    end: '18:00',
-                  },
-                ]}
+              <ScheduleAvailability
+                handlChange={(time: string) => {
+                  formik.setFieldValue('time', time);
+                }}
+                interval={30}
+                date={moment(formik.values.date).toDate()}
+                scheduleDuration={formik.values.duration}
+                unavailableTimes={selectedDateSchedules}
+                workPeriods={workPeriods}
               />
             </FormControl>
           </DrawerBody>

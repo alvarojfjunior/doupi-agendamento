@@ -45,7 +45,8 @@ export default function Navbar() {
   const appContext = useContext(AppContext);
   const { colorMode, toggleColorMode } = useColorMode();
   const router = useRouter();
-  const isCompanyPage = router.asPath.indexOf('/d/') >= 0;
+
+  const isCompanyPage = (router.asPath.indexOf('/d/') >= 0) || (router.asPath.indexOf('/a/') >= 0);
 
   useEffect(() => {
     user = JSON.parse(String(localStorage.getItem('user')));

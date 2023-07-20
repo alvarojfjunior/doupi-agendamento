@@ -6,7 +6,7 @@ export const getScheduleNotification = (sheduleId: string, clientName: string, p
   notification += `${servicesNames.length > 1 ? 'Serviços:' : 'Serviço:'} *${servicesNames.map((s: any, i: number) => i < servicesNames.length ? s : s + ',')}*. \n`
   notification += `Data: *${date} as ${hour}*.\n\n`
   notification += `Caso queira cancelar, basta acessar o link abaixo: \n`
-  notification += `https://localhost:3000/a/${sheduleId}`
+  notification += `https://doupi.com.br/a/${sheduleId}`
 
   return notification
 }

@@ -16,7 +16,6 @@ export const handleImageImageAndUpload = async (event: any, quality: number,  ca
       `https://api.cloudinary.com/v1_1/dovvizyxg/image/upload`,
       formData
     );
-    console.log('HEERE', data.url)
     callback(data.secure_url)
   } catch (error) {
     console.log(error);

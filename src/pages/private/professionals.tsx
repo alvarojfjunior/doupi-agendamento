@@ -145,8 +145,8 @@ export default function Professionals() {
         },
         {
           day: 'segunda',
-          end: '14:00',
-          start: '18:00',
+          end: '18:00',
+          start: '14:00',
         },
 
         {
@@ -156,8 +156,8 @@ export default function Professionals() {
         },
         {
           day: 'terca',
-          end: '14:00',
-          start: '18:00',
+          end: '18:00',
+          start: '14:00',
         },
 
         {
@@ -167,8 +167,8 @@ export default function Professionals() {
         },
         {
           day: 'quarta',
-          end: '14:00',
-          start: '18:00',
+          end: '18:00',
+          start: '14:00',
         },
 
         {
@@ -178,8 +178,8 @@ export default function Professionals() {
         },
         {
           day: 'quinta',
-          end: '14:00',
-          start: '18:00',
+          end: '18:00',
+          start: '14:00',
         },
 
         {
@@ -189,8 +189,8 @@ export default function Professionals() {
         },
         {
           day: 'sexta',
-          end: '14:00',
-          start: '18:00',
+          end: '18:00',
+          start: '14:00',
         },
 
         {
