@@ -1,11 +1,9 @@
-import { ReactNode } from 'react';
 import { useContext, useEffect } from 'react';
 import {
   Box,
   Flex,
   Avatar,
   HStack,
-  Link,
   IconButton,
   Button,
   Menu,
@@ -18,9 +16,7 @@ import {
   Stack,
   useColorMode,
   Center,
-  Text,
 } from '@chakra-ui/react';
-import { useState } from 'react';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 import { useRouter } from 'next/router';
 import { AuthContext } from '@/contexts/auth';
@@ -59,7 +55,6 @@ export default function Navbar() {
       const { data } = await api.get(`/api/auth/logout`);
       localStorage.removeItem('user');
       router.push('/');
-
       appContext.onCloseLoading();
     } catch (error) {
       appContext.onCloseLoading();

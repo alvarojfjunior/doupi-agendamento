@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import { Company, Service } from '../../services/database';
 import { getFontColor, modifyTheme, pulsate } from '@/utils/style';
 import { CheckIcon } from '@chakra-ui/icons';
+import Head from 'next/head';
 
 export async function getServerSideProps(context: any) {
   const { companyName } = context.query;
@@ -87,163 +88,168 @@ export default function CompanyPage({ company, services: servicesProps }: any) {
   };
 
   return (
-    <Stack mb={30}>
-      <Box
-        width={'100%'}
-        height={{ base: 150, md: 250, lg: 250 }}
-        overflow='hidden'
-        justifyContent='center'
-        alignItems='center'
-      >
-        <Image alt='company image' w={'full'} src={company.coverImage} />
-      </Box>
-      <Heading
-        fontSize={'3xl'}
-        color={'gray.700'}
-        textAlign={'center'}
-        mt={'20px'}
-      >
-        {company.name}
-      </Heading>
-      <Text textAlign={'center'} color={'gray.600'}>
-        {' '}
-        Selecione um mais serviços para agendar!{' '}
-      </Text>
+    <>
+      <Head>
+        <title>{company.name}</title>
+      </Head>
+      <Stack mb={30}>
+        <Box
+          width={'100%'}
+          height={{ base: 150, md: 250, lg: 250 }}
+          overflow='hidden'
+          justifyContent='center'
+          alignItems='center'
+        >
+          <Image alt='company image' w={'full'} src={company.coverImage} />
+        </Box>
+        <Heading
+          fontSize={'3xl'}
+          color={'gray.700'}
+          textAlign={'center'}
+          mt={'20px'}
+        >
+          {company.name}
+        </Heading>
+        <Text textAlign={'center'} color={'gray.600'}>
+          {' '}
+          Selecione um mais serviços para agendar!{' '}
+        </Text>
 
-      <Flex
-        mt={'50px'}
-        wrap={'wrap'}
-        alignItems={'center'}
-        justifyContent={'center'}
-        gap={{ base: 20, md: 10, lg: 10 }}
-      >
-        {services.map((s: any) => (
-          <Box
-            onClick={() => handleSelectService(s)}
-            cursor={'pointer'}
-            transition={
-              'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s'
-            }
-            _hover={{
-              bgColor: s.selected
-                ? modifyTheme(company.color, 0.3)
-                : modifyTheme(company.color, 0.8),
-              transform: 'scale(1.02)',
-              color: getFontColor(company.color),
-            }}
-            key={s._id}
-            role={'group'}
-            p={6}
-            maxW={'330px'}
-            bg={useColorModeValue('white', 'gray.800')}
-            boxShadow={'2xl'}
-            rounded={'lg'}
-            pos={'relative'}
-            zIndex={1}
-            bgColor={s.selected ? modifyTheme(company.color, 0.3) : '#fff'}
-          >
+        <Flex
+          mt={'50px'}
+          wrap={'wrap'}
+          alignItems={'center'}
+          justifyContent={'center'}
+          gap={{ base: 20, md: 10, lg: 10 }}
+        >
+          {services.map((s: any) => (
             <Box
+              onClick={() => handleSelectService(s)}
+              cursor={'pointer'}
+              transition={
+                'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s'
+              }
+              _hover={{
+                bgColor: s.selected
+                  ? modifyTheme(company.color, 0.3)
+                  : modifyTheme(company.color, 0.8),
+                transform: 'scale(1.02)',
+                color: getFontColor(company.color),
+              }}
+              key={s._id}
+              role={'group'}
+              p={6}
+              maxW={'330px'}
+              bg={useColorModeValue('white', 'gray.800')}
+              boxShadow={'2xl'}
               rounded={'lg'}
-              mt={-12}
               pos={'relative'}
-              height={'230px'}
-              _after={{
-                transition: 'all .3s ease',
-                content: '""',
-                w: 'full',
-                h: 'full',
-                pos: 'absolute',
-                top: 5,
-                left: 0,
-                backgroundImage: `url(${s.image})`,
-                filter: 'blur(15px)',
-                zIndex: -1,
-              }}
-              _groupHover={{
-                _after: {
-                  filter: 'blur(20px)',
-                },
-              }}
+              zIndex={1}
+              bgColor={s.selected ? modifyTheme(company.color, 0.3) : '#fff'}
             >
-              <Image
+              <Box
                 rounded={'lg'}
-                height={230}
-                width={282}
-                objectFit={'cover'}
-                src={s.image}
-              />
-            </Box>
-            <Stack pt={10} align={'center'}>
-              <Heading
-                fontSize={'2xl'}
-                fontFamily={'body'}
-                fontWeight={500}
-                color={'gray.700'}
+                mt={-12}
+                pos={'relative'}
+                height={'230px'}
+                _after={{
+                  transition: 'all .3s ease',
+                  content: '""',
+                  w: 'full',
+                  h: 'full',
+                  pos: 'absolute',
+                  top: 5,
+                  left: 0,
+                  backgroundImage: `url(${s.image})`,
+                  filter: 'blur(15px)',
+                  zIndex: -1,
+                }}
+                _groupHover={{
+                  _after: {
+                    filter: 'blur(20px)',
+                  },
+                }}
               >
-                {s.name + ' '}
-                {s.selected && <CheckIcon color={'green'} />}
-              </Heading>
-              <Text
-                color={'gray.600'}
-                fontSize={'sm'}
-                textTransform={'uppercase'}
-                h={50}
-              >
-                {s.description}
-              </Text>
-              <Stack direction={'row'} align={'center'}>
-                <Text fontWeight={800} fontSize={'xl'}>
-                  R${s.price}
+                <Image
+                  rounded={'lg'}
+                  height={230}
+                  width={282}
+                  objectFit={'cover'}
+                  src={s.image}
+                />
+              </Box>
+              <Stack pt={10} align={'center'}>
+                <Heading
+                  fontSize={'2xl'}
+                  fontFamily={'body'}
+                  fontWeight={500}
+                  color={'gray.700'}
+                >
+                  {s.name + ' '}
+                  {s.selected && <CheckIcon color={'green'} />}
+                </Heading>
+                <Text
+                  color={'gray.600'}
+                  fontSize={'sm'}
+                  textTransform={'uppercase'}
+                  h={50}
+                >
+                  {s.description}
                 </Text>
-                <Text textDecoration={'line-through'} color={'gray.700'}>
-                  {(parseFloat(s.price) + 0.1 * parseFloat(s.price))
-                    .toFixed(2)
-                    .replace('.', ',')}
-                </Text>
+                <Stack direction={'row'} align={'center'}>
+                  <Text fontWeight={800} fontSize={'xl'}>
+                    R${s.price}
+                  </Text>
+                  <Text textDecoration={'line-through'} color={'gray.700'}>
+                    {(parseFloat(s.price) + 0.1 * parseFloat(s.price))
+                      .toFixed(2)
+                      .replace('.', ',')}
+                  </Text>
+                </Stack>
               </Stack>
-            </Stack>
-          </Box>
-        ))}
-      </Flex>
-      <Button
-        mt={'40px'}
-        marginInline={{ base: 5, md: 50, lg: 250 }}
-        fontSize={30}
-        p={10}
-        cursor={isSomeSelected ? 'pointer' : 'auto'}
-        disabled={!isSomeSelected}
-        transition={
-          'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s'
-        }
-        bgColor={
-          isSomeSelected ? company.color : modifyTheme(company.color, 0.6)
-        }
-        _hover={{
-          bgColor: isSomeSelected ? company.color : '',
-          transform: isSomeSelected ? 'scale(1.02)' : '',
-          boxShadow: 'none',
-        }}
-        color={'white'}
-        _active={{ boxShadow: 'none' }}
-        _focus={{ boxShadow: 'none' }}
-        //@ts-ignore
-        animation={isSomeSelected && `${pulsate} 1.5s infinite`}
-        onClick={() => {
-          if (!isSomeSelected)
-            toast({
-              title: 'Selecione um serviço',
-              description:
-                'Você precisa selecionar um serviço antes de continuar',
-              status: 'info',
-              position: 'top-right',
-              duration: 6000,
-              isClosable: true,
-            });
-        }}
-      >
-        {' '}
-        Agendar{' '}
-      </Button>
-    </Stack>
+            </Box>
+          ))}
+        </Flex>
+        <Button
+          mt={'40px'}
+          marginInline={{ base: 5, md: 50, lg: 250 }}
+          fontSize={30}
+          p={10}
+          cursor={isSomeSelected ? 'pointer' : 'auto'}
+          disabled={!isSomeSelected}
+          transition={
+            'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s'
+          }
+          bgColor={
+            isSomeSelected ? company.color : modifyTheme(company.color, 0.6)
+          }
+          _hover={{
+            bgColor: isSomeSelected ? company.color : '',
+            transform: isSomeSelected ? 'scale(1.02)' : '',
+            boxShadow: 'none',
+          }}
+          color={'white'}
+          _active={{ boxShadow: 'none' }}
+          _focus={{ boxShadow: 'none' }}
+          //@ts-ignore
+          animation={isSomeSelected && `${pulsate} 1.5s infinite`}
+          onClick={() => {
+            if (!isSomeSelected)
+              toast({
+                title: 'Selecione um serviço',
+                description:
+                  'Você precisa selecionar um serviço antes de continuar',
+                status: 'info',
+                position: 'top-right',
+                duration: 6000,
+                isClosable: true,
+              });
+          }}
+        >
+          {' '}
+          Agendar{' '}
+        </Button>
+      </Stack>
+    </>
   );
 }

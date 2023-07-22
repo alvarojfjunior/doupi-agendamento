@@ -1,3 +1,4 @@
+import moment from "moment"
 
 
 
@@ -10,3 +11,10 @@ export const getScheduleNotification = (sheduleId: string, clientName: string, p
 
   return notification
 }
+
+
+export const remaindMessage = (schedule: any): string => `Olá *${schedule.client.name
+  }*, passando para te lembrar do nosso agendamento ${moment(
+    schedule.date,
+    'YYYY-MM-DD'
+  ).format('LL')} as *${schedule.time}*. Te aguardo. 😁`

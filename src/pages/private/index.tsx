@@ -1,6 +1,5 @@
 import { useContext, useEffect } from 'react';
 import { AppContext } from '@/contexts/app';
-import { useRouter } from 'next/router';
 import InputMask from 'react-input-mask';
 import Page from '@/components/Page';
 import { IUser } from '@/types/api/User';
@@ -45,20 +44,26 @@ import {
   ModalBody,
   ModalFooter,
   Heading,
+  Textarea,
+  ModalCloseButton,
+  Divider,
 } from '@chakra-ui/react';
+import ConfirmButtonModal from '../../components/ConfirmButtonModal';
 import makeAnimated from 'react-select/animated';
 import Select from 'react-select';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { AddIcon } from '@chakra-ui/icons';
+import { AddIcon, ArrowRightIcon } from '@chakra-ui/icons';
 import { sumHours } from '@/utils/time';
 import { withIronSessionSsr } from 'iron-session/next';
 import { Professional, Schedule } from '@/services/database';
 import mongoose from 'mongoose';
 import moment from 'moment';
-import { getScheduleNotification } from '@/utils/notificarions';
+import 'moment/locale/pt-br';
+import { getScheduleNotification, remaindMessage } from '@/utils/notificarions';
 import ScheduleAvailability from '@/components/ScheduleAvailability';
 import { getDayOfWeekInPortuguese } from '@/utils/date';
+import { pulsate, shakeAnimation } from '@/utils/style';
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req }) => {
@@ -74,7 +79,7 @@ export const getServerSideProps = withIronSessionSsr(
     let schedules = await Schedule.aggregate([
       {
         $addFields: {
-          newDate: {
+          day: {
             $dateToString: {
               format: '%Y-%m-%d',
               date: '$date',
@@ -85,7 +90,7 @@ export const getServerSideProps = withIronSessionSsr(
       {
         $match: {
           companyId: new mongoose.Types.ObjectId(user.companyId),
-          newDate: moment().format('YYYY-MM-DD'),
+          day: moment().format('YYYY-MM-DD'),
         },
       },
       {
@@ -176,13 +181,15 @@ export default function Panel({ schedules, professionals }: any) {
   const toast = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [data, setData] = useState(schedules);
+  const [selectedProfessional, setSelectedProfessional] = useState({});
   const [services, setServices] = useState([]);
-  const [selected, setSelected] = useState({});
   const [date, setDate] = useState(moment().format('YYYY-MM-DD'));
+  const [selectedSchedule, setSelectedSchedule] = useState<any>({});
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isNotify, setIsNotify] = useState(true);
   const [workPeriods, setWorkPeriods] = useState([]);
-  const [selectedDateSchedules, setSelectedDateSchedules] = useState([]);
+  const [invailableSchedules, setInvailableSchedules] = useState([]);
+  const [remainderMessage, setRemainderMessage] = useState('');
 
   const {
     isOpen: formIsOpen,
@@ -196,6 +203,12 @@ export default function Panel({ schedules, professionals }: any) {
     appContext.onCloseLoading();
   }, []);
 
+  useEffect(() => {
+    if (selectedSchedule.client && selectedSchedule.status === 'agendado')
+      setRemainderMessage(remaindMessage(selectedSchedule));
+    else setRemainderMessage('');
+  }, [selectedSchedule]);
+
   const onSubmit = async (values: any) => {
     try {
       let res: any;
@@ -208,6 +221,7 @@ export default function Panel({ schedules, professionals }: any) {
       values.companyId = user.companyId;
       values.professionalId = values.professional;
       values.serviceIds = values.services.map((s: any) => s.value);
+      values.origem = 'admin';
 
       delete values.professional;
       delete values.services;
@@ -226,8 +240,6 @@ export default function Panel({ schedules, professionals }: any) {
         duration: 5000,
         isClosable: true,
       });
-
-      console.log(user);
 
       if (isNotify) {
         const notidy = getScheduleNotification(
@@ -281,49 +293,62 @@ export default function Panel({ schedules, professionals }: any) {
       duration: '00:00',
       professional: '',
       services: [],
-      date: new Date(),
+      date: moment().format('YYYY-MM-DD'),
       time: '',
     },
     validationSchema: schema,
     onSubmit: onSubmit,
   });
 
+  useEffect(() => {
+    const professional = professionals.find(
+      (p: any) => p._id === formik.values.professional
+    );
+
+    if (!professional) return;
+
+    setSelectedProfessional(professional);
+
+    setWorkPeriods(
+      professional.defaultSchedule.filter(
+        (s: any) =>
+          s.day ===
+          getDayOfWeekInPortuguese(moment(formik.values.date).toDate())
+      )
+    );
+  }, [formik.values.date]);
+
   const getSchedules = async (date?: string) => {
     try {
+      appContext.onOpenLoading();
       const d = date || moment().format('YYYY-MM-DD');
       const { data } = await api.get(
-        `/api/schedules?companyId=${user.companyId}&date=${d}`
+        `/api/schedules/perProfessional?companyId=${user.companyId}&date=${d}`
       );
       setData(data);
+      appContext.onCloseLoading();
     } catch (error) {
       console.log(error);
       appContext.onCloseLoading();
     }
   };
 
-  const getSelectedSchedules = async (date: string) => {
+  const getUnavailableSchedulePerDay = async (d?: string) => {
     try {
-      appContext.onOpenLoading()
-      if (!formik.values.professional) {
-        setSelectedDateSchedules([]);
-        return;
-      }
+      const date = d ? d : formik.values.date;
+      if (moment(d).isBefore(moment().subtract('day', 1))) return;
+
+      appContext.onOpenLoading();
 
       const { data } = await api.get(
-        `/api/schedules?companyId=${user.companyId}&date=${date}`
+        `/api/schedules?companyId=${user.companyId}&day=${date}&status=agendado`
       );
 
-      let newSchedules: any = [];
+      setInvailableSchedules(data);
 
-      data.forEach((d: any) => {
-        if (d.professional._id === formik.values.professional)
-          newSchedules = d.schedules;
-      });
-
-      if (newSchedules) setSelectedDateSchedules(newSchedules);
-      else setSelectedDateSchedules([]);
-      appContext.onCloseLoading()
+      appContext.onCloseLoading();
     } catch (error) {
+      setInvailableSchedules([]);
       console.log(error);
       appContext.onCloseLoading();
     }
@@ -355,6 +380,40 @@ export default function Panel({ schedules, professionals }: any) {
     );
 
     formik.setFieldValue('services', []);
+  };
+
+  const handleCancelSchedule = async (schedule: any) => {
+    try {
+      appContext.onOpenLoading();
+
+      const { data } = await api.put(`/api/schedules`, {
+        _id: schedule._id,
+        status: 'cancelado',
+      });
+
+      appContext.onCloseLoading();
+      onClose();
+    } catch (error) {
+      console.log(error);
+      appContext.onCloseLoading();
+    }
+  };
+
+  const handleMissSchedule = async (schedule: any) => {
+    try {
+      appContext.onOpenLoading();
+
+      const { data } = await api.put(`/api/schedules`, {
+        _id: schedule._id,
+        status: 'faltou',
+      });
+
+      appContext.onCloseLoading();
+      onClose();
+    } catch (error) {
+      console.log(error);
+      appContext.onCloseLoading();
+    }
   };
 
   return (
@@ -422,9 +481,15 @@ export default function Panel({ schedules, professionals }: any) {
                       item.schedules &&
                       item.schedules.map((schedule: any) => (
                         <GridItem
+                          bgColor={
+                            schedule.status === 'cancelado'
+                              ? 'red.100'
+                              : schedule.status === 'faltou' ? 'yellow.100' : 'transparent'
+                          }
                           key={schedule._id}
                           onClick={() => {
-                            setSelected(schedule);
+                            console.log('HEERE', schedule);
+                            setSelectedSchedule(schedule);
                             onOpen();
                           }}
                           cursor={'pointer'}
@@ -480,9 +545,9 @@ export default function Panel({ schedules, professionals }: any) {
             formik.resetForm();
             setIsEditing(false);
             getServicesPerProfessional(professionals[0]._id);
-            getSelectedSchedules(moment().format('YYYY-MM-DD'));
             formik.setFieldValue('professional', professionals[0]._id);
             formik.setFieldValue('date', moment().format('YYYY-MM-DD'));
+            getUnavailableSchedulePerDay();
             formOnOpen();
           }}
         />
@@ -540,7 +605,6 @@ export default function Panel({ schedules, professionals }: any) {
                 mb={3}
                 id='professional'
                 isRequired
-                //@ts-ignore
                 isInvalid={
                   !!formik.errors.professional && formik.touched.professional
                 }
@@ -591,9 +655,7 @@ export default function Panel({ schedules, professionals }: any) {
                     formik.setFieldValue('services', e);
                     formik.setFieldValue(
                       'duration',
-                      sumHours(
-                        formik.values.services.map((s: any) => s.duration)
-                      )
+                      sumHours(e.map((s: any) => s.duration))
                     );
                   }}
                   onBlur={() => {
@@ -607,9 +669,7 @@ export default function Panel({ schedules, professionals }: any) {
                           formik.values.services.map((s: any) => s.duration)
                         )
                       );
-
-                    //Busca os agendamento
-                    getSelectedSchedules(moment().format('YYYY-MM-DD'));
+                    getUnavailableSchedulePerDay();
                   }}
                   closeMenuOnSelect={false}
                   components={animatedComponents}
@@ -660,11 +720,10 @@ export default function Panel({ schedules, professionals }: any) {
                 <Input
                   type='date'
                   name='date'
-                  //@ts-ignore
                   value={formik.values.date}
                   onChange={(e) => {
                     formik.handleChange(e);
-                    getSelectedSchedules(
+                    getUnavailableSchedulePerDay(
                       moment(e.target.value).format('YYYY-MM-DD')
                     );
                   }}
@@ -676,7 +735,7 @@ export default function Panel({ schedules, professionals }: any) {
                   m={'auto'}
                   size={'md'}
                   fontWeight={'medium'}
-                  checked={isNotify}
+                  isChecked={isNotify}
                   onChange={(e: any) => setIsNotify(e.target.checked)}
                 >
                   {' '}
@@ -699,7 +758,7 @@ export default function Panel({ schedules, professionals }: any) {
                 interval={30}
                 date={moment(formik.values.date).toDate()}
                 scheduleDuration={formik.values.duration}
-                unavailableTimes={selectedDateSchedules}
+                unavailableTimes={invailableSchedules}
                 workPeriods={workPeriods}
               />
             </FormControl>
@@ -727,21 +786,80 @@ export default function Panel({ schedules, professionals }: any) {
         </DrawerContent>
       </Drawer>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Opções do Agendamento</ModalHeader>
-          <ModalBody>
-            <Text> </Text>
-          </ModalBody>
+      {selectedSchedule.client && (
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalCloseButton animation={`${pulsate} 1.5s infinite`} />
+            <ModalHeader textAlign={'center'} mt={5}>
+              Agendamento com{' '}
+              <span style={{ fontWeight: 'bold' }}>
+                {selectedSchedule.client.name}
+              </span>{' '}
+              {moment(selectedSchedule.date, 'YYYY-MM-DD').format('DD/MM/YYYY')}{' '}
+              às {selectedSchedule.time}{' '}
+            </ModalHeader>
+            <ModalBody></ModalBody>
 
-          <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={onClose}>
-              Close
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+            <ModalFooter flexDirection={'column'} gap={5}>
+              <Box w={'full'}>
+                <Text fontWeight={'semibold'}>
+                  {' '}
+                  Enviar mensagem para o cliente:{' '}
+                </Text>
+                <Flex alignItems={'center'}>
+                  <Textarea
+                    resize={'none'}
+                    height={'80px'}
+                    overflowY='hidden'
+                    placeholder='Mensagem'
+                    value={remainderMessage}
+                    onChange={(e: any) => setRemainderMessage(e.target.value)}
+                  />
+                  <Button
+                    variant='outline'
+                    colorScheme='blue'
+                    h={'80px'}
+                    onClick={() => {
+                      const phone = String(selectedSchedule.client.phone)
+                        .replaceAll(' ', '')
+                        .replaceAll('(', '')
+                        .replaceAll(')', '')
+                        .replaceAll('-', '');
+                      window.open(
+                        `https://api.whatsapp.com/send?phone=${phone}&text=${remainderMessage}`,
+                        '_blank'
+                      );
+                      onClose();
+                    }}
+                  >
+                    <ArrowRightIcon />
+                  </Button>
+                </Flex>
+              </Box>
+
+              <Divider />
+
+              {selectedSchedule.status === 'agendado' ? (
+                <>
+                  <ConfirmButtonModal
+                    colorScheme={'yellow'}
+                    value={'Marcar como faltante'}
+                    onDelete={() => handleMissSchedule(selectedSchedule)}
+                  />
+                  <ConfirmButtonModal
+                    colorScheme={'red'}
+                    value={'Cancelar Agendamento'}
+                    onClick={() => handleCancelSchedule(selectedSchedule)}
+                  />
+                </>
+              ) : (
+                <></>
+              )}
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
     </Page>
   );
 }

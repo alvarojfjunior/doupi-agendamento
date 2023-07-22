@@ -11,18 +11,22 @@ interface ScheduleAvailabilityProps {
 }
 
 const ScheduleAvailability: React.FC<ScheduleAvailabilityProps> = ({
+  interval,
   date,
   workPeriods,
   unavailableTimes,
   scheduleDuration,
   handlChange,
-  interval,
 }) => {
   const [availableTimes, setScheduleAvailability] = useState<any[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
   useEffect(() => {
-    showScheduleAvailabilityPerDay();
+    if (moment(date).isBefore(moment().subtract('day', 1))) {
+      setScheduleAvailability([]);
+    } else {
+      showScheduleAvailabilityPerDay();
+    }
   }, [date, interval]);
 
   function convertToMinutes(time: string) {
@@ -72,9 +76,7 @@ const ScheduleAvailability: React.FC<ScheduleAvailabilityProps> = ({
       }
     }
 
-    let res: any = availableTimes.map((t) => {
-      return t;
-    });
+    let res = availableTimes;
 
     if (moment(date).format('DD/MM/YYYY') === moment().format('DD/MM/YYYY')) {
       res = removePastTimes(res);
@@ -98,9 +100,7 @@ const ScheduleAvailability: React.FC<ScheduleAvailabilityProps> = ({
 
   return (
     <Flex gap={2} wrap={'wrap'}>
-      {scheduleDuration != '00:00' &&
-      unavailableTimes.length > 0 &&
-      availableTimes.length > 0 ? (
+      {availableTimes.length > 0 ? (
         availableTimes.map((t: any, i: number) => (
           <Button
             bgColor={i === selectedIndex ? 'blue.900' : 'blue.400'}

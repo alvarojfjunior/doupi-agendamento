@@ -5,7 +5,7 @@ export default withIronSessionApiRoute(
   async function handler(req: any, res: NextApiResponse) {
     try {
       if (req.method === 'GET') {
-        req.session.destroy();
+        await req.session.destroy();
         res.status(200).send({ ok: true });
       }
       return res.status(404);

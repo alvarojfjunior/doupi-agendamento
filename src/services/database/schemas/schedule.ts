@@ -42,6 +42,15 @@ try {
         type: String,
         required: true,
       },
+      origem: {
+        type: String,
+        required: true,
+      },
+      status: {
+        type: String,
+        required: true,
+        default: 'agendado'
+      },
     },
     { collection: 'schedules', timestamps: true }
   )

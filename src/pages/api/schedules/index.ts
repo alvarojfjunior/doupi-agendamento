@@ -16,36 +16,35 @@ export default async function handler(
 
       const query = JSON.parse(JSON.stringify(req.query));
 
-      let schedules = await Schedule.aggregate([
+      const data = await Schedule.aggregate([
         {
           $addFields: {
-            newDate: {
+            day: {
               $dateToString: {
                 format: '%Y-%m-%d',
-                date: '$date'
-              }
-            }
-          }
+                date: '$date',
+              },
+            },
+          },
         },
         {
           $match: {
             companyId: new mongoose.Types.ObjectId(query.companyId),
-            newDate: moment(query.date).format('YYYY-MM-DD')
-          }
+            query
+          },
         },
         {
           $lookup: {
-            from: 'services', // Nome da coleção de serviços
-            let: { serviceIds: '$serviceIds' }, // Array de IDs de serviço da entidade principal
+            from: 'services',
+            let: { serviceIds: '$serviceIds' },
             pipeline: [
               {
                 $match: {
-                  $expr: { $in: ['$_id', '$$serviceIds'] }, // Filtra os documentos onde o _id está presente no array de IDs
+                  $expr: { $in: ['$_id', '$$serviceIds'] },
                 },
               },
-              // Outras etapas do pipeline, se necessário
             ],
-            as: 'services', // Nome do array no qual os documentos vinculados serão armazenados
+            as: 'services',
           },
         },
         {
@@ -69,24 +68,14 @@ export default async function handler(
         },
         {
           $unwind: '$client',
-        },
-        {
-          $group: {
-            _id: '$professionalId',
-            schedules: { $push: '$$ROOT' },
-          },
-        },
+        }
       ]);
 
-      schedules = schedules.map((s: any) => {
-        const newArr:any = {};
-        newArr.professional = s.schedules[0].professional;
-        newArr.schedules = s.schedules;
-        return newArr;
-      });
+      return res.status(200).json(data);
+    }
 
-      return res.status(200).json(schedules);
-    } else if (req.method === 'POST') {
+
+    else if (req.method === 'POST') {
       const auth: any = authenticate(req);
       if (!auth) return res.status(401).json({ message: 'Unauthorized' });
 
@@ -130,7 +119,11 @@ export default async function handler(
       });
 
       return res.status(201).json(schedule);
-    } else if (req.method === 'PUT') {
+    }
+
+
+
+    else if (req.method === 'PUT') {
       const auth = authenticate(req);
       if (!auth) return res.status(401).json({ message: 'Unauthorized' });
 
