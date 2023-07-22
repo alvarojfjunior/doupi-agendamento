@@ -104,7 +104,7 @@ export default function CompanyPage({ company, schedule }: any) {
         .replaceAll(')', '')
         .replaceAll('-', '');
       window.open(
-        `https://api.whatsapp.com/send?phone=${phone}&text=${message}`,
+        `https://api.whatsapp.com/send?phone=55${phone}&text=${message}`,
         '_blank'
       );
     } catch (error) {

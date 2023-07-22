@@ -258,7 +258,7 @@ export default function Panel({ schedules, professionals }: any) {
           .replaceAll(')', '')
           .replaceAll('-', '');
         window.open(
-          `https://api.whatsapp.com/send?phone=${phone}&text=${message}`,
+          `https://api.whatsapp.com/send?phone=55${phone}&text=${message}`,
           '_blank'
         );
       }
@@ -827,7 +827,7 @@ export default function Panel({ schedules, professionals }: any) {
                         .replaceAll(')', '')
                         .replaceAll('-', '');
                       window.open(
-                        `https://api.whatsapp.com/send?phone=${phone}&text=${remainderMessage}`,
+                        `https://api.whatsapp.com/send?phone=55${phone}&text=${remainderMessage}`,
                         '_blank'
                       );
                       onClose();
