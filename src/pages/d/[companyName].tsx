@@ -102,8 +102,8 @@ export default function CompanyPage({ company, services: servicesProps }: any) {
     try {
       appContext.onOpenLoading();
       const body = {
-        name: selectedName,
-        phone: selectedPhone,
+        name: name,
+        phone: phone,
         companyId: company._id,
         professionalId: selectedProfessional._id,
         serviceIds: selectedServices.map((s: any) => s._id),
@@ -125,7 +125,7 @@ export default function CompanyPage({ company, services: servicesProps }: any) {
 
       const notidy = getScheduleNotification(
         data._id,
-        selectedName,
+        name,
         selectedProfessional.name,
         company.name,
         selectedServices.map((s: any) => s.name),
@@ -133,13 +133,13 @@ export default function CompanyPage({ company, services: servicesProps }: any) {
         selectedTime
       );
       const message = encodeURIComponent(notidy);
-      const phone = String(company.phone)
+      const whatsapp = String(company.phone)
         .replaceAll(' ', '')
         .replaceAll('(', '')
         .replaceAll(')', '')
         .replaceAll('-', '');
       window.open(
-        `https://api.whatsapp.com/send?phone=55${phone}&text=${message}`,
+        `https://api.whatsapp.com/send?phone=55${whatsapp}&text=${message}`,
         '_blank'
       );
       setStep(1);

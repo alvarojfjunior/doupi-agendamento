@@ -203,9 +203,7 @@ export default function SelectUserData({
                   isClosable: true,
                 });
               } else {
-                const localStorageName = localStorage.getItem('name');
-                const localStoragePhone = localStorage.getItem('phone');
-                handleCLick(name ? name :localStorageName, phone ? phone : localStoragePhone);
+                handleCLick(name, phone);
               }
             }}
           >
