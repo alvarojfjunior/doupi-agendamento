@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Flex, Button, Text } from '@chakra-ui/react';
 import moment from 'moment';
+import { pulsate } from '@/utils/style';
 interface ScheduleAvailabilityProps {
   date: Date;
   workPeriods: { start: string; end: string }[];
@@ -22,7 +23,7 @@ const ScheduleAvailability: React.FC<ScheduleAvailabilityProps> = ({
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
   useEffect(() => {
-    if (moment(date).isBefore(moment().subtract('day', 1))) {
+    if (moment(date, 'YYYY-MM-DD').isBefore(moment().subtract('day', 1))) {
       setScheduleAvailability([]);
     } else {
       showScheduleAvailabilityPerDay();
@@ -78,7 +79,10 @@ const ScheduleAvailability: React.FC<ScheduleAvailabilityProps> = ({
 
     let res = availableTimes;
 
-    if (moment(date).format('DD/MM/YYYY') === moment().format('DD/MM/YYYY')) {
+    if (
+      moment(date, 'YYYY-MM-DD').format('DD/MM/YYYY') ===
+      moment().format('DD/MM/YYYY')
+    ) {
       res = removePastTimes(res);
     }
 
@@ -103,6 +107,9 @@ const ScheduleAvailability: React.FC<ScheduleAvailabilityProps> = ({
       {availableTimes.length > 0 ? (
         availableTimes.map((t: any, i: number) => (
           <Button
+            animation={`${
+              i === 0 && selectedIndex === -1 && pulsate
+            } 1.5s infinite`}
             bgColor={i === selectedIndex ? 'blue.900' : 'blue.400'}
             _hover={{ bgColor: i === selectedIndex ? 'blue.900' : 'blue.500' }}
             color={'white'}

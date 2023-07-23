@@ -30,7 +30,7 @@ export default async function handler(
       {
         $match: {
           companyId: new mongoose.Types.ObjectId(query.companyId),
-          newDate: moment(query.date).format('YYYY-MM-DD'),
+          newDate: moment(query.date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
         },
       },
       {

@@ -248,7 +248,7 @@ export default function Panel({ schedules, professionals }: any) {
           professional.name,
           user.companyName,
           serviceNames,
-          moment(date).format('DD/MM/YYYY'),
+          moment(date, 'YYYY-MM-DD').format('DD/MM/YYYY'),
           values.time
         );
         const message = encodeURIComponent(notidy);
@@ -313,7 +313,9 @@ export default function Panel({ schedules, professionals }: any) {
       professional.defaultSchedule.filter(
         (s: any) =>
           s.day ===
-          getDayOfWeekInPortuguese(moment(formik.values.date).toDate())
+          getDayOfWeekInPortuguese(
+            moment(formik.values.date, 'YYYY-MM-DD').toDate()
+          )
       )
     );
   }, [formik.values.date]);
@@ -335,10 +337,9 @@ export default function Panel({ schedules, professionals }: any) {
 
   const getUnavailableSchedulePerDay = async (d?: string) => {
     try {
-      const date = d ? d : formik.values.date;
-      if (moment(d).isBefore(moment().subtract('day', 1))) return;
-
       appContext.onOpenLoading();
+      const date = d ? d : formik.values.date;
+      if (moment(d, 'YYYY-MM-DD').isBefore(moment().subtract('day', 1))) return;
 
       const { data } = await api.get(
         `/api/schedules?companyId=${user.companyId}&day=${date}&status=agendado`
@@ -391,6 +392,8 @@ export default function Panel({ schedules, professionals }: any) {
         status: 'cancelado',
       });
 
+      getSchedules();
+
       appContext.onCloseLoading();
       onClose();
     } catch (error) {
@@ -407,6 +410,8 @@ export default function Panel({ schedules, professionals }: any) {
         _id: schedule._id,
         status: 'faltou',
       });
+
+      getSchedules();
 
       appContext.onCloseLoading();
       onClose();
@@ -437,7 +442,7 @@ export default function Panel({ schedules, professionals }: any) {
             }}
           />
         </Box>
-        <Accordion>
+        <Accordion defaultIndex={[0]} allowMultiple>
           {data.map((item: any, ii: number) => (
             <AccordionItem roundedTop={10} key={ii}>
               <AccordionButton
@@ -484,11 +489,12 @@ export default function Panel({ schedules, professionals }: any) {
                           bgColor={
                             schedule.status === 'cancelado'
                               ? 'red.100'
-                              : schedule.status === 'faltou' ? 'yellow.100' : 'transparent'
+                              : schedule.status === 'faltou'
+                              ? 'yellow.100'
+                              : 'transparent'
                           }
                           key={schedule._id}
                           onClick={() => {
-                            console.log('HEERE', schedule);
                             setSelectedSchedule(schedule);
                             onOpen();
                           }}
@@ -724,7 +730,7 @@ export default function Panel({ schedules, professionals }: any) {
                   onChange={(e) => {
                     formik.handleChange(e);
                     getUnavailableSchedulePerDay(
-                      moment(e.target.value).format('YYYY-MM-DD')
+                      moment(e.target.value, 'YYYY-MM-DD').format('YYYY-MM-DD')
                     );
                   }}
                 />
@@ -756,7 +762,7 @@ export default function Panel({ schedules, professionals }: any) {
                   formik.setFieldValue('time', time);
                 }}
                 interval={30}
-                date={moment(formik.values.date).toDate()}
+                date={moment(formik.values.date, 'YYYY-MM-DD').toDate()}
                 scheduleDuration={formik.values.duration}
                 unavailableTimes={invailableSchedules}
                 workPeriods={workPeriods}
@@ -850,7 +856,7 @@ export default function Panel({ schedules, professionals }: any) {
                   <ConfirmButtonModal
                     colorScheme={'red'}
                     value={'Cancelar Agendamento'}
-                    onClick={() => handleCancelSchedule(selectedSchedule)}
+                    onDelete={() => handleCancelSchedule(selectedSchedule)}
                   />
                 </>
               ) : (

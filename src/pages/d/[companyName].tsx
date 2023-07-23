@@ -1,20 +1,25 @@
 import {
-  Image,
   Box,
   Button,
-  useColorModeValue,
+  Image as ChakraImage,
   Heading,
-  Text,
+  IconButton,
   Stack,
   useColorMode,
   useToast,
-  Flex,
 } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Company, Service } from '../../services/database';
-import { getFontColor, modifyTheme, pulsate } from '@/utils/style';
-import { CheckIcon } from '@chakra-ui/icons';
 import Head from 'next/head';
+import SelectService from '@/components/ClientFlow/SelectService';
+import SelectShedule from '@/components/ClientFlow/SelectShedule';
+import SelectUserData from '@/components/ClientFlow/SelectUserData';
+import axios from 'axios';
+import moment from 'moment';
+import { AppContext } from '@/contexts/app';
+import { useRouter } from 'next/router';
+import { getScheduleNotification } from '@/utils/notificarions';
+import { ArrowForwardIcon, ArrowLeftIcon } from '@chakra-ui/icons';
 
 export async function getServerSideProps(context: any) {
   const { companyName } = context.query;
@@ -44,47 +49,113 @@ export async function getServerSideProps(context: any) {
   };
 }
 
+const api = axios.create({
+  baseURL: '',
+});
+
 export default function CompanyPage({ company, services: servicesProps }: any) {
   const { setColorMode } = useColorMode();
   const toast = useToast();
-  const [isSomeSelected, setIsSomeSelected] = useState(false);
-  const [services, setServices] = useState(
-    servicesProps.map((s: any) => {
-      s.selected = false;
-      return s;
-    })
-  );
-
-  useEffect(() => {
-    if (services.find((s: any) => s.selected)) setIsSomeSelected(true);
-    else setIsSomeSelected(false);
-  }, [services]);
+  const router = useRouter();
+  const appContext = useContext(AppContext);
+  const [step, setStep] = useState(1);
+  const [selectedServices, setSelectedServices] = useState([]);
+  const [selectedProfessional, setSelectedProfessional] = useState<any>({});
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedTime, setSelectedTime] = useState('');
+  const [selectedName, setSelectedName] = useState('');
+  const [selectedPhone, setSelectedPhone] = useState('');
+  const [selectedAmount, setSelectedAmount] = useState('');
+  const [selectedDuration, setSelectedDuration] = useState('');
 
   useEffect(() => {
     setColorMode('light');
   }, []);
 
-  const handleSelectService = (service: any) => {
-    const isSelected: any = services.find((s: any) => s._id === service._id);
-    isSelected.selected = !isSelected.selected;
-    if (isSelected.selected)
+  const handleSelectService = (selectedServices: any) => {
+    setSelectedServices(selectedServices);
+    setStep(2);
+  };
+
+  const handleSelectSchedule = (
+    professional: any,
+    time: string,
+    date: string,
+    amount: string,
+    duration: string
+  ) => {
+    setSelectedProfessional(professional);
+    setSelectedTime(time);
+    setSelectedDate(date);
+    setSelectedAmount(amount);
+    setSelectedDuration(duration);
+    setStep(3);
+  };
+
+  const handleSelectUser = async (name: string, phone: string) => {
+    setSelectedName(name);
+    setSelectedPhone(phone);
+
+    localStorage.setItem('name', name);
+    localStorage.setItem('phone', phone);
+
+    try {
+      appContext.onOpenLoading();
+      const body = {
+        name: selectedName,
+        phone: selectedPhone,
+        companyId: company._id,
+        professionalId: selectedProfessional._id,
+        serviceIds: selectedServices.map((s: any) => s._id),
+        date: selectedDate,
+        time: selectedTime,
+        duration: selectedDuration,
+        origem: 'client',
+      };
+      const { data } = await api.post(`/api/publics/schedules`, body);
+
       toast({
-        title: 'Serviço Selecionado!',
-        description: 'Selecione um mais e clique em "Agendar" para concluir!',
+        title: 'Agendamento Registrado!',
+        description: 'O seu agendamento foi agendado!',
         status: 'success',
         position: 'top-right',
-        duration: 2000,
+        duration: 20000,
         isClosable: true,
       });
 
-    setServices((prevItems: any) =>
-      prevItems.map((item: any) => {
-        if (item._id === isSelected._id) {
-          return { ...item, isSelected };
-        }
-        return item;
-      })
-    );
+      const notidy = getScheduleNotification(
+        data._id,
+        selectedName,
+        selectedProfessional.name,
+        company.name,
+        selectedServices.map((s: any) => s.name),
+        moment(selectedDate, 'YYYY-MM-DD').format('DD/MM/YYYY'),
+        selectedTime
+      );
+      const message = encodeURIComponent(notidy);
+      const phone = String(company.phone)
+        .replaceAll(' ', '')
+        .replaceAll('(', '')
+        .replaceAll(')', '')
+        .replaceAll('-', '');
+      window.open(
+        `https://api.whatsapp.com/send?phone=55${phone}&text=${message}`,
+        '_blank'
+      );
+      setStep(1);
+      appContext.onCloseLoading();
+    } catch (error: any) {
+      console.log(error);
+      appContext.onCloseLoading();
+      toast({
+        title: 'Houve um erro',
+        description: 'Tente mais tarde.',
+        status: 'error',
+        position: 'top-right',
+        duration: 9000,
+        isClosable: true,
+      });
+    }
   };
 
   return (
@@ -93,163 +164,61 @@ export default function CompanyPage({ company, services: servicesProps }: any) {
         <title>{company.name}</title>
       </Head>
       <Stack mb={30}>
-        <Box
-          width={'100%'}
-          height={{ base: 150, md: 250, lg: 250 }}
-          overflow='hidden'
-          justifyContent='center'
-          alignItems='center'
-        >
-          <Image alt='company image' w={'full'} src={company.coverImage} />
-        </Box>
+        <ChakraImage
+          src={company.coverImage}
+          objectFit='cover'
+          boxSize='100%'
+          maxH={400}
+          alt='Imagem de capa'
+        />
         <Heading
           fontSize={'3xl'}
           color={'gray.700'}
           textAlign={'center'}
-          mt={'20px'}
+          mt={step > 1 ? '0px' : '10px'}
+          mb={5}
         >
           {company.name}
         </Heading>
-        <Text textAlign={'center'} color={'gray.600'}>
-          {' '}
-          Selecione um mais serviços para agendar!{' '}
-        </Text>
 
-        <Flex
-          mt={'50px'}
-          wrap={'wrap'}
-          alignItems={'center'}
-          justifyContent={'center'}
-          gap={{ base: 20, md: 10, lg: 10 }}
-        >
-          {services.map((s: any) => (
-            <Box
-              onClick={() => handleSelectService(s)}
-              cursor={'pointer'}
-              transition={
-                'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s'
-              }
-              _hover={{
-                bgColor: s.selected
-                  ? modifyTheme(company.color, 0.3)
-                  : modifyTheme(company.color, 0.8),
-                transform: 'scale(1.02)',
-                color: getFontColor(company.color),
-              }}
-              key={s._id}
-              role={'group'}
-              p={6}
-              maxW={'330px'}
-              bg={useColorModeValue('white', 'gray.800')}
-              boxShadow={'2xl'}
-              rounded={'lg'}
-              pos={'relative'}
-              zIndex={1}
-              bgColor={s.selected ? modifyTheme(company.color, 0.3) : '#fff'}
-            >
-              <Box
-                rounded={'lg'}
-                mt={-12}
-                pos={'relative'}
-                height={'230px'}
-                _after={{
-                  transition: 'all .3s ease',
-                  content: '""',
-                  w: 'full',
-                  h: 'full',
-                  pos: 'absolute',
-                  top: 5,
-                  left: 0,
-                  backgroundImage: `url(${s.image})`,
-                  filter: 'blur(15px)',
-                  zIndex: -1,
-                }}
-                _groupHover={{
-                  _after: {
-                    filter: 'blur(20px)',
-                  },
-                }}
-              >
-                <Image
-                  rounded={'lg'}
-                  height={230}
-                  width={282}
-                  objectFit={'cover'}
-                  src={s.image}
-                />
-              </Box>
-              <Stack pt={10} align={'center'}>
-                <Heading
-                  fontSize={'2xl'}
-                  fontFamily={'body'}
-                  fontWeight={500}
-                  color={'gray.700'}
-                >
-                  {s.name + ' '}
-                  {s.selected && <CheckIcon color={'green'} />}
-                </Heading>
-                <Text
-                  color={'gray.600'}
-                  fontSize={'sm'}
-                  textTransform={'uppercase'}
-                  h={50}
-                >
-                  {s.description}
-                </Text>
-                <Stack direction={'row'} align={'center'}>
-                  <Text fontWeight={800} fontSize={'xl'}>
-                    R${s.price}
-                  </Text>
-                  <Text textDecoration={'line-through'} color={'gray.700'}>
-                    {(parseFloat(s.price) + 0.1 * parseFloat(s.price))
-                      .toFixed(2)
-                      .replace('.', ',')}
-                  </Text>
-                </Stack>
-              </Stack>
-            </Box>
-          ))}
-        </Flex>
-        <Button
-          mt={'40px'}
-          marginInline={{ base: 5, md: 50, lg: 250 }}
-          fontSize={30}
-          p={10}
-          cursor={isSomeSelected ? 'pointer' : 'auto'}
-          disabled={!isSomeSelected}
-          transition={
-            'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s'
-          }
-          bgColor={
-            isSomeSelected ? company.color : modifyTheme(company.color, 0.6)
-          }
-          _hover={{
-            bgColor: isSomeSelected ? company.color : '',
-            transform: isSomeSelected ? 'scale(1.02)' : '',
-            boxShadow: 'none',
-          }}
-          color={'white'}
-          _active={{ boxShadow: 'none' }}
-          _focus={{ boxShadow: 'none' }}
-          //@ts-ignore
-          animation={isSomeSelected && `${pulsate} 1.5s infinite`}
-          onClick={() => {
-            if (!isSomeSelected)
-              toast({
-                title: 'Selecione um serviço',
-                description:
-                  'Você precisa selecionar um serviço antes de continuar',
-                status: 'info',
-                position: 'top-right',
-                duration: 6000,
-                isClosable: true,
-              });
-          }}
-        >
-          {' '}
-          Agendar{' '}
-        </Button>
+        {step === 1 ? (
+          <SelectService
+            company={company}
+            services={servicesProps}
+            handleCLick={handleSelectService}
+          />
+        ) : step === 2 ? (
+          <SelectShedule
+            company={company}
+            selectedServices={selectedServices}
+            handleCLick={handleSelectSchedule}
+          />
+        ) : (
+          <SelectUserData
+            company={company}
+            selectedServices={selectedServices}
+            selectedProfessional={selectedProfessional}
+            selectedTime={selectedTime}
+            selectedDate={selectedDate}
+            selectedAmount={selectedAmount}
+            selectedDuration={selectedDuration}
+            handleCLick={handleSelectUser}
+          />
+        )}
       </Stack>
+
+      {step > 1 && (
+        <Stack direction='row' spacing={4} position={'absolute'} top={5}>
+          <Button
+            leftIcon={<ArrowLeftIcon />}
+            variant='solid'
+            marginLeft={5}
+            onClick={() => setStep(step - 1)}
+          >
+            Voltar
+          </Button>
+        </Stack>
+      )}
     </>
   );
 }

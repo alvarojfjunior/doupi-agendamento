@@ -8,9 +8,7 @@ import {
   ModalFooter,
   ModalBody,
   useDisclosure,
-  IconButton,
 } from '@chakra-ui/react';
-import { DeleteIcon } from '@chakra-ui/icons';
 
 export default function ConfirmButtonModal({ onDelete, value, colorScheme }: any) {
   const { isOpen, onOpen, onClose } = useDisclosure();

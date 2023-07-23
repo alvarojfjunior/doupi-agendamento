@@ -94,9 +94,9 @@ export default function CompanyPage({ company, schedule }: any) {
       });
 
       let message = 'Olá, acabei de *cancelar um agendamento*. \n\n';
-      message += `Agendamento: ${moment(schedule.date).format('DD/MM/YYYY')} ${
-        schedule.time
-      }`;
+      message += `Agendamento: ${moment(schedule.date, 'YYYY-MM-DD').format(
+        'DD/MM/YYYY'
+      )} ${schedule.time}`;
 
       const phone = String(company.phone)
         .replaceAll(' ', '')
@@ -119,15 +119,13 @@ export default function CompanyPage({ company, schedule }: any) {
         <title>{company.name}</title>
       </Head>
       <Stack mb={30}>
-        <Box
-          width={'100%'}
-          height={{ base: 150, md: 250, lg: 250 }}
-          overflow='hidden'
-          justifyContent='center'
-          alignItems='center'
-        >
-          <Image alt='company image' w={'full'} src={company.coverImage} />
-        </Box>
+        <Image
+          src={company.coverImage}
+          objectFit='cover' // Redimensiona a imagem proporcionalmente para cobrir o elemento sem distorção
+          boxSize='100%' // Tamanho do elemento Image (ajuste conforme necessário)
+          maxH={400}
+          alt='Imagem de capa' // Texto alternativo da imagem
+        />
         <Heading
           fontSize={'3xl'}
           color={'gray.600'}
@@ -148,7 +146,8 @@ export default function CompanyPage({ company, schedule }: any) {
           <CardHeader>
             <Heading size='md' color={'gray.600'}>
               {' '}
-              Agendamento {moment(schedule.date).format('DD/MM/YYYY')}{' '}
+              Agendamento{' '}
+              {moment(schedule.date, 'YYYY-MM-DD').format('DD/MM/YYYY')}{' '}
               {schedule.time}{' '}
             </Heading>
           </CardHeader>
