@@ -3,7 +3,6 @@ import {
   Button,
   Image as ChakraImage,
   Heading,
-  IconButton,
   Stack,
   useColorMode,
   useToast,
@@ -133,7 +132,7 @@ export default function CompanyPage({ company, services: servicesProps }: any) {
         selectedTime
       );
       const message = encodeURIComponent(notidy);
-      const whatsapp = String(company.phone)
+      const whatsapp = String(selectedProfessional.whatsapp)
         .replaceAll(' ', '')
         .replaceAll('(', '')
         .replaceAll(')', '')

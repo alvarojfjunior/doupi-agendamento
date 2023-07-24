@@ -394,8 +394,8 @@ export default function Panel({ schedules, professionals }: any) {
 
       getSchedules();
 
-      appContext.onCloseLoading();
       onClose();
+      appContext.onCloseLoading();
     } catch (error) {
       console.log(error);
       appContext.onCloseLoading();
