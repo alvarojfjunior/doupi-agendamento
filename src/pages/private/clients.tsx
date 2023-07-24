@@ -44,7 +44,6 @@ import { withIronSessionSsr } from 'iron-session/next';
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req, res }) => {
-
     if (!('user' in req.session))
       return {
         redirect: {
@@ -52,7 +51,6 @@ export const getServerSideProps = withIronSessionSsr(
           permanent: false,
         },
       };
-
 
     const user = req.session.user;
     return {
@@ -71,9 +69,8 @@ export const getServerSideProps = withIronSessionSsr(
   }
 );
 
-let user: IUser;
 let api: AxiosInstance;
-export default function Clients() {
+export default function Clients({ user }: any) {
   const appContext = useContext(AppContext);
   const [isEditing, setIsEditing] = useState(false);
   const [data, setData] = useState([]);
@@ -83,8 +80,6 @@ export default function Clients() {
     onClose: formOnClose,
   } = useDisclosure();
   const toast = useToast();
-  const router = useRouter();
-  const animatedComponents = makeAnimated();
 
   const onSubmit = async (values: any) => {
     try {
@@ -134,7 +129,6 @@ export default function Clients() {
   });
 
   useEffect(() => {
-    user = JSON.parse(String(localStorage.getItem('user')));
     api = getAxiosInstance(user);
     getData();
   }, []);
@@ -263,7 +257,9 @@ export default function Clients() {
               isRequired
               isInvalid={!!formik.errors.name && formik.touched.name}
             >
-              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Nome</FormLabel>
+              <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                Nome
+              </FormLabel>
               <Input
                 type='text'
                 name='name'
@@ -277,7 +273,9 @@ export default function Clients() {
               isRequired
               isInvalid={!!formik.errors.phone && formik.touched.phone}
             >
-              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Telefone </FormLabel>
+              <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                Telefone{' '}
+              </FormLabel>
               <Input
                 name='phone'
                 as={InputMask}

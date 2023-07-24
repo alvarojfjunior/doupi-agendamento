@@ -2,14 +2,11 @@ import {
   Box,
   TableContainer,
   Table,
-  Image as ChakraImage,
   Thead,
   Tr,
   Th,
-  Text,
   Tbody,
   Td,
-  useColorMode,
   useToast,
   IconButton,
   Stack,
@@ -18,7 +15,6 @@ import {
   Drawer,
   DrawerOverlay,
   DrawerContent,
-  HStack,
   DrawerHeader,
   DrawerBody,
   FormLabel,
@@ -26,26 +22,26 @@ import {
   Input,
   DrawerFooter,
   Button,
+  Select,
+  HStack,
+  TableCaption,
 } from '@chakra-ui/react';
-import makeAnimated from 'react-select/animated';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '@/contexts/app';
-import InputMask from 'react-input-mask';
-import { useRouter } from 'next/router';
 import Page from '@/components/Page';
-import { IUser } from '@/types/api/User';
 import { AxiosInstance } from 'axios';
 import { getAxiosInstance } from '@/services/api';
 import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
 import { AddIcon, EditIcon } from '@chakra-ui/icons';
 import { withIronSessionSsr } from 'iron-session/next';
-import { handleImageImageAndUpload } from '@/utils/upload';
+import { NumericFormat } from 'react-number-format';
+import { floatToString, stringToFloat } from '@/utils/helpers';
+import moment from 'moment';
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req, res }) => {
-
     if (!('user' in req.session))
       return {
         redirect: {
@@ -53,7 +49,6 @@ export const getServerSideProps = withIronSessionSsr(
           permanent: false,
         },
       };
-
 
     const user = req.session.user;
     return {
@@ -72,32 +67,37 @@ export const getServerSideProps = withIronSessionSsr(
   }
 );
 
-let user: IUser;
 let api: AxiosInstance;
-export default function Services({ user }: any) {
-  const { colorMode } = useColorMode();
+export default function Clients({ user }: any) {
   const appContext = useContext(AppContext);
   const [isEditing, setIsEditing] = useState(false);
   const [data, setData] = useState([]);
+  const [date, setDate] = useState(moment().format('YYYY-MM-DD'));
+  const [amount, setAmount] = useState(0);
   const {
     isOpen: formIsOpen,
     onOpen: formOnOpen,
     onClose: formOnClose,
   } = useDisclosure();
   const toast = useToast();
-  const router = useRouter();
-  const animatedComponents = makeAnimated();
 
   const onSubmit = async (values: any) => {
     try {
       appContext.onOpenLoading();
+      let res: any;
 
       values.companyId = user.companyId;
 
-      let res: any;
+      values.value = stringToFloat(values.value);
 
-      if (isEditing) res = await api.put(`/api/services`, values);
-      else res = await api.post(`/api/services`, values);
+      values.fatherName = 'usuario';
+
+      values.fatherId = user._id;
+
+      values.date = moment(values.date, 'YYYY-MM-DD').toDate();
+
+      if (isEditing) res = await api.put(`/api/cashiers`, values);
+      else res = await api.post(`/api/cashiers`, values);
 
       updateData(res.data);
       appContext.onCloseLoading();
@@ -124,22 +124,34 @@ export default function Services({ user }: any) {
     }
   };
 
+  const schema = Yup.object().shape({
+    reason: Yup.string().min(2).max(100).required(),
+    value: Yup.string().min(3).required(),
+    cashierType: Yup.string().min(4).required(),
+    date: Yup.string().min(10).required(),
+  });
+
   const formik = useFormik({
     initialValues: {
-      image: 'http://res.cloudinary.com/dovvizyxg/image/upload/v1689457590/hairdresser-using-drier-hair-client_pkgttk.jpg',
-      name: '',
-      description: '',
-      duration: '',
-      price: '',
+      reason: '',
+      value: '',
+      date: moment().format('YYYY-MM-DD'),
+      cashierType: 'Geral',
     },
-    validationSchema: Yup.object().shape({
-      name: Yup.string().min(2).max(50).required(),
-      description: Yup.string().min(2).max(50).required(),
-      duration: Yup.string().min(5).required(),
-      price: Yup.string().min(5).required(),
-    }),
+    validationSchema: schema,
     onSubmit: onSubmit,
   });
+
+  // schema
+  //   .validate(formik.values, { abortEarly: false })
+  //   .then((validatedData) => {
+  //     // Se não houver erros, a validação passou
+  //     console.log('HEERE Dados válidos:', validatedData);
+  //   })
+  //   .catch((errors) => {
+  //     // Se houver erros, a validação falhou
+  //     console.log('HEERE Erros de validação:', errors);
+  //   });
 
   useEffect(() => {
     api = getAxiosInstance(user);
@@ -159,11 +171,19 @@ export default function Services({ user }: any) {
     }
   };
 
-  const getData = async () => {
+  const getData = async (d?: string) => {
     try {
       appContext.onOpenLoading();
       const { data } = await api.get(
-        `/api/services?companyId=${user.companyId}`
+        `/api/cashiers?companyId=${user.companyId}&date=${
+          d ? d : moment().format('YYYY-MM-DD')
+        }`
+      );
+
+      setAmount(
+        data.reduce((count: Number, d: any) => {
+          return count + d.value;
+        }, 0)
       );
 
       setData(data);
@@ -179,7 +199,8 @@ export default function Services({ user }: any) {
   const handleDelete = async (item: any) => {
     try {
       appContext.onOpenLoading();
-      const { data } = await api.delete(`/api/services?_id=${item._id}`);
+
+      const { data } = await api.delete(`/api/cashiers?_id=${item._id}`);
 
       setData((prevArray) => prevArray.filter((d: any) => d._id !== item._id));
 
@@ -189,47 +210,45 @@ export default function Services({ user }: any) {
       appContext.onCloseLoading();
     }
   };
-
-
   return (
     <Page
-      path='/service'
+      path='/cashier'
       title='Doupi - Cadastro de profissionais'
       description='App para genciamento de agendamentos'
     >
       <Stack h={'full'} m={5}>
         <Heading mb={5} fontSize={'2xl'} textAlign={'center'}>
-          Cadastro de Serviços
+          Cadastro de Caixa
         </Heading>
+        <Box maxW={300} margin={'auto'} mt={2} mb={5}>
+          <Input
+            type='date'
+            value={date}
+            onChange={(e: any) => {
+              setDate(e.target.value);
+              getData(e.target.value);
+            }}
+          />
+        </Box>
         <TableContainer shadow={'#cccccc4e 0px 0px 2px 1px'} rounded={20}>
           <Table variant='striped'>
+            <TableCaption>TOTAL: R${floatToString(amount)}</TableCaption>
             <Thead>
               <Tr>
-                <Th>Nome</Th>
-                <Th>Preço</Th>
+                <Th>Data</Th>
+                <Th>Referente</Th>
+                <Th>Valor</Th>
                 <Th width={50}>Opções</Th>
               </Tr>
             </Thead>
             <Tbody>
               {data.map((item: any) => (
                 <Tr key={item._id}>
-                  <Td display={'flex'} alignItems={'center'}>
-                    <ChakraImage
-                      src={item.image}
-                      alt='Imagem de Capa'
-                      m={2}
-                      rounded={10}
-                      style={{
-                        objectFit: 'cover',
-                        width: 50,
-                        height: 50,
-                      }}
-                    />
-                    {item.name}
+                  <Td>
+                    {moment(item.date, 'YYYY-MM-DD').format('DD/MM/YYYY')}
                   </Td>
-
-                  <Td>{item.price}</Td>
-
+                  <Td>{item.reason}</Td>
+                  <Td>R${floatToString(item.value)}</Td>
                   <Td>
                     <IconButton
                       size={'sm'}
@@ -239,6 +258,14 @@ export default function Services({ user }: any) {
                       mr={1}
                       onClick={() => {
                         formik.setValues(item);
+                        formik.setFieldValue(
+                          'date',
+                          moment(item.date, 'YYYY-MM-DD').format('YYYY-MM-DD')
+                        );
+                        formik.setFieldValue(
+                          'value',
+                          floatToString(item.value)
+                        );
                         setIsEditing(true);
                         formOnOpen();
                       }}
@@ -276,125 +303,92 @@ export default function Services({ user }: any) {
       >
         <DrawerOverlay />
         <DrawerContent>
-          <DrawerHeader borderBottomWidth='1px'>Serviço</DrawerHeader>
+          <DrawerHeader borderBottomWidth='1px'>
+            Lançamento de Caixa
+          </DrawerHeader>
 
           <DrawerBody>
             <FormControl
               mb={3}
-              id='image'
-              textAlign={'center'}
+              id='reason'
               isRequired
-              isInvalid={!!formik.errors.image && formik.touched.image}
+              isInvalid={!!formik.errors.reason && formik.touched.reason}
             >
-              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Imagem</FormLabel>
-              <Box
-                position='relative'
-                display='inline-block'
-                border={'1px solid #ccc'}
-                rounded={20}
-                width={200}
-                height={150}
-                overflow='hidden'
-                justifyContent='center'
-                alignItems='center'
-              >
-                <ChakraImage
-                  src={formik.values.image}
-                  alt='Imagem'
-                  mb={2}
-                  style={{
-                    objectFit: 'cover',
-                    width: '100%',
-                    height: '100%',
-                  }}
-                />
-                <Input
-                  type='file'
-                  accept='image/*'
-                  name='image'
-                  onChange={(event) => handleImageImageAndUpload(event, 0.5, (url: string) =>
-                    formik.setFieldValue('image', url)
-                  )}
-                  position='absolute'
-                  top={0}
-                  left={0}
-                  opacity={0}
-                  width='100%'
-                  height='100%'
-                  cursor='pointer'
-                  zIndex={1}
-                  required={false}
-                />
-              </Box>
-            </FormControl>
-
-            <FormControl
-              mb={3}
-              id='name'
-              isRequired
-              isInvalid={!!formik.errors.name && formik.touched.name}
-            >
-              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Nome</FormLabel>
+              <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                Descrição (referente a)
+              </FormLabel>
               <Input
                 type='text'
-                name='name'
-                value={formik.values.name}
+                name='reason'
+                value={formik.values.reason}
                 onChange={formik.handleChange}
               />
             </FormControl>
 
-            <FormControl
-              mb={3}
-              id='description'
-              isRequired
-              isInvalid={
-                !!formik.errors.description && formik.touched.description
-              }
-            >
-              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Descrição</FormLabel>
-              <Input
-                type='text'
-                name='description'
-                value={formik.values.description}
-                onChange={formik.handleChange}
-              />
-            </FormControl>
-
-            <HStack spacing={4}>
+            <HStack>
               <FormControl
-                mb={3}
-                id='price'
+                id='cashierType'
                 isRequired
-                isInvalid={!!formik.errors.price && formik.touched.price}
+                isInvalid={
+                  !!formik.errors.cashierType && formik.touched.cashierType
+                }
               >
-                <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Preço </FormLabel>
-                <Input
-                  name='price'
-                  as={InputMask}
-                  value={formik.values.price}
+                <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                  Tipo de conta{' '}
+                </FormLabel>
+                <Select
+                  name='cashierType'
+                  value={formik.values.cashierType}
                   onChange={formik.handleChange}
-                  mask='99,99'
-                />
+                >
+                  <option value='Geral'> Geral </option>
+                  <option value='Dinheiro'> Dinheiro </option>
+                  <option value='Transferência bancária'>
+                    {' '}
+                    Transferência bancária{' '}
+                  </option>
+                </Select>
               </FormControl>
 
               <FormControl
                 mb={3}
-                id='duration'
+                id='date'
                 isRequired
-                isInvalid={!!formik.errors.duration && formik.touched.duration}
+                isInvalid={!!formik.errors.date && formik.touched.date}
               >
-                <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}> Duração do Serviço </FormLabel>
-
+                <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                  Data
+                </FormLabel>
                 <Input
-                  name='duration'
-                  as={InputMask}
-                  value={formik.values.duration}
+                  type='date'
+                  name='date'
+                  value={formik.values.date}
                   onChange={formik.handleChange}
-                  defaultValue={'01:00'}
-                  mask='99:99'
                 />
               </FormControl>
             </HStack>
+
+            <FormControl
+              id='value'
+              isRequired
+              isInvalid={!!formik.errors.value && formik.touched.value}
+              maxW={200}
+            >
+              <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                Valor (R$){' '}
+              </FormLabel>
+
+              <Input
+                as={NumericFormat}
+                name='value'
+                value={formik.values.value}
+                onChange={formik.handleChange}
+                thousandSeparator='.'
+                decimalSeparator=','
+                decimalScale={2}
+                fixedDecimalScale={true}
+              />
+            </FormControl>
           </DrawerBody>
 
           <DrawerFooter borderTopWidth='1px'>

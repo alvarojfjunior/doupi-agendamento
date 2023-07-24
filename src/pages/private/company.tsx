@@ -54,9 +54,8 @@ export const getServerSideProps = withIronSessionSsr(
   }
 );
 
-let user: IUser;
 let api: AxiosInstance;
-export default function Panel() {
+export default function Company({ user }: any) {
   const appContext = useContext(AppContext);
   const toast = useToast();
   const router = useRouter();

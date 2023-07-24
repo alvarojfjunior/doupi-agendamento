@@ -30,6 +30,12 @@ try {
           ref: 'Service',
         },
       ],
+      cashierId: {
+        type: Mongoose.Schema.Types.ObjectId,
+        ref: 'Cashier',
+        required: false,
+        index: true,
+      },
       date: {
         type: Date,
         required: true,

@@ -28,10 +28,13 @@ import { AppContext } from '@/contexts/app';
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
 
 const Links = [
-  { route: '/private/', text: 'Agendas' },
-  { route: '/private/clients', text: 'Clientes' },
-  { route: '/private/professionals', text: 'Profissionais' },
-  { route: '/private/services', text: 'Serviços' },
+  { label: 'Agendas', href: '/private/' },
+  { label: 'Clientes', href: '/private/clients' },
+  { label: 'Profissionais', href: '/private/professionals' },
+  { label: 'Profissionais', href: '/private/professionals' },
+  { label: 'Serviços', href: '/private/services' },
+  { label: 'Caixa', href: '/private/cashier' },
+  { label: 'Relatórios', href: '/private/reports' },
 ];
 
 let user: IUser;
@@ -42,7 +45,8 @@ export default function Navbar() {
   const { colorMode, toggleColorMode } = useColorMode();
   const router = useRouter();
 
-  const isCompanyPage = (router.asPath.indexOf('/d/') >= 0) || (router.asPath.indexOf('/a/') >= 0);
+  const isCompanyPage =
+    router.asPath.indexOf('/d/') >= 0 || router.asPath.indexOf('/a/') >= 0;
 
   useEffect(() => {
     user = JSON.parse(String(localStorage.getItem('user')));
@@ -94,13 +98,13 @@ export default function Navbar() {
               {isAuth &&
                 Links.map((link) => (
                   <Button
-                    key={link.route}
+                    key={link.href}
                     color='white'
                     colorScheme='whiteAlpha'
                     variant='ghost'
-                    onClick={() => router.push(link.route)}
+                    onClick={() => router.push(link.href)}
                   >
-                    {link.text}
+                    {link.label}
                   </Button>
                 ))}
             </HStack>
@@ -203,16 +207,16 @@ export default function Navbar() {
               {isAuth &&
                 Links.map((link) => (
                   <Button
-                    key={link.route}
+                    key={link.href}
                     color='white'
                     colorScheme='whiteAlpha'
                     variant='ghost'
                     onClick={() => {
                       onClose();
-                      router.push(link.route);
+                      router.push(link.href);
                     }}
                   >
-                    {link.text}
+                    {link.label}
                   </Button>
                 ))}
             </Stack>

@@ -2,7 +2,6 @@ import { useContext, useEffect } from 'react';
 import { AppContext } from '@/contexts/app';
 import InputMask from 'react-input-mask';
 import Page from '@/components/Page';
-import { IUser } from '@/types/api/User';
 import { AxiosInstance } from 'axios';
 import { getAxiosInstance } from '@/services/api';
 import { useState } from 'react';
@@ -63,7 +62,9 @@ import 'moment/locale/pt-br';
 import { getScheduleNotification, remaindMessage } from '@/utils/notificarions';
 import ScheduleAvailability from '@/components/ScheduleAvailability';
 import { getDayOfWeekInPortuguese } from '@/utils/date';
-import { pulsate, shakeAnimation } from '@/utils/style';
+import { pulsate } from '@/utils/style';
+import { floatToString, stringToFloat } from '@/utils/helpers';
+import { NumericFormat } from 'react-number-format';
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req }) => {
@@ -172,9 +173,8 @@ export const getServerSideProps = withIronSessionSsr(
   }
 );
 
-let user: IUser;
 let api: AxiosInstance;
-export default function Panel({ schedules, professionals }: any) {
+export default function Panel({ schedules, professionals, user }: any) {
   const appContext = useContext(AppContext);
   const { colorMode } = useColorMode();
   const animatedComponents = makeAnimated();
@@ -190,6 +190,10 @@ export default function Panel({ schedules, professionals }: any) {
   const [workPeriods, setWorkPeriods] = useState([]);
   const [invailableSchedules, setInvailableSchedules] = useState([]);
   const [remainderMessage, setRemainderMessage] = useState('');
+  const [servicesAmount, setServicesAmount] = useState(0);
+
+  const [cashierType, setCashierType] = useState('Geral');
+  const [cashierValue, setCashierValue] = useState('0');
 
   const {
     isOpen: formIsOpen,
@@ -198,7 +202,6 @@ export default function Panel({ schedules, professionals }: any) {
   } = useDisclosure();
 
   useEffect(() => {
-    user = JSON.parse(String(localStorage.getItem('user')));
     api = getAxiosInstance(user);
     appContext.onCloseLoading();
   }, []);
@@ -402,6 +405,28 @@ export default function Panel({ schedules, professionals }: any) {
     }
   };
 
+  const handleCashierSchedule = async (schedule: any) => {
+    try {
+      appContext.onOpenLoading();
+
+      const body = {
+        _id: schedule._id,
+        cashierType: cashierType,
+        value: stringToFloat(cashierValue),
+        reason: `Agendamento: ${schedule.client.name}`,
+      };
+      const { data } = await api.post(`/api/schedules/cashier`, body);
+
+      getSchedules();
+
+      appContext.onCloseLoading();
+      onClose();
+    } catch (error) {
+      console.log(error);
+      appContext.onCloseLoading();
+    }
+  };
+
   const handleMissSchedule = async (schedule: any) => {
     try {
       appContext.onOpenLoading();
@@ -428,7 +453,7 @@ export default function Panel({ schedules, professionals }: any) {
       description='App para genciamento de agendamentos'
     >
       <Box h={'full'} m={5}>
-        <Box textAlign={'center'} mb={10}>
+        <Box textAlign={'center'}>
           <Heading mb={5} fontSize={'2xl'} textAlign={'center'}>
             Agenda do dia
           </Heading>
@@ -442,6 +467,21 @@ export default function Panel({ schedules, professionals }: any) {
             }}
           />
         </Box>
+
+        <HStack justifyContent='start' mb={1}>
+          <Tag size={'sm'} variant='subtle' bgColor={'red.100'}>
+            <TagLabel> Cancelado </TagLabel>
+          </Tag>
+          <Tag size={'sm'} variant='subtle' bgColor={'yellow.100'}>
+            <TagLabel> Faltou </TagLabel>
+          </Tag>
+          <Tag size={'sm'} variant='outline' bgColor={'transparent'}>
+            <TagLabel> Aguardando faturamento </TagLabel>
+          </Tag>
+          <Tag size={'sm'} variant='subtle' bgColor={'green.100'}>
+            <TagLabel> Faturado </TagLabel>
+          </Tag>
+        </HStack>
         <Accordion defaultIndex={[0]} allowMultiple>
           {data.map((item: any, ii: number) => (
             <AccordionItem roundedTop={10} key={ii}>
@@ -491,11 +531,20 @@ export default function Panel({ schedules, professionals }: any) {
                               ? 'red.100'
                               : schedule.status === 'faltou'
                               ? 'yellow.100'
+                              : schedule.cashierId
+                              ? 'green.100'
                               : 'transparent'
                           }
                           key={schedule._id}
                           onClick={() => {
                             setSelectedSchedule(schedule);
+                            let scheduleAmount = 0;
+                            schedule.services.forEach((s: any) => {
+                              //@ts-ignore
+                              scheduleAmount += stringToFloat(s.price);
+                            });
+                            setServicesAmount(scheduleAmount);
+                            setCashierValue(floatToString(scheduleAmount));
                             onOpen();
                           }}
                           cursor={'pointer'}
@@ -848,16 +897,62 @@ export default function Panel({ schedules, professionals }: any) {
 
               {selectedSchedule.status === 'agendado' ? (
                 <>
-                  <ConfirmButtonModal
-                    colorScheme={'yellow'}
-                    value={'Marcar como faltante'}
-                    onDelete={() => handleMissSchedule(selectedSchedule)}
-                  />
-                  <ConfirmButtonModal
-                    colorScheme={'red'}
-                    value={'Cancelar Agendamento'}
-                    onDelete={() => handleCancelSchedule(selectedSchedule)}
-                  />
+                  {selectedSchedule.cashierId ? (
+                    'Agendamento já faturado!'
+                  ) : (
+                    <>
+                      <Box border={'1px solid #ccc'} p={2} borderRadius={10}>
+                        <Text fontWeight={'semibold'} textAlign={'center'}>
+                          {' '}
+                          Faturar{' '}
+                        </Text>
+                        <Flex>
+                          <Input
+                            as={NumericFormat}
+                            name='value'
+                            value={cashierValue}
+                            onChange={(e: any) =>
+                              setCashierValue(e.target.value)
+                            }
+                            thousandSeparator='.'
+                            decimalSeparator=','
+                            decimalScale={2}
+                            fixedDecimalScale={true}
+                          />
+                          <ChakraSelect
+                            value={cashierType}
+                            onChange={(e: any) =>
+                              setCashierType(e.target.value)
+                            }
+                          >
+                            <option value='Geral'> Geral </option>
+                            <option value='Dinheiro'> Dinheiro </option>
+                            <option value='Transferência bancária'>
+                              {' '}
+                              Transferência bancária{' '}
+                            </option>
+                          </ChakraSelect>
+                          <ConfirmButtonModal
+                            colorScheme={'green'}
+                            value={'Faturar'}
+                            onDelete={() =>
+                              handleCashierSchedule(selectedSchedule)
+                            }
+                          />
+                        </Flex>
+                      </Box>
+                      <ConfirmButtonModal
+                        colorScheme={'yellow'}
+                        value={'Marcar como faltante'}
+                        onDelete={() => handleMissSchedule(selectedSchedule)}
+                      />
+                      <ConfirmButtonModal
+                        colorScheme={'red'}
+                        value={'Cancelar Agendamento'}
+                        onDelete={() => handleCancelSchedule(selectedSchedule)}
+                      />
+                    </>
+                  )}
                 </>
               ) : (
                 <></>

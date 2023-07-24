@@ -47,7 +47,6 @@ import { handleImageImageAndUpload } from '@/utils/upload';
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req, res }) => {
-
     if (!('user' in req.session))
       return {
         redirect: {
@@ -55,7 +54,6 @@ export const getServerSideProps = withIronSessionSsr(
           permanent: false,
         },
       };
-
 
     const user = req.session.user;
     return {
@@ -76,7 +74,7 @@ export const getServerSideProps = withIronSessionSsr(
 
 let user: IUser;
 let api: AxiosInstance;
-export default function Professionals() {
+export default function Professionals({ user }: any) {
   const { colorMode } = useColorMode();
   const appContext = useContext(AppContext);
   const [isEditing, setIsEditing] = useState(false);
@@ -88,7 +86,6 @@ export default function Professionals() {
     onClose: formOnClose,
   } = useDisclosure();
   const toast = useToast();
-  const router = useRouter();
   const animatedComponents = makeAnimated();
 
   const onSubmit = async (values: any) => {
@@ -131,7 +128,8 @@ export default function Professionals() {
 
   const formik = useFormik({
     initialValues: {
-      photo: 'http://res.cloudinary.com/dovvizyxg/image/upload/v1689457969/barber-shop-mens-haircut-vintage-barbershop-shaving-barber-scissors-barber-straight-razor-scissors-over-blue-background-215247336_rtkpq7.webp',
+      photo:
+        'http://res.cloudinary.com/dovvizyxg/image/upload/v1689457969/barber-shop-mens-haircut-vintage-barbershop-shaving-barber-scissors-barber-straight-razor-scissors-over-blue-background-215247336_rtkpq7.webp',
       name: '',
       description: '',
       phone: '',
@@ -211,7 +209,6 @@ export default function Professionals() {
   });
 
   useEffect(() => {
-    user = JSON.parse(String(localStorage.getItem('user')));
     api = getAxiosInstance(user);
     getData();
   }, []);
@@ -417,7 +414,9 @@ export default function Professionals() {
               isRequired
               isInvalid={!!formik.errors.photo && formik.touched.photo}
             >
-              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Foto</FormLabel>
+              <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                Foto
+              </FormLabel>
               <Box
                 position='relative'
                 display='inline-block'
@@ -430,9 +429,7 @@ export default function Professionals() {
                 alignItems='center'
               >
                 <ChakraImage
-                  src={
-                    formik.values.photo
-                  }
+                  src={formik.values.photo}
                   alt='Foto'
                   mb={2}
                   style={{
@@ -445,9 +442,11 @@ export default function Professionals() {
                   type='file'
                   accept='image/*'
                   name='coverPreview'
-                  onChange={(event)=> handleImageImageAndUpload(event, 0.5, (url: string) =>
-                    formik.setFieldValue('photo', url)
-                  )}
+                  onChange={(event) =>
+                    handleImageImageAndUpload(event, 0.5, (url: string) =>
+                      formik.setFieldValue('photo', url)
+                    )
+                  }
                   position='absolute'
                   top={0}
                   left={0}
@@ -467,7 +466,9 @@ export default function Professionals() {
               isRequired
               isInvalid={!!formik.errors.name && formik.touched.name}
             >
-              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Nome</FormLabel>
+              <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                Nome
+              </FormLabel>
               <Input
                 type='text'
                 name='name'
@@ -484,7 +485,9 @@ export default function Professionals() {
                 !!formik.errors.description && formik.touched.description
               }
             >
-              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Descrição</FormLabel>
+              <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                Descrição
+              </FormLabel>
               <Input
                 type='text'
                 name='description'
@@ -499,7 +502,9 @@ export default function Professionals() {
               isRequired
               isInvalid={!!formik.errors.phone && formik.touched.phone}
             >
-              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Telefone </FormLabel>
+              <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                Telefone{' '}
+              </FormLabel>
               <Input
                 name='phone'
                 as={InputMask}
@@ -515,7 +520,10 @@ export default function Professionals() {
               isRequired
               isInvalid={!!formik.errors.whatsapp && formik.touched.whatsapp}
             >
-              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}> Whatsapp </FormLabel>
+              <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                {' '}
+                Whatsapp{' '}
+              </FormLabel>
 
               <Input
                 name='whatsapp'
@@ -533,7 +541,10 @@ export default function Professionals() {
               //@ts-ignore
               isInvalid={!!formik.errors.services && formik.touched.services}
             >
-              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}> Serviços </FormLabel>
+              <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                {' '}
+                Serviços{' '}
+              </FormLabel>
               <Select
                 name='services'
                 value={formik.values.services}
@@ -582,7 +593,10 @@ export default function Professionals() {
                 formik.touched.defaultSchedule
               }
             >
-              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}> Períodos de Trabalho Padrão </FormLabel>
+              <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                {' '}
+                Períodos de Trabalho Padrão{' '}
+              </FormLabel>
               <SchedulesInput
                 schedules={formik.values.defaultSchedule}
                 onChange={(value: any) =>

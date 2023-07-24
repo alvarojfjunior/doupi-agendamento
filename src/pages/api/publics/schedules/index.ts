@@ -1,7 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { Client, Schedule } from '../../../../services/database';
-import moment from 'moment';
-import mongoose from 'mongoose';
 
 export default async function handler(
   req: NextApiRequest,

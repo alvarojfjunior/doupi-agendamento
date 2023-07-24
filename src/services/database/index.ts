@@ -3,6 +3,7 @@ import { CompanySchema } from './schemas/company';
 import { ProfessionalSchema } from './schemas/professional';
 import { ServiceSchema } from './schemas/service';
 import { ClientSchema } from './schemas/client';
+import { CashierSchema } from './schemas/cashier';
 import { ScheduleSchemaSchema } from './schemas/schedule';
 
 import { UserSchema } from './schemas/user';
@@ -34,4 +35,5 @@ export const Company = Mongoose.model('Company', CompanySchema);
 export const Professional = Mongoose.model('Professional', ProfessionalSchema);
 export const Service = Mongoose.model('Service', ServiceSchema);
 export const Client = Mongoose.model('Client', ClientSchema);
+export const Cashier = Mongoose.model('Cashier', CashierSchema);
 export const Schedule = Mongoose.model('Schedule', ScheduleSchemaSchema);
