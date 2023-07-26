@@ -31,7 +31,6 @@ const Links = [
   { label: 'Agendas', href: '/private/' },
   { label: 'Clientes', href: '/private/clients' },
   { label: 'Profissionais', href: '/private/professionals' },
-  { label: 'Profissionais', href: '/private/professionals' },
   { label: 'Serviços', href: '/private/services' },
   { label: 'Caixa', href: '/private/cashier' },
   { label: 'Relatórios', href: '/private/reports' },
