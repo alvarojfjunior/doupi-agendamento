@@ -30,7 +30,7 @@ export default function DeleteConfirmationModal({ onDelete }: any) {
         onClick={onOpen}
       />
 
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isCentered isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Confirmar exclusão</ModalHeader>

@@ -282,7 +282,8 @@ export default function Company({ user }: any) {
                   onChange={formik.handleChange}
                 >
                   <option value='Beleza'>Beleza</option>
-                  <option value='Clínica'>Clínica</option>
+                  <option value='Beleza'>Estética</option>
+                  <option value='Saúde'>Saúde</option>
                 </Select>
               </FormControl>
 

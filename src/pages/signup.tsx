@@ -31,8 +31,7 @@ import { withIronSessionSsr } from 'iron-session/next';
 
 export const getServerSideProps = withIronSessionSsr(
   ({ req }) => {
-
-    if (('user' in req.session))
+    if ('user' in req.session)
       return {
         redirect: {
           destination: '/private',
@@ -194,7 +193,11 @@ export default function SignupCard() {
                         isRequired
                         isInvalid={!!errors.companyName && touched.companyName}
                       >
-                        <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Nome da Empresa</FormLabel>
+                        <FormLabel
+                          fontSize={{ base: 'sm', md: 'md', lg: 'md' }}
+                        >
+                          Nome da Empresa
+                        </FormLabel>
                         <Field as={Input} type='text' name='companyName' />
                       </FormControl>
 
@@ -217,10 +220,15 @@ export default function SignupCard() {
                           isRequired
                           isInvalid={!!errors.type && touched.type}
                         >
-                          <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Ramo da sua empresa</FormLabel>
+                          <FormLabel
+                            fontSize={{ base: 'sm', md: 'md', lg: 'md' }}
+                          >
+                            Ramo da sua empresa
+                          </FormLabel>
                           <Field as={Select} type='text' name='type'>
                             <option value='Beleza'>Beleza</option>
-                            <option value='Clínica'>Clínica</option>
+                            <option value='Beleza'>Estética</option>
+                            <option value='Saúde'>Saúde</option>
                           </Field>
                         </FormControl>
                       </Box>
@@ -243,7 +251,9 @@ export default function SignupCard() {
                       isRequired
                       isInvalid={!!errors.email && touched.email}
                     >
-                      <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Email para contato e login</FormLabel>
+                      <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                        Email para contato e login
+                      </FormLabel>
                       <Field as={Input} type='email' name='email' />
                     </FormControl>
 
@@ -255,7 +265,11 @@ export default function SignupCard() {
                             isRequired
                             isInvalid={!!errors.password && touched.password}
                           >
-                            <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Senha</FormLabel>
+                            <FormLabel
+                              fontSize={{ base: 'sm', md: 'md', lg: 'md' }}
+                            >
+                              Senha
+                            </FormLabel>
                             <InputGroup>
                               <Field
                                 as={Input}
@@ -294,7 +308,11 @@ export default function SignupCard() {
                               touched.confirmPassword
                             }
                           >
-                            <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Confirme a Senha</FormLabel>
+                            <FormLabel
+                              fontSize={{ base: 'sm', md: 'md', lg: 'md' }}
+                            >
+                              Confirme a Senha
+                            </FormLabel>
                             <InputGroup>
                               <Field
                                 as={Input}

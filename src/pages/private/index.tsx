@@ -52,7 +52,7 @@ import makeAnimated from 'react-select/animated';
 import Select from 'react-select';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { AddIcon, ArrowRightIcon } from '@chakra-ui/icons';
+import { AddIcon, ArrowRightIcon, RepeatIcon } from '@chakra-ui/icons';
 import { sumHours } from '@/utils/time';
 import { withIronSessionSsr } from 'iron-session/next';
 import { Professional, Schedule } from '@/services/database';
@@ -191,6 +191,7 @@ export default function Panel({ schedules, professionals, user }: any) {
   const [invailableSchedules, setInvailableSchedules] = useState([]);
   const [remainderMessage, setRemainderMessage] = useState('');
   const [servicesAmount, setServicesAmount] = useState(0);
+  const [count, setCount] = useState(0);
 
   const [cashierType, setCashierType] = useState('Geral');
   const [cashierValue, setCashierValue] = useState('0');
@@ -204,6 +205,15 @@ export default function Panel({ schedules, professionals, user }: any) {
   useEffect(() => {
     api = getAxiosInstance(user);
     appContext.onCloseLoading();
+  }, []);
+
+  useEffect(() => {
+    const countFiveMinutes = () => {
+      setCount((prevCount) => prevCount + 1);
+      getSchedules();
+    };
+    const intervalId = setInterval(countFiveMinutes, 5 * 60 * 1000);
+    return () => clearInterval(intervalId);
   }, []);
 
   useEffect(() => {
@@ -323,10 +333,10 @@ export default function Panel({ schedules, professionals, user }: any) {
     );
   }, [formik.values.date]);
 
-  const getSchedules = async (date?: string) => {
+  const getSchedules = async (dateProp?: string) => {
     try {
       appContext.onOpenLoading();
-      const d = date || moment().format('YYYY-MM-DD');
+      const d = dateProp || date || moment().format('YYYY-MM-DD');
       const { data } = await api.get(
         `/api/schedules/perProfessional?companyId=${user.companyId}&date=${d}`
       );
@@ -458,8 +468,10 @@ export default function Panel({ schedules, professionals, user }: any) {
             Agenda do dia
           </Heading>
           <Input
-            w={200}
+            w={150}
             type='date'
+            textAlign={'center'}
+            animation={`${pulsate} 1.5s infinite`}
             value={date}
             onChange={(e: any) => {
               setDate(e.target.value);
@@ -468,20 +480,41 @@ export default function Panel({ schedules, professionals, user }: any) {
           />
         </Box>
 
-        <HStack justifyContent='start' mb={1}>
-          <Tag size={'sm'} variant='subtle' bgColor={'red.100'}>
-            <TagLabel> Cancelado </TagLabel>
-          </Tag>
-          <Tag size={'sm'} variant='subtle' bgColor={'yellow.100'}>
-            <TagLabel> Faltou </TagLabel>
-          </Tag>
-          <Tag size={'sm'} variant='outline' bgColor={'transparent'}>
-            <TagLabel> Aguardando faturamento </TagLabel>
-          </Tag>
-          <Tag size={'sm'} variant='subtle' bgColor={'green.100'}>
-            <TagLabel> Faturado </TagLabel>
-          </Tag>
+        <HStack justifyContent='space-between' marginBlock={5}>
+          <HStack justifyContent='center' wrap={'wrap'}>
+            <Tag size={'sm'} variant='subtle' bgColor={'red.500'} color='white'>
+              <TagLabel> Cancelado </TagLabel>
+            </Tag>
+            <Tag
+              size={'sm'}
+              variant='subtle'
+              bgColor={'yellow.500'}
+              color='white'
+            >
+              <TagLabel> Faltou </TagLabel>
+            </Tag>
+            <Tag size={'sm'} variant='outline' bgColor={'transparent'}>
+              <TagLabel> Aguardando </TagLabel>
+            </Tag>
+            <Tag
+              size={'sm'}
+              variant='subtle'
+              bgColor={'green.500'}
+              color='white'
+            >
+              <TagLabel> Faturado </TagLabel>
+            </Tag>
+          </HStack>
+
+          <RepeatIcon
+            w={25}
+            h={25}
+            color={colorMode === 'dark' ? '#white' : 'gray.700'}
+            cursor={'pointer'}
+            onClick={()=> getSchedules()}
+          />
         </HStack>
+
         <Accordion defaultIndex={[0]} allowMultiple>
           {data.map((item: any, ii: number) => (
             <AccordionItem roundedTop={10} key={ii}>
@@ -528,12 +561,15 @@ export default function Panel({ schedules, professionals, user }: any) {
                         <GridItem
                           bgColor={
                             schedule.status === 'cancelado'
-                              ? 'red.100'
+                              ? 'red.500'
                               : schedule.status === 'faltou'
-                              ? 'yellow.100'
+                              ? 'yellow.500'
                               : schedule.cashierId
-                              ? 'green.100'
+                              ? 'green.500'
                               : 'transparent'
+                          }
+                          color={
+                            schedule.status !== 'agendado' ? 'white' : colorMode === 'dark' ? '#white' : '#black'
                           }
                           key={schedule._id}
                           onClick={() => {
@@ -554,8 +590,7 @@ export default function Panel({ schedules, professionals, user }: any) {
                             colorMode === 'dark' ? '#cccccc3f' : '#cccccc'
                           }`}
                           _hover={{
-                            bgColor: '#3E4D92',
-                            color: 'white',
+                            boxShadow: '0px 0px 10px 0px #ccc',
                           }}
                           p={2}
                           textAlign={'center'}
@@ -842,7 +877,7 @@ export default function Panel({ schedules, professionals, user }: any) {
       </Drawer>
 
       {selectedSchedule.client && (
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal isCentered isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
             <ModalCloseButton animation={`${pulsate} 1.5s infinite`} />
@@ -902,11 +937,11 @@ export default function Panel({ schedules, professionals, user }: any) {
                   ) : (
                     <>
                       <Box border={'1px solid #ccc'} p={2} borderRadius={10}>
-                        <Text fontWeight={'semibold'} textAlign={'center'}>
+                        <Text fontWeight={'semibold'} textAlign={'center'} mb={2}>
                           {' '}
                           Faturar{' '}
                         </Text>
-                        <Flex>
+                        <Flex gap={1}>
                           <Input
                             as={NumericFormat}
                             name='value'

@@ -200,7 +200,7 @@ export default function Professionals({ user }: any) {
     },
     validationSchema: Yup.object().shape({
       name: Yup.string().min(2).max(50).required(),
-      description: Yup.string().min(2).max(50).required(),
+      description: Yup.string().min(2).max(200).required(),
       phone: Yup.string().min(16).required(),
       whatsapp: Yup.string().min(16).required(),
       services: Yup.array().min(1),

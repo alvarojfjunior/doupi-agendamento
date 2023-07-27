@@ -20,11 +20,11 @@ export default function ConfirmButtonModal({ onDelete, value, colorScheme }: any
 
   return (
     <>
-      <Button w={'full'} colorScheme={colorScheme} onClick={onOpen}>
+      <Button w={'full'} color={'white'} colorScheme={colorScheme} onClick={onOpen}>
         {value}
       </Button>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Deseja confirmar esta ação?</ModalHeader>
@@ -33,7 +33,7 @@ export default function ConfirmButtonModal({ onDelete, value, colorScheme }: any
             <Button variant='ghost' onClick={onClose}>
               Cancelar
             </Button>
-            <Button colorScheme='red' ml={3} onClick={handleDelete}>
+            <Button colorScheme={colorScheme} ml={3} onClick={handleDelete}>
               Confirmar
             </Button>
           </ModalFooter>

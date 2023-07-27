@@ -2,7 +2,6 @@ import {
   Box,
   TableContainer,
   Table,
-  Image as ChakraImage,
   Thead,
   Tr,
   Th,
@@ -10,7 +9,6 @@ import {
   Tbody,
   Td,
   useColorMode,
-  useToast,
   IconButton,
   Stack,
   Heading,
@@ -26,6 +24,10 @@ import {
   Input,
   DrawerFooter,
   Button,
+  Divider,
+  Flex,
+  Textarea,
+  useToast,
 } from '@chakra-ui/react';
 import makeAnimated from 'react-select/animated';
 import { useFormik } from 'formik';
@@ -39,7 +41,7 @@ import { IUser } from '@/types/api/User';
 import { AxiosInstance } from 'axios';
 import { getAxiosInstance } from '@/services/api';
 import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
-import { AddIcon, EditIcon } from '@chakra-ui/icons';
+import { AddIcon, ArrowRightIcon, EditIcon } from '@chakra-ui/icons';
 import { withIronSessionSsr } from 'iron-session/next';
 
 export const getServerSideProps = withIronSessionSsr(
@@ -74,6 +76,7 @@ export default function Clients({ user }: any) {
   const appContext = useContext(AppContext);
   const [isEditing, setIsEditing] = useState(false);
   const [data, setData] = useState([]);
+  const [message, setMessage] = useState('');
   const {
     isOpen: formIsOpen,
     onOpen: formOnOpen,
@@ -102,7 +105,6 @@ export default function Clients({ user }: any) {
         isClosable: true,
       });
       setIsEditing(false);
-      formOnClose();
     } catch (error: any) {
       toast({
         title: 'Houve um erro',
@@ -212,6 +214,8 @@ export default function Clients({ user }: any) {
                       onClick={() => {
                         formik.setValues(item);
                         setIsEditing(true);
+                        const sugestionMessage = `Olá ${item.name}, tudo bem? Aqui é da ${user.companyName}, vamos agendar? \nAcesse o link abaixo e agende já! \n\nhttps://doupi.com.br/d/${user.companyName.replaceAll(' ', '')}`
+                        setMessage(sugestionMessage)
                         formOnOpen();
                       }}
                     />
@@ -284,6 +288,47 @@ export default function Clients({ user }: any) {
                 mask='(99) 9 9999-9999'
               />
             </FormControl>
+
+            {isEditing && (
+              <Box>
+                <Divider marginBlock={10} />
+
+                <Box w={'full'}>
+                  <Text fontWeight={'semibold'}>
+                    {' '}
+                    Enviar mensagem para o cliente:{' '}
+                  </Text>
+                  <Flex alignItems={'center'}>
+                    <Textarea
+                      resize={'none'}
+                      height={'80px'}
+                      overflowY='hidden'
+                      placeholder='Mensagem'
+                      value={message}
+                      onChange={(e: any) => setMessage(e.target.value)}
+                    />
+                    <Button
+                      variant='outline'
+                      colorScheme='blue'
+                      h={'80px'}
+                      onClick={() => {
+                        const phone = String(formik.values.phone)
+                          .replaceAll(' ', '')
+                          .replaceAll('(', '')
+                          .replaceAll(')', '')
+                          .replaceAll('-', '');
+                        window.open(
+                          `https://api.whatsapp.com/send?phone=55${phone}&text=${message}`,
+                          '_blank'
+                        );
+                      }}
+                    >
+                      <ArrowRightIcon />
+                    </Button>
+                  </Flex>
+                </Box>
+              </Box>
+            )}
           </DrawerBody>
 
           <DrawerFooter borderTopWidth='1px'>

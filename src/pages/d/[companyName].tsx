@@ -19,6 +19,7 @@ import { AppContext } from '@/contexts/app';
 import { useRouter } from 'next/router';
 import { getScheduleNotification } from '@/utils/notificarions';
 import { ArrowForwardIcon, ArrowLeftIcon } from '@chakra-ui/icons';
+import { modifyTheme } from '@/utils/style';
 
 export async function getServerSideProps(context: any) {
   const { companyName } = context.query;
@@ -158,18 +159,22 @@ export default function CompanyPage({ company, services: servicesProps }: any) {
   };
 
   return (
-    <>
+    <Box bgColor={modifyTheme(company.color, 0.97)}>
       <Head>
         <title>{company.name}</title>
       </Head>
       <Stack mb={30}>
-        <ChakraImage
-          src={company.coverImage}
-          objectFit='cover'
-          boxSize='100%'
-          maxH={400}
-          alt='Imagem de capa'
-        />
+        <Box w={'100%'} bgColor={modifyTheme(company.color, 0.5)} boxShadow={`0px 0px 10px 10px ${company.color}`} mb={5}>
+          <ChakraImage
+            src={company.coverImage}
+            objectFit='cover'
+            boxSize='100%'
+            maxW={800}
+            m={'auto'}
+            h={{ base: 200, sm: 300 }}
+            alt='Imagem de capa'
+          />
+        </Box>
         <Heading
           fontSize={'3xl'}
           color={'gray.700'}
@@ -218,6 +223,6 @@ export default function CompanyPage({ company, services: servicesProps }: any) {
           </Button>
         </Stack>
       )}
-    </>
+    </Box>
   );
 }

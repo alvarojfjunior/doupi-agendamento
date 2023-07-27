@@ -134,7 +134,7 @@ export default function Services({ user }: any) {
     },
     validationSchema: Yup.object().shape({
       name: Yup.string().min(2).max(50).required(),
-      description: Yup.string().min(2).max(50).required(),
+      description: Yup.string().min(2).max(200).required(),
       duration: Yup.string().min(5).required(),
       price: Yup.string().min(5).required(),
     }),

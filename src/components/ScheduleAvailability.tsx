@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Flex, Button, Text } from '@chakra-ui/react';
 import moment from 'moment';
-import { pulsate } from '@/utils/style';
+import { modifyTheme, pulsate } from '@/utils/style';
 interface ScheduleAvailabilityProps {
+  color?: String;
   date: Date;
   workPeriods: { start: string; end: string }[];
   unavailableTimes: { time: string; duration: string }[];
@@ -12,6 +13,7 @@ interface ScheduleAvailabilityProps {
 }
 
 const ScheduleAvailability: React.FC<ScheduleAvailabilityProps> = ({
+  color = 'blue.900',
   interval,
   date,
   workPeriods,
@@ -103,15 +105,18 @@ const ScheduleAvailability: React.FC<ScheduleAvailabilityProps> = ({
   }
 
   return (
-    <Flex gap={2} wrap={'wrap'}>
+    <Flex gap={2} wrap={'wrap'} justifyContent={'center'}>
       {availableTimes.length > 0 ? (
         availableTimes.map((t: any, i: number) => (
           <Button
             animation={`${
-              i === 0 && selectedIndex === -1 && pulsate
+              (i === 0 && selectedIndex === -1) && pulsate
             } 1.5s infinite`}
-            bgColor={i === selectedIndex ? 'blue.900' : 'blue.400'}
-            _hover={{ bgColor: i === selectedIndex ? 'blue.900' : 'blue.500' }}
+            //@ts-ignore
+            bgColor={i === selectedIndex ? color : modifyTheme(color, 0.2)}
+            boxShadow={i === selectedIndex ? `0px 0px 10px 3px black` : 'none'}
+            //@ts-ignore
+            _hover={{ bgColor: color }}
             color={'white'}
             onClick={() => {
               setSelectedIndex(i);

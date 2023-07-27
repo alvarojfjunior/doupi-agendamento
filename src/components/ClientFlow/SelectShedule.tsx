@@ -7,8 +7,6 @@ import {
   CardBody,
   Image,
   Card,
-  CardFooter,
-  UnorderedList,
   ListItem,
   Input,
   Box,
@@ -47,7 +45,7 @@ export default function SelectShedule({
   const [amount, setAmount] = useState('');
   const [schedulePerPrefessional, setSchedulePerPrefessional] = useState([]);
   const [duration, setDuration] = useState('00:00');
-  const [selectedProfessional, setSelectedProfessional] = useState({})
+  const [selectedProfessional, setSelectedProfessional] = useState({});
   const [time, setTime] = useState('');
 
   useEffect(() => {
@@ -85,20 +83,20 @@ export default function SelectShedule({
       <Card
         maxW={'600px'}
         m={'auto'}
-        direction={{ base: 'column', sm: 'row' }}
+        direction={{ base: 'row', sm: 'row' }}
         overflow='hidden'
         variant='outline'
       >
         <Image
           objectFit='cover'
-          maxW={{ base: '100%', sm: '200px' }}
+          maxW={{ base: '50%', sm: '200px' }}
           src={selectedServices[0].image}
           alt='SERVIÇO'
         />
         <Stack>
           <CardBody>
             <Heading size='md' mb={2}>
-              Serviços selecionados:
+              Resumo:
             </Heading>
             <List spacing={1}>
               {selectedServices.map((s: any) => (
@@ -108,8 +106,8 @@ export default function SelectShedule({
                 </ListItem>
               ))}
             </List>
-            <Text mt={2} fontWeight={'semibold'}>
-              Duração: {duration}. {' | '}Total: R${amount}
+            <Text mt={2}>
+              <b>Duração:</b> {duration} <b>Total:</b> R${amount}
             </Text>
           </CardBody>
         </Stack>
@@ -117,15 +115,16 @@ export default function SelectShedule({
 
       <Divider />
 
-      <Box w={'full'} textAlign={'center'} mt={5}>
+      <Box w={'full'} textAlign={'center'} marginBlock={5}>
         <Text color={'gray.700'} fontSize={17} fontWeight={'semibold'}>
           {' '}
           Data para o agendamento{' '}
         </Text>
         <Input
-          animation={`${!isValid && pulsate} 1.5s infinite`}
+          animation={`${pulsate} 1.5s infinite`}
           m={'auto'}
-          w={200}
+          w={150}
+          textAlign={'center'}
           type='date'
           value={date}
           onChange={(e: any) => {
@@ -134,7 +133,7 @@ export default function SelectShedule({
         />
       </Box>
 
-      <Accordion marginInline={5} defaultIndex={[0]}>
+      <Accordion marginInline={5} defaultIndex={[0]} maxW={{ base: 500, sm: '100%' }} m={'auto'}>
         {schedulePerPrefessional.map((p: any, i: number) => (
           <AccordionItem roundedTop={10} key={i}>
             <AccordionButton
@@ -165,6 +164,7 @@ export default function SelectShedule({
               roundedBottom={10}
             >
               <ScheduleAvailability
+                color={company.color}
                 date={moment(date, 'YYYY-MM-DD').toDate()}
                 interval={30}
                 unavailableTimes={p.schedules}
@@ -172,7 +172,7 @@ export default function SelectShedule({
                 workPeriods={p.selectedWorkPeriod}
                 handlChange={(t: any) => {
                   setTime(t);
-                  setSelectedProfessional(p)
+                  setSelectedProfessional(p);
                   setIsValid(true);
                 }}
               />

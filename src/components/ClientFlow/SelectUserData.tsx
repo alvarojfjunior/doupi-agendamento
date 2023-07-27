@@ -71,13 +71,13 @@ export default function SelectUserData({
       <Card
         maxW={'600px'}
         m={'auto'}
-        direction={{ base: 'column', sm: 'row' }}
+        direction={{ base: 'row', sm: 'row' }}
         overflow='hidden'
         variant='outline'
       >
         <Image
           objectFit='cover'
-          maxW={{ base: '100%', sm: '200px' }}
+          maxW={{ base: '30%', sm: '200px' }}
           src={selectedServices[0].image}
           alt='sERVIÇO'
         />
@@ -129,7 +129,8 @@ export default function SelectUserData({
                 {selectedTime}
               </Text>
               <Text mt={3} fontWeight={'semibold'}>
-                Duração: {selectedDuration}. {' | '}Total: R${selectedAmount}
+                <b>Duração:</b> {selectedDuration} <b>Total:</b> R$
+                {selectedAmount}
               </Text>
             </Box>
           </CardBody>
