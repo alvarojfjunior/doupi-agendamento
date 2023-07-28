@@ -26,6 +26,7 @@ import { getAxiosInstance } from '@/services/api';
 import { IUser } from '@/types/api/User';
 import { AppContext } from '@/contexts/app';
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
+import Cookies from 'js-cookie';
 
 const Links = [
   { label: 'Agendas', href: '/private/' },
@@ -55,8 +56,9 @@ export default function Navbar() {
   const handleLogout = async () => {
     try {
       appContext.onOpenLoading();
-      const { data } = await api.get(`/api/auth/logout`);
       localStorage.removeItem('user');
+      Cookies.remove('doupi_cookie');
+      const { data } = await api.get(`/api/auth/logout`);
       router.push('/');
       appContext.onCloseLoading();
     } catch (error) {

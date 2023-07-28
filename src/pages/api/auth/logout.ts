@@ -6,7 +6,7 @@ export default withIronSessionApiRoute(
     try {
       if (req.method === 'GET') {
         await req.session.destroy();
-        res.status(200).send({ ok: true });
+        return res.status(200).send({ ok: true });
       }
       return res.status(404);
     } catch (error: any) {
