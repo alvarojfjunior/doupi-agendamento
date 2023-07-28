@@ -214,7 +214,7 @@ export default function Clients({ user }: any) {
                       onClick={() => {
                         formik.setValues(item);
                         setIsEditing(true);
-                        const sugestionMessage = `Olá ${item.name}, tudo bem? Aqui é da ${user.companyName}, vamos agendar? \nAcesse o link abaixo e agende já! \n\nhttps://doupi.com.br/d/${user.companyName.replaceAll(' ', '')}`
+                        const sugestionMessage = `Olá ${item.name}, tudo bem? Aqui é da ${user.companyName}, vamos agendar? \nAcesse o link abaixo e agende já! \n\nhttps://doupi.com.br/d/${user.companyName.replaceAll(' ', '-')}`
                         setMessage(sugestionMessage)
                         formOnOpen();
                       }}

@@ -842,6 +842,7 @@ export default function Panel({ schedules, professionals, user }: any) {
                 Horários Disponíveis
               </FormLabel>
               <ScheduleAvailability
+                color={'#3E4D92'}
                 handlChange={(time: string) => {
                   formik.setFieldValue('time', time);
                 }}
