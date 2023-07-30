@@ -11,7 +11,7 @@ export const getAverage = (array: string[]): number => {
 };
 
 
-export const objetoTemConteudo = (objeto) => {
+export const objetoTemConteudo = (objeto: object): boolean => {
   for (const key in objeto) {
     if (objeto.hasOwnProperty(key)) {
       return true;

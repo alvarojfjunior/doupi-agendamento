@@ -397,7 +397,7 @@ export default function Panel({ schedules, professionals, user }: any) {
 
       onClose();
       appContext.onCloseLoading();
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: 'Houve um erro',
         description: error.Message,

@@ -158,7 +158,7 @@ export default function Clients({ user }: any) {
       setData(data);
 
       appContext.onCloseLoading();
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
       toast({
         title: 'Houve um erro',
@@ -181,7 +181,7 @@ export default function Clients({ user }: any) {
       setData((prevArray) => prevArray.filter((d: any) => d._id !== item._id));
 
       appContext.onCloseLoading();
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: 'Houve um erro',
         description: error.Message,
@@ -214,7 +214,7 @@ export default function Clients({ user }: any) {
       });
 
       appContext.onCloseLoading();
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: 'Houve um erro',
         description: error.Message,

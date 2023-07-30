@@ -110,7 +110,7 @@ export default async function handler(
       //@ts-ignore
       body.clientID = client._id;
 
-      const schedule = new Schedule(body);
+      const schedule: any = new Schedule(body);
 
       await schedule.save();
 
