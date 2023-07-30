@@ -82,6 +82,8 @@ export default function Clients({ user }: any) {
   const [isEditing, setIsEditing] = useState(false);
   const [qrCode, setQrCode] = useState('');
   const [data, setData] = useState([]);
+  const [clickCount, setClickCount] = useState(0);
+
   const toast = useToast();
 
   const onSubmit = async (values: any) => {
@@ -217,17 +219,58 @@ export default function Clients({ user }: any) {
     }
   };
 
+  const handleRestoreAll = async () => {
+    if (clickCount < 3) {
+      setClickCount(clickCount + 1);
+      return;
+    } else {
+      setClickCount(0);
+    }
+
+    try {
+      appContext.onOpenLoading();
+
+      //restore all
+      await api.get('/api/message');
+
+      toast({
+        title: 'Sucesso!',
+        description: 'Serviço reiniciado',
+        status: 'success',
+        position: 'top-right',
+        duration: 9000,
+        isClosable: true,
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Houve um erro',
+        description: error.Message,
+        status: 'error',
+        position: 'top-right',
+        duration: 9000,
+        isClosable: true,
+      });
+
+    } finally {
+      await getData();
+      appContext.onCloseLoading();
+    }
+  };
+
   const handleTesteWhatsapp = async () => {
     try {
       appContext.onOpenLoading();
 
-      await sendMessage(
-        user.companyId,
-        user.companyWhatsapp,
-        'O módulo de whatsapp da Doupi está configurado!'
-      );
+      //restore all
+      await api.get('/api/message');
 
-      formik.setFieldValue('isWhatsappConnected', true)
+      //send a message
+      await api.post('/api/message', {
+        phone: user.companyWhatsapp,
+        message: 'O módulo de whatsapp da Doupi está configurado!',
+      });
+
+      formik.setFieldValue('isWhatsappConnected', true);
 
       toast({
         title: 'Sucesso!',
@@ -238,7 +281,15 @@ export default function Clients({ user }: any) {
         isClosable: true,
       });
       appContext.onCloseLoading();
-    } catch (error) {
+    } catch (error: any) {
+      toast({
+        title: 'Houve um erro',
+        description: error.Message,
+        status: 'error',
+        position: 'top-right',
+        duration: 9000,
+        isClosable: true,
+      });
       appContext.onCloseLoading();
     }
   };
@@ -250,7 +301,12 @@ export default function Clients({ user }: any) {
       description='App para genciamento de agendamentos'
     >
       <Stack h={'full'} m={5}>
-        <Heading mb={5} fontSize={'2xl'} textAlign={'center'}>
+        <Heading
+          mb={5}
+          fontSize={'2xl'}
+          textAlign={'center'}
+          onClick={handleRestoreAll}
+        >
           Configurações
         </Heading>
         <form onSubmit={formik.handleSubmit}>
