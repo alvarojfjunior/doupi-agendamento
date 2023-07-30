@@ -232,9 +232,12 @@ export default function Panel({ schedules, professionals, user }: any) {
         (p: any) => p._id === values.professional
       );
       values.companyId = user.companyId;
+      values.companyName = user.companyName;
       values.professionalId = values.professional;
       values.serviceIds = values.services.map((s: any) => s.value);
-      values.origem = 'admin';
+      values.serviceNames = serviceNames;
+      (values.professionalName = professional.name), (values.origem = 'admin');
+      values.isNotify = isNotify;
 
       delete values.professional;
       delete values.services;
@@ -253,28 +256,6 @@ export default function Panel({ schedules, professionals, user }: any) {
         duration: 5000,
         isClosable: true,
       });
-
-      if (isNotify) {
-        const notidy = getScheduleNotification(
-          res.data._id,
-          values.name,
-          professional.name,
-          user.companyName,
-          serviceNames,
-          moment(date, 'YYYY-MM-DD').format('DD/MM/YYYY'),
-          values.time
-        );
-        const message = encodeURIComponent(notidy);
-        const phone = String(values.phone)
-          .replaceAll(' ', '')
-          .replaceAll('(', '')
-          .replaceAll(')', '')
-          .replaceAll('-', '');
-        window.open(
-          `https://api.whatsapp.com/send?phone=55${phone}&text=${message}`,
-          '_blank'
-        );
-      }
       appContext.onCloseLoading();
     } catch (error: any) {
       toast({
@@ -396,6 +377,39 @@ export default function Panel({ schedules, professionals, user }: any) {
     formik.setFieldValue('services', []);
   };
 
+  const handleSendRemaindMessage = async () => {
+    try {
+      appContext.onOpenLoading();
+
+      await api.post('/api/message', {
+        phone: selectedSchedule.client.phone,
+        message: remainderMessage,
+      });
+
+      toast({
+        title: 'Sucesso!',
+        description: 'Mensagem encaminhada para o cliente.',
+        status: 'success',
+        position: 'top-right',
+        duration: 9000,
+        isClosable: true,
+      });
+
+      onClose();
+      appContext.onCloseLoading();
+    } catch (error) {
+      toast({
+        title: 'Houve um erro',
+        description: error.Message,
+        status: 'error',
+        position: 'top-right',
+        duration: 9000,
+        isClosable: true,
+      });
+      appContext.onCloseLoading();
+    }
+  };
+
   const handleCancelSchedule = async (schedule: any) => {
     try {
       appContext.onOpenLoading();
@@ -511,7 +525,7 @@ export default function Panel({ schedules, professionals, user }: any) {
             h={25}
             color={colorMode === 'dark' ? '#white' : 'gray.700'}
             cursor={'pointer'}
-            onClick={()=> getSchedules()}
+            onClick={() => getSchedules()}
           />
         </HStack>
 
@@ -569,7 +583,11 @@ export default function Panel({ schedules, professionals, user }: any) {
                               : 'transparent'
                           }
                           color={
-                            schedule.status !== 'agendado' ? 'white' : colorMode === 'dark' ? '#white' : '#black'
+                            schedule.status !== 'agendado'
+                              ? 'white'
+                              : colorMode === 'dark'
+                              ? '#white'
+                              : '#black'
                           }
                           key={schedule._id}
                           onClick={() => {
@@ -911,18 +929,7 @@ export default function Panel({ schedules, professionals, user }: any) {
                     variant='outline'
                     colorScheme='blue'
                     h={'80px'}
-                    onClick={() => {
-                      const phone = String(selectedSchedule.client.phone)
-                        .replaceAll(' ', '')
-                        .replaceAll('(', '')
-                        .replaceAll(')', '')
-                        .replaceAll('-', '');
-                      window.open(
-                        `https://api.whatsapp.com/send?phone=55${phone}&text=${remainderMessage}`,
-                        '_blank'
-                      );
-                      onClose();
-                    }}
+                    onClick={handleSendRemaindMessage}
                   >
                     <ArrowRightIcon />
                   </Button>
@@ -938,7 +945,11 @@ export default function Panel({ schedules, professionals, user }: any) {
                   ) : (
                     <>
                       <Box border={'1px solid #ccc'} p={2} borderRadius={10}>
-                        <Text fontWeight={'semibold'} textAlign={'center'} mb={2}>
+                        <Text
+                          fontWeight={'semibold'}
+                          textAlign={'center'}
+                          mb={2}
+                        >
                           {' '}
                           Faturar{' '}
                         </Text>

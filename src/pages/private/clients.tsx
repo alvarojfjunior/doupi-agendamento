@@ -160,6 +160,14 @@ export default function Clients({ user }: any) {
       appContext.onCloseLoading();
     } catch (error) {
       console.log(error);
+      toast({
+        title: 'Houve um erro',
+        description: error.Message,
+        status: 'error',
+        position: 'top-right',
+        duration: 9000,
+        isClosable: true,
+      });
 
       appContext.onCloseLoading();
     }
@@ -174,7 +182,47 @@ export default function Clients({ user }: any) {
 
       appContext.onCloseLoading();
     } catch (error) {
+      toast({
+        title: 'Houve um erro',
+        description: error.Message,
+        status: 'error',
+        position: 'top-right',
+        duration: 9000,
+        isClosable: true,
+      });
       console.log(error);
+      appContext.onCloseLoading();
+    }
+  };
+
+  const handleSendMessage = async () => {
+    try {
+      appContext.onOpenLoading();
+
+      await api.post('/api/message', {
+        phone: formik.values.phone,
+        message: message,
+      });
+
+      toast({
+        title: 'Sucesso!',
+        description: 'Mensagem encaminhada para o cliente.',
+        status: 'success',
+        position: 'top-right',
+        duration: 9000,
+        isClosable: true,
+      });
+
+      appContext.onCloseLoading();
+    } catch (error) {
+      toast({
+        title: 'Houve um erro',
+        description: error.Message,
+        status: 'error',
+        position: 'top-right',
+        duration: 9000,
+        isClosable: true,
+      });
       appContext.onCloseLoading();
     }
   };
@@ -214,8 +262,15 @@ export default function Clients({ user }: any) {
                       onClick={() => {
                         formik.setValues(item);
                         setIsEditing(true);
-                        const sugestionMessage = `Olá ${item.name}, tudo bem? Aqui é da ${user.companyName}, vamos agendar? \nAcesse o link abaixo e agende já! \n\nhttps://doupi.com.br/d/${user.companyName.replaceAll(' ', '-')}`
-                        setMessage(sugestionMessage)
+                        const sugestionMessage = `Olá ${
+                          item.name
+                        }, tudo bem? Aqui é da ${
+                          user.companyName
+                        }, vamos agendar? \nAcesse o link abaixo e agende já! \n\nhttps://doupi.com.br/d/${user.companyName.replaceAll(
+                          ' ',
+                          '-'
+                        )}`;
+                        setMessage(sugestionMessage);
                         formOnOpen();
                       }}
                     />
@@ -311,17 +366,7 @@ export default function Clients({ user }: any) {
                       variant='outline'
                       colorScheme='blue'
                       h={'80px'}
-                      onClick={() => {
-                        const phone = String(formik.values.phone)
-                          .replaceAll(' ', '')
-                          .replaceAll('(', '')
-                          .replaceAll(')', '')
-                          .replaceAll('-', '');
-                        window.open(
-                          `https://api.whatsapp.com/send?phone=55${phone}&text=${message}`,
-                          '_blank'
-                        );
-                      }}
+                      onClick={handleSendMessage}
                     >
                       <ArrowRightIcon />
                     </Button>

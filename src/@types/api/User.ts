@@ -3,6 +3,7 @@ export interface IUser {
   active: boolean;
   companyId: string;
   companyName: string;
+  companyWhatsapp: string;
   name: string;
   email: string;
   phone: string;

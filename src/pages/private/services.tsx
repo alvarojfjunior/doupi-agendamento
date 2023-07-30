@@ -42,10 +42,10 @@ import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
 import { AddIcon, EditIcon } from '@chakra-ui/icons';
 import { withIronSessionSsr } from 'iron-session/next';
 import { handleImageImageAndUpload } from '@/utils/upload';
+import { NumericFormat } from 'react-number-format';
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req, res }) => {
-
     if (!('user' in req.session))
       return {
         redirect: {
@@ -53,7 +53,6 @@ export const getServerSideProps = withIronSessionSsr(
           permanent: false,
         },
       };
-
 
     const user = req.session.user;
     return {
@@ -126,7 +125,8 @@ export default function Services({ user }: any) {
 
   const formik = useFormik({
     initialValues: {
-      image: 'http://res.cloudinary.com/dovvizyxg/image/upload/v1689457590/hairdresser-using-drier-hair-client_pkgttk.jpg',
+      image:
+        'http://res.cloudinary.com/dovvizyxg/image/upload/v1689457590/hairdresser-using-drier-hair-client_pkgttk.jpg',
       name: '',
       description: '',
       duration: '',
@@ -189,7 +189,6 @@ export default function Services({ user }: any) {
       appContext.onCloseLoading();
     }
   };
-
 
   return (
     <Page
@@ -286,7 +285,9 @@ export default function Services({ user }: any) {
               isRequired
               isInvalid={!!formik.errors.image && formik.touched.image}
             >
-              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Imagem</FormLabel>
+              <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                Imagem
+              </FormLabel>
               <Box
                 position='relative'
                 display='inline-block'
@@ -312,9 +313,11 @@ export default function Services({ user }: any) {
                   type='file'
                   accept='image/*'
                   name='image'
-                  onChange={(event) => handleImageImageAndUpload(event, 0.5, (url: string) =>
-                    formik.setFieldValue('image', url)
-                  )}
+                  onChange={(event) =>
+                    handleImageImageAndUpload(event, 0.5, (url: string) =>
+                      formik.setFieldValue('image', url)
+                    )
+                  }
                   position='absolute'
                   top={0}
                   left={0}
@@ -334,7 +337,9 @@ export default function Services({ user }: any) {
               isRequired
               isInvalid={!!formik.errors.name && formik.touched.name}
             >
-              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Nome</FormLabel>
+              <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                Nome
+              </FormLabel>
               <Input
                 type='text'
                 name='name'
@@ -351,7 +356,9 @@ export default function Services({ user }: any) {
                 !!formik.errors.description && formik.touched.description
               }
             >
-              <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Descrição</FormLabel>
+              <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                Descrição
+              </FormLabel>
               <Input
                 type='text'
                 name='description'
@@ -367,13 +374,18 @@ export default function Services({ user }: any) {
                 isRequired
                 isInvalid={!!formik.errors.price && formik.touched.price}
               >
-                <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}>Preço </FormLabel>
+                <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                  Preço{' '}
+                </FormLabel>
                 <Input
+                  as={NumericFormat}
                   name='price'
-                  as={InputMask}
                   value={formik.values.price}
                   onChange={formik.handleChange}
-                  mask='99,99'
+                  thousandSeparator='.'
+                  decimalSeparator=','
+                  decimalScale={2}
+                  fixedDecimalScale={true}
                 />
               </FormControl>
 
@@ -383,7 +395,10 @@ export default function Services({ user }: any) {
                 isRequired
                 isInvalid={!!formik.errors.duration && formik.touched.duration}
               >
-                <FormLabel fontSize={{ base: "sm", md: "md", lg: "md" }}> Duração do Serviço </FormLabel>
+                <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                  {' '}
+                  Duração do Serviço{' '}
+                </FormLabel>
 
                 <Input
                   name='duration'

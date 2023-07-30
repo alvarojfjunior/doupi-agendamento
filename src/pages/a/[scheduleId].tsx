@@ -93,20 +93,6 @@ export default function CompanyPage({ company, schedule }: any) {
         isClosable: true,
       });
 
-      let message = 'Olá, acabei de *cancelar um agendamento*. \n\n';
-      message += `Agendamento: ${moment(schedule.date, 'YYYY-MM-DD').format(
-        'DD/MM/YYYY'
-      )} ${schedule.time}`;
-
-      const phone = String(company.phone)
-        .replaceAll(' ', '')
-        .replaceAll('(', '')
-        .replaceAll(')', '')
-        .replaceAll('-', '');
-      window.open(
-        `https://api.whatsapp.com/send?phone=55${phone}&text=${message}`,
-        '_blank'
-      );
     } catch (error) {
       console.log(error);
       appContext.onCloseLoading();

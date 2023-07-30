@@ -9,3 +9,13 @@ export const getAverage = (array: string[]): number => {
   const media = soma / array.length;
   return media;
 };
+
+
+export const objetoTemConteudo = (objeto) => {
+  for (const key in objeto) {
+    if (objeto.hasOwnProperty(key)) {
+      return true;
+    }
+  }
+  return false;
+}

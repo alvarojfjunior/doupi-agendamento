@@ -105,7 +105,10 @@ export default function CompanyPage({ company, services: servicesProps }: any) {
         name: name,
         phone: phone,
         companyId: company._id,
+        companyName: company.name,
         professionalId: selectedProfessional._id,
+        professionalName: selectedProfessional.name,
+        serviceNames: selectedServices.map((s: any) => s.name),
         serviceIds: selectedServices.map((s: any) => s._id),
         date: selectedDate,
         time: selectedTime,
@@ -123,25 +126,6 @@ export default function CompanyPage({ company, services: servicesProps }: any) {
         isClosable: true,
       });
 
-      const notidy = getScheduleNotification(
-        data._id,
-        name,
-        selectedProfessional.name,
-        company.name,
-        selectedServices.map((s: any) => s.name),
-        moment(selectedDate, 'YYYY-MM-DD').format('DD/MM/YYYY'),
-        selectedTime
-      );
-      const message = encodeURIComponent(notidy);
-      const whatsapp = String(selectedProfessional.whatsapp)
-        .replaceAll(' ', '')
-        .replaceAll('(', '')
-        .replaceAll(')', '')
-        .replaceAll('-', '');
-      window.open(
-        `https://api.whatsapp.com/send?phone=55${whatsapp}&text=${message}`,
-        '_blank'
-      );
       setStep(1);
       appContext.onCloseLoading();
     } catch (error: any) {
@@ -164,7 +148,12 @@ export default function CompanyPage({ company, services: servicesProps }: any) {
         <title>{company.name}</title>
       </Head>
       <Stack mb={30}>
-        <Box w={'100%'} bgColor={modifyTheme(company.color, 0.5)} boxShadow={`0px 0px 10px 10px ${company.color}`} mb={5}>
+        <Box
+          w={'100%'}
+          bgColor={modifyTheme(company.color, 0.5)}
+          boxShadow={`0px 0px 10px 10px ${company.color}`}
+          mb={5}
+        >
           <ChakraImage
             src={company.coverImage}
             objectFit='cover'

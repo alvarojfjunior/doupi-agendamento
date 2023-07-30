@@ -4,6 +4,8 @@ import { authenticate } from '@/utils/apiAuth';
 import { createDossie } from '@/utils/createDossie';
 import mongoose from 'mongoose';
 import moment from 'moment'
+import { getScheduleNotification } from '@/utils/notificarions';
+import { sendMessage } from '@/services/whatsapp';
 
 export default async function handler(
   req: NextApiRequest,
@@ -117,6 +119,21 @@ export default async function handler(
         action: 'new',
         identfier: 'schedule',
       });
+
+
+      if (body.isNotify) {
+        const message = getScheduleNotification(
+          schedule._id,
+          body.name,
+          body.professionalName,
+          body.companyName,
+          body.serviceNames,
+          moment(schedule.date, 'YYYY-MM-DD').format('DD/MM/YYYY'),
+          body.time
+        );
+
+        sendMessage(body.companyId, body.phone, message)
+      }
 
       return res.status(201).json(schedule);
     }

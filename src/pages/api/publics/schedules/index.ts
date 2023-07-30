@@ -1,5 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { Client, Schedule } from '../../../../services/database';
+import { sendMessage } from '@/services/whatsapp';
+import moment from 'moment';
+import { getScheduleNotification } from '@/utils/notificarions';
 
 export default async function handler(
   req: NextApiRequest,
@@ -40,11 +43,18 @@ export default async function handler(
 
       await schedule.save();
 
-      // createDossie({
-      //   userId: auth._id,
-      //   action: 'new',
-      //   identfier: 'schedule',
-      // });
+      const message = getScheduleNotification(
+        schedule._id,
+        body.name,
+        body.professionalName,
+        body.companyName,
+        body.serviceNames,
+        moment(body.date, 'YYYY-MM-DD').format('DD/MM/YYYY'),
+        body.time
+      );
+
+
+      sendMessage(body.companyId, body.phone, message)
 
       return res.status(201).json(schedule);
     }
@@ -60,17 +70,23 @@ export default async function handler(
       delete body.updatedAt;
       delete body.createdAt;
 
-      const { modifiedCount } = await Schedule.updateOne({ _id }, body).lean();
+      const schedule: any = await Schedule.findOneAndUpdate({ _id }, body).populate({
+        path: 'clientID',
+        select: 'name phone',
+      }).populate({
+        path: 'companyId',
+        select: 'whatsapp',
+      }).lean();
 
-      // await createDossie({
-      //   userId: auth._id,
-      //   action: 'update',
-      //   identfier: 'schedule',
-      // });
+      let message = `${schedule.clientID.name} acabou de *cancelar um agendamento*. \n\n`;
+      message += `Agendamento: ${moment(schedule.date, 'YYYY-MM-DD').format(
+        'DD/MM/YYYY'
+      )} às ${schedule.time}`;
 
-      if (modifiedCount > 0) {
-        const scheduleRes = await Schedule.findOne({ _id }).lean();
-        return res.status(200).json(scheduleRes);
+      sendMessage(schedule.companyId._id, schedule.companyId.whatsapp, message)
+
+      if (schedule) {
+        return res.status(200).json(schedule);
       } else return res.status(500);
     }
 
@@ -78,7 +94,7 @@ export default async function handler(
       return res.status(404);
     }
   } catch (error: any) {
-    console.log(error);
+    console.log(error.message);
     return res.status(500).json({ data: error, message: error.message });
   }
 }
