@@ -185,6 +185,9 @@ export default function Navbar() {
                       <MenuItem onClick={() => router.push('/private/company')}>
                         Dados da empresa
                       </MenuItem>
+                      <MenuItem onClick={() => router.push('/private/settings')}>
+                        Configurações
+                      </MenuItem>
                       <MenuItem onClick={handleLogout}>Sair</MenuItem>
                     </MenuList>
                   </Stack>

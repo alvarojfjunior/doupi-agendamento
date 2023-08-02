@@ -9,3 +9,11 @@ export const getAverage = (array: string[]): number => {
   const media = soma / array.length;
   return media;
 };
+
+
+export const transformPhoneNumber = (phoneNumber: string): string => {
+  const numericString = phoneNumber.replace(/\D/g, '');
+  const firstPart = numericString.substring(0, 2);
+  const lastPart = numericString.substring(3);
+  return '55' + firstPart + lastPart
+}
