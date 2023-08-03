@@ -52,6 +52,7 @@ export default function Company({ user }: any) {
   const getWhatsAppServiceStatus = async () => {
     try {
       setQrCode('');
+      console.log(user)
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API}/connect-client?id=${transformPhoneNumber(user.companyWhatsapp)}`
       );

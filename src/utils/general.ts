@@ -12,6 +12,7 @@ export const getAverage = (array: string[]): number => {
 
 
 export const transformPhoneNumber = (phoneNumber: string): string => {
+  console.log(phoneNumber)
   const numericString = phoneNumber.replace(/\D/g, '');
   const firstPart = numericString.substring(0, 2);
   const lastPart = numericString.substring(3);
