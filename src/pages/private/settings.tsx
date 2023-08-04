@@ -15,6 +15,7 @@ import { getAxiosInstance } from '@/services/api';
 import { withIronSessionSsr } from 'iron-session/next';
 import QRCodeReact from 'qrcode.react';
 import { transformPhoneNumber } from '@/utils/general';
+import { whatsappApiInstance } from '@/services/whatsappApi';
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req, res }) => {
@@ -52,9 +53,11 @@ export default function Company({ user }: any) {
   const getWhatsAppServiceStatus = async () => {
     try {
       setQrCode('');
-      console.log(user)
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API}/connect-client?id=${transformPhoneNumber(user.companyWhatsapp)}`
+      console.log(user);
+      const { data } = await whatsappApiInstance.get(
+        `${
+          process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API
+        }/connect-client?id=${transformPhoneNumber(user.companyWhatsapp)}`
       );
       if (data && data.message && data.message === 'connected') {
         setIsWhatsaapConnected(true);
@@ -81,8 +84,10 @@ export default function Company({ user }: any) {
   const sendMessage = async () => {
     try {
       appContext.onCloseLoading();
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API}/send-message?id=${transformPhoneNumber(user.companyWhatsapp)}`,
+      const { data } = await whatsappApiInstance.post(
+        `${
+          process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API
+        }/send-message?id=${transformPhoneNumber(user.companyWhatsapp)}`,
         {
           to: transformPhoneNumber(user.companyWhatsapp),
           message: 'O serviço do whatsapp está em pleno funcionamento!',
