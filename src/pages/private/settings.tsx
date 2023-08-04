@@ -13,7 +13,7 @@ import Page from '@/components/Page';
 import { withIronSessionSsr } from 'iron-session/next';
 import QRCodeReact from 'qrcode.react';
 import { transformPhoneNumber } from '@/utils/general';
-import { whatsappApiFetch, whatsappApiInstance } from '@/services/whatsappApi';
+import { whatsappApiFetch } from '@/services/whatsappApi';
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req, res }) => {
@@ -80,25 +80,23 @@ export default function Company({ user }: any) {
 
   const sendMessage = async () => {
     try {
-      appContext.onCloseLoading();
-      const { data } = await whatsappApiInstance.post(
-        `${
-          process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API
-        }/send-message?id=${transformPhoneNumber(user.companyWhatsapp)}`,
-        {
-          to: transformPhoneNumber(user.companyWhatsapp),
-          message: 'O serviço do whatsapp está em pleno funcionamento!',
-        }
-      );
-
-      if (data && data.message && data.message === 'connected') {
-        setIsWhatsaapConnected(true);
-      } else if (data && data.message && data.message.length > 100) {
-        setIsWhatsaapConnected(false);
-        setQrCode(data.message);
-      }
-
-      console.log('HEERE', data);
+      // appContext.onCloseLoading();
+      // const { data } = await whatsappApiInstance.post(
+      //   `${
+      //     process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API
+      //   }/send-message?id=${transformPhoneNumber(user.companyWhatsapp)}`,
+      //   {
+      //     to: transformPhoneNumber(user.companyWhatsapp),
+      //     message: 'O serviço do whatsapp está em pleno funcionamento!',
+      //   }
+      // );
+      // if (data && data.message && data.message === 'connected') {
+      //   setIsWhatsaapConnected(true);
+      // } else if (data && data.message && data.message.length > 100) {
+      //   setIsWhatsaapConnected(false);
+      //   setQrCode(data.message);
+      // }
+      //console.log('HEERE', data);
     } catch (error) {
       appContext.onCloseLoading();
     }
