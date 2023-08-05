@@ -1,14 +1,16 @@
-import Mongoose from "mongoose";
+import Mongoose from 'mongoose';
 
 export let UserSchema: Mongoose.Schema;
 try {
-  UserSchema = Mongoose.model("User").schema;
+  UserSchema = Mongoose.model('User').schema;
 } catch (error) {
   UserSchema = new Mongoose.Schema(
     {
       companyId: {
-        type: String,
+        type: Mongoose.Schema.Types.ObjectId,
+        ref: 'Company',
         required: true,
+        index: true,
       },
       name: {
         type: String,
@@ -35,6 +37,6 @@ try {
         default: 1,
       },
     },
-    { collection: "users", timestamps: true }
+    { collection: 'users', timestamps: true }
   );
 }

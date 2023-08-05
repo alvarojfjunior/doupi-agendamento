@@ -3,11 +3,11 @@
  * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.
  * This is especially useful for Docker builds.
  */
-!process.env.SKIP_ENV_VALIDATION && (await import("./src/env/server.mjs"));
+!process.env.SKIP_ENV_VALIDATION && (await import('./src/env/server.mjs'));
 
 const nextConfig = {
   env: {
-    NEXT_PUBLIC_API_BODY_SIZE_LIMIT: "5mb",
+    NEXT_PUBLIC_API_BODY_SIZE_LIMIT: '10mb',
   },
   reactStrictMode: true,
   // esmExternals: false,
@@ -19,3 +19,4 @@ const nextConfig = {
 };
 
 export default nextConfig;
+

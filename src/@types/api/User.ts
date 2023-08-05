@@ -1,7 +1,8 @@
 export interface IUser {
-  active: boolean
-  companyId: string
   _id: string;
+  active: boolean;
+  companyId: string;
+  companyName: string;
   name: string;
   email: string;
   phone: string;

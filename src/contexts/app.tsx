@@ -1,8 +1,6 @@
-import LoadingModal from "@/components/LoadingModal";
-import { useDisclosure } from "@chakra-ui/react";
-import {
-  createContext,
-} from "react";
+import LoadingModal from '@/components/LoadingModal';
+import { useDisclosure } from '@chakra-ui/react';
+import { createContext } from 'react';
 
 interface AppContextProps {
   children: React.ReactNode;
@@ -15,7 +13,7 @@ interface IAppContextData {
 
 export const AppContext = createContext<IAppContextData>({} as IAppContextData);
 
-export const AppProvider: React.FC<AppContextProps> = ({ children}) => {
+export const AppProvider: React.FC<AppContextProps> = ({ children }) => {
   const {
     isOpen: isLoading,
     onOpen: onOpenLoading,
@@ -23,13 +21,14 @@ export const AppProvider: React.FC<AppContextProps> = ({ children}) => {
   } = useDisclosure();
 
   return (
-    <AppContext.Provider value={{
-      onOpenLoading,
-      onCloseLoading,
-    }}>
+    <AppContext.Provider
+      value={{
+        onOpenLoading,
+        onCloseLoading,
+      }}
+    >
       <LoadingModal isOpen={isLoading} />
       {children}
     </AppContext.Provider>
   );
 };
-

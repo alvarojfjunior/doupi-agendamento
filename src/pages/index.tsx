@@ -2,74 +2,107 @@ import {
   Button,
   Flex,
   Heading,
-  Image,
   Stack,
   Text,
   useBreakpointValue,
   useColorModeValue,
-} from "@chakra-ui/react";
-import { useRouter } from "next/router";
+  Image,
+} from '@chakra-ui/react';
+import { useRouter } from 'next/router';
+import { withIronSessionSsr } from 'iron-session/next';
+
+export const getServerSideProps = withIronSessionSsr(
+  ({ req }) => {
+    if ('user' in req.session)
+      return {
+        redirect: {
+          destination: '/private',
+          permanent: false,
+        },
+      };
+    else
+      return {
+        props: {
+          user: null,
+        },
+      };
+  },
+  {
+    cookieName: 'doupi_cookie',
+    //@ts-ignore
+    password: process.env.SESSION_SECRET,
+    cookieOptions: {
+      secure: process.env.NODE_ENV === 'production',
+    },
+  }
+);
+
 
 export default function Home({ data }: any) {
   const router = useRouter();
 
   return (
-    <Stack h={"full"} direction={{ base: "column", md: "row" }}>
-      <Flex p={8} flex={1} align={"center"} justify={"center"}>
-        <Stack spacing={6} w={"full"} maxW={"lg"}>
-          <Heading fontSize={{ base: "3xl", md: "4xl", lg: "5xl" }}>
+    <Stack h={'full'} direction={{ base: 'column', md: 'row' }}>
+      <Flex p={8} flex={1} align={'center'} justify={'center'}>
+        <Stack spacing={6} w={'full'} maxW={'lg'}>
+          <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }}>
             <Text
-              as={"span"}
-              position={"relative"}
-              color={useColorModeValue("#ffc03f", "#FFF")}
+              color={useColorModeValue('#3e4d92', '#3e4d92')}
+              as={'span'}
+              textAlign={'center'}
+            >
+              Diga adeus a bagunça e dê olá para a
+            </Text>{' '}
+            <Text
+              as={'span'}
+              position={'relative'}
+              color={useColorModeValue('#ffc03f', '#FFF')}
               _after={{
                 content: "''",
-                width: "full",
-                height: useBreakpointValue({ base: "20%", md: "30%" }),
-                position: "absolute",
+                width: 'full',
+                height: useBreakpointValue({ base: '20%', md: '30%' }),
+                position: 'absolute',
                 bottom: 1,
                 left: 0,
-                bg: useColorModeValue("#ffc03f36", "#ffc03f"),
+                bg: useColorModeValue('#ffc03f36', '#ffc03f'),
                 zIndex: -1,
               }}
             >
               Doupi
             </Text>
-            <br />{" "}
-            <Text
-              color={useColorModeValue("#3e4d92", "#3e4d92")}
-              as={"span"}
-              textAlign={"center"}
-            >
-              Gerencie todo o seu negócio com o Doupi!
-            </Text>{" "}
+            <br />{' '}
           </Heading>
-          <Text fontSize={{ base: "md", lg: "lg" }} color={"gray.500"}>
-            Com o Doupi, você consegue controlar todos os agendamentos do seu
-            negócio e se tornar cada vez mais profissional e competitivo!
+          <Text fontSize={{ base: 'md', lg: 'lg' }} textAlign={'justify'} color={'gray.500'}>
+            Bem-vindo à Doupi, onde a simplicidade e a praticidade são nossas
+            maiores prioridades. Nós entendemos as dores e frustrações de lidar
+            com agenda desorganizada, compromissos perdidos e o estresse que
+            acompanha essa desorganização. É por isso que estamos aqui para
+            ajudar!
           </Text>
-          <Stack direction={{ base: "column", md: "row" }} spacing={4}>
+          <Stack direction={{ base: 'column', md: 'row' }} spacing={4}>
             <Button
-              rounded={"full"}
-              bg={useColorModeValue("#ffc03f", "#3e4d92")}
-              color={"white"}
-              _hover={{ filter: "brightness(110%)" }}
-              onClick={() => router.push("/signup")}
+              rounded={'full'}
+              bg={useColorModeValue('#ffc03f', '#3e4d92')}
+              size={"lg"}
+              color={'white'}
+              _hover={{ filter: 'brightness(110%)' }}
+              onClick={() => router.push('/signup')}
             >
-              Testar Grátis!
-            </Button>
-            <Button rounded={"full"} onClick={() => router.push("/signin")}>
-              Entrar
+              Saiba mais
             </Button>
           </Stack>
         </Stack>
       </Flex>
-      <Flex
-        flex={1}
-        alignItems={"center"}
-        justifyContent={"center"}
-        flexDir={"column"}
-      ></Flex>
+
+      <Flex w={{ md: '50%' }}>
+        <Image
+          alt={'main image'}
+          margin={'auto'}
+          textAlign={'center'}
+          src={'home-image.png'}
+          maxH={400}
+        />
+      </Flex>
     </Stack>
   );
 }

@@ -2,7 +2,6 @@ import {
   Box,
   TableContainer,
   Table,
-  Image as ChakraImage,
   Thead,
   Tr,
   Th,
@@ -10,7 +9,6 @@ import {
   Tbody,
   Td,
   useColorMode,
-  useToast,
   IconButton,
   Stack,
   Heading,
@@ -26,43 +24,72 @@ import {
   Input,
   DrawerFooter,
   Button,
-} from "@chakra-ui/react";
-import makeAnimated from "react-select/animated";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import { useContext, useEffect, useState } from "react";
-import { AppContext } from "@/contexts/app";
-import InputMask from "react-input-mask";
-import { useRouter } from "next/router";
-import Page from "@/components/Page";
-import { IUser } from "@/types/api/User";
-import { AxiosInstance } from "axios";
-import { getAxiosInstance } from "@/services/api";
-import DeleteConfirmationModal from "../../components/DeleteConfirmationModal";
-import { AddIcon, EditIcon } from "@chakra-ui/icons";
+  Divider,
+  Flex,
+  Textarea,
+  useToast,
+} from '@chakra-ui/react';
+import makeAnimated from 'react-select/animated';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { useContext, useEffect, useState } from 'react';
+import { AppContext } from '@/contexts/app';
+import InputMask from 'react-input-mask';
+import { useRouter } from 'next/router';
+import Page from '@/components/Page';
+import { IUser } from '@/types/api/User';
+import { AxiosInstance } from 'axios';
+import { getAxiosInstance } from '@/services/api';
+import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
+import { AddIcon, ArrowRightIcon, EditIcon } from '@chakra-ui/icons';
+import { withIronSessionSsr } from 'iron-session/next';
 
-let user: IUser;
+export const getServerSideProps = withIronSessionSsr(
+  async ({ req, res }) => {
+    if (!('user' in req.session))
+      return {
+        redirect: {
+          destination: '/signin',
+          permanent: false,
+        },
+      };
+
+    const user = req.session.user;
+    return {
+      props: {
+        user: user,
+      },
+    };
+  },
+  {
+    cookieName: 'doupi_cookie',
+    //@ts-ignore
+    password: process.env.SESSION_SECRET,
+    cookieOptions: {
+      secure: process.env.NODE_ENV === 'production',
+    },
+  }
+);
+
 let api: AxiosInstance;
-export default function Clients() {
+export default function Clients({ user }: any) {
   const appContext = useContext(AppContext);
   const [isEditing, setIsEditing] = useState(false);
   const [data, setData] = useState([]);
+  const [message, setMessage] = useState('');
   const {
     isOpen: formIsOpen,
     onOpen: formOnOpen,
     onClose: formOnClose,
   } = useDisclosure();
   const toast = useToast();
-  const router = useRouter();
-  const animatedComponents = makeAnimated();
 
   const onSubmit = async (values: any) => {
     try {
       appContext.onOpenLoading();
       let res: any;
 
-      values.companyId = user.companyId
-
+      values.companyId = user.companyId;
 
       if (isEditing) res = await api.put(`/api/clients`, values);
       else res = await api.post(`/api/clients`, values);
@@ -70,21 +97,20 @@ export default function Clients() {
       updateData(res.data);
       appContext.onCloseLoading();
       toast({
-        title: "Sucesso!",
-        description: "Os dados foram salvos!",
-        status: "success",
-        position: "top-right",
+        title: 'Sucesso!',
+        description: 'Os dados foram salvos!',
+        status: 'success',
+        position: 'top-right',
         duration: 9000,
         isClosable: true,
       });
       setIsEditing(false);
-      formOnClose();
     } catch (error: any) {
       toast({
-        title: "Houve um erro",
+        title: 'Houve um erro',
         description: error.Message,
-        status: "error",
-        position: "top-right",
+        status: 'error',
+        position: 'top-right',
         duration: 9000,
         isClosable: true,
       });
@@ -94,8 +120,8 @@ export default function Clients() {
 
   const formik = useFormik({
     initialValues: {
-      name: "",
-      phone: "",
+      name: '',
+      phone: '',
     },
     validationSchema: Yup.object().shape({
       name: Yup.string().min(2).max(50).required(),
@@ -105,7 +131,6 @@ export default function Clients() {
   });
 
   useEffect(() => {
-    user = JSON.parse(String(localStorage.getItem("user")));
     api = getAxiosInstance(user);
     getData();
   }, []);
@@ -155,16 +180,16 @@ export default function Clients() {
   };
   return (
     <Page
-      path="/client"
-      title="Doupi - Cadastro de profissionais"
-      description="App para genciamento de agendamentos"
+      path='/client'
+      title='Doupi - Cadastro de profissionais'
+      description='App para genciamento de agendamentos'
     >
-      <Stack h={"full"} m={5}>
-        <Heading mb={5} fontSize={"2xl"} textAlign={"center"}>
+      <Stack h={'full'} m={5}>
+        <Heading mb={5} fontSize={'2xl'} textAlign={'center'}>
           Cadastro de Clientes
         </Heading>
-        <TableContainer shadow={"#cccccc4e 0px 0px 2px 1px"} rounded={20}>
-          <Table variant="striped">
+        <TableContainer shadow={'#cccccc4e 0px 0px 2px 1px'} rounded={20}>
+          <Table variant='striped'>
             <Thead>
               <Tr>
                 <Th>Nome</Th>
@@ -175,22 +200,22 @@ export default function Clients() {
             <Tbody>
               {data.map((item: any) => (
                 <Tr key={item._id}>
-                  <Td>
-                    {item.name}
-                  </Td>
+                  <Td>{item.name}</Td>
 
                   <Td>{item.phone}</Td>
 
                   <Td>
                     <IconButton
-                      size={"sm"}
+                      size={'sm'}
                       icon={<EditIcon />}
-                      colorScheme="blue"
-                      aria-label="Editar"
+                      colorScheme='blue'
+                      aria-label='Editar'
                       mr={1}
                       onClick={() => {
                         formik.setValues(item);
                         setIsEditing(true);
+                        const sugestionMessage = `Olá ${item.name}, tudo bem? Aqui é da ${user.companyName}, vamos agendar? \nAcesse o link abaixo e agende já! \n\nhttps://doupi.com.br/d/${user.companyName.replaceAll(' ', '-')}`
+                        setMessage(sugestionMessage)
                         formOnOpen();
                       }}
                     />
@@ -203,13 +228,13 @@ export default function Clients() {
             </Tbody>
           </Table>
         </TableContainer>
-        <Box position="fixed" bottom={{ base: "120px", md: "80px" }} right={4}>
+        <Box position='fixed' bottom={{ base: '120px', md: '80px' }} right={4}>
           <IconButton
-            colorScheme="blue"
+            colorScheme='blue'
             icon={<AddIcon />}
             isRound
-            size="lg"
-            aria-label="Adicionar"
+            size='lg'
+            aria-label='Adicionar'
             onClick={() => {
               formik.resetForm();
               setIsEditing(false);
@@ -221,49 +246,94 @@ export default function Clients() {
 
       <Drawer
         isOpen={formIsOpen}
-        placement="right"
-        size={"xl"}
+        placement='right'
+        size={'xl'}
         onClose={() => 1}
       >
         <DrawerOverlay />
         <DrawerContent>
-          <DrawerHeader borderBottomWidth="1px">Serviço</DrawerHeader>
+          <DrawerHeader borderBottomWidth='1px'>Serviço</DrawerHeader>
 
           <DrawerBody>
             <FormControl
               mb={3}
-              id="name"
+              id='name'
               isRequired
               isInvalid={!!formik.errors.name && formik.touched.name}
             >
-              <FormLabel>Nome</FormLabel>
+              <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                Nome
+              </FormLabel>
               <Input
-                type="text"
-                name="name"
+                type='text'
+                name='name'
                 value={formik.values.name}
                 onChange={formik.handleChange}
               />
             </FormControl>
 
             <FormControl
-              id="phone"
+              id='phone'
               isRequired
               isInvalid={!!formik.errors.phone && formik.touched.phone}
             >
-              <FormLabel>Telefone </FormLabel>
+              <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                Telefone{' '}
+              </FormLabel>
               <Input
-                name="phone"
+                name='phone'
                 as={InputMask}
                 value={formik.values.phone}
                 onChange={formik.handleChange}
-                mask="(99) 9 9999-9999"
+                mask='(99) 9 9999-9999'
               />
             </FormControl>
+
+            {isEditing && (
+              <Box>
+                <Divider marginBlock={10} />
+
+                <Box w={'full'}>
+                  <Text fontWeight={'semibold'}>
+                    {' '}
+                    Enviar mensagem para o cliente:{' '}
+                  </Text>
+                  <Flex alignItems={'center'}>
+                    <Textarea
+                      resize={'none'}
+                      height={'80px'}
+                      overflowY='hidden'
+                      placeholder='Mensagem'
+                      value={message}
+                      onChange={(e: any) => setMessage(e.target.value)}
+                    />
+                    <Button
+                      variant='outline'
+                      colorScheme='blue'
+                      h={'80px'}
+                      onClick={() => {
+                        const phone = String(formik.values.phone)
+                          .replaceAll(' ', '')
+                          .replaceAll('(', '')
+                          .replaceAll(')', '')
+                          .replaceAll('-', '');
+                        window.open(
+                          `https://api.whatsapp.com/send?phone=55${phone}&text=${message}`,
+                          '_blank'
+                        );
+                      }}
+                    >
+                      <ArrowRightIcon />
+                    </Button>
+                  </Flex>
+                </Box>
+              </Box>
+            )}
           </DrawerBody>
 
-          <DrawerFooter borderTopWidth="1px">
+          <DrawerFooter borderTopWidth='1px'>
             <Button
-              variant="outline"
+              variant='outline'
               mr={3}
               onClick={() => {
                 setIsEditing(false);
@@ -273,7 +343,7 @@ export default function Clients() {
               Cancel
             </Button>
             <Button
-              colorScheme="blue"
+              colorScheme='blue'
               //@ts-ignore
               onClick={formik.handleSubmit}
             >

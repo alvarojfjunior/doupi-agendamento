@@ -26,26 +26,54 @@ import {
   Input,
   DrawerFooter,
   Button,
-} from "@chakra-ui/react";
-import Select from "react-select";
-import makeAnimated from "react-select/animated";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import { useContext, useEffect, useState } from "react";
-import { AppContext } from "@/contexts/app";
-import InputMask from "react-input-mask";
-import { useRouter } from "next/router";
-import Page from "@/components/Page";
-import { IUser } from "@/types/api/User";
-import { AxiosInstance } from "axios";
-import { getAxiosInstance } from "@/services/api";
-import DeleteConfirmationModal from "../../components/DeleteConfirmationModal";
-import { AddIcon, EditIcon } from "@chakra-ui/icons";
-import { serviceImage } from "@/utils/images";
+} from '@chakra-ui/react';
+import makeAnimated from 'react-select/animated';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { useContext, useEffect, useState } from 'react';
+import { AppContext } from '@/contexts/app';
+import InputMask from 'react-input-mask';
+import { useRouter } from 'next/router';
+import Page from '@/components/Page';
+import { IUser } from '@/types/api/User';
+import { AxiosInstance } from 'axios';
+import { getAxiosInstance } from '@/services/api';
+import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
+import { AddIcon, EditIcon } from '@chakra-ui/icons';
+import { withIronSessionSsr } from 'iron-session/next';
+import { handleImageImageAndUpload } from '@/utils/upload';
+import { NumericFormat } from 'react-number-format';
+
+export const getServerSideProps = withIronSessionSsr(
+  async ({ req, res }) => {
+    if (!('user' in req.session))
+      return {
+        redirect: {
+          destination: '/signin',
+          permanent: false,
+        },
+      };
+
+    const user = req.session.user;
+    return {
+      props: {
+        user: user,
+      },
+    };
+  },
+  {
+    cookieName: 'doupi_cookie',
+    //@ts-ignore
+    password: process.env.SESSION_SECRET,
+    cookieOptions: {
+      secure: process.env.NODE_ENV === 'production',
+    },
+  }
+);
 
 let user: IUser;
 let api: AxiosInstance;
-export default function Services() {
+export default function Services({ user }: any) {
   const { colorMode } = useColorMode();
   const appContext = useContext(AppContext);
   const [isEditing, setIsEditing] = useState(false);
@@ -63,7 +91,6 @@ export default function Services() {
     try {
       appContext.onOpenLoading();
 
-      if (!values.image) values.image = serviceImage;
       values.companyId = user.companyId;
 
       let res: any;
@@ -74,10 +101,10 @@ export default function Services() {
       updateData(res.data);
       appContext.onCloseLoading();
       toast({
-        title: "Sucesso!",
-        description: "Os dados foram salvos!",
-        status: "success",
-        position: "top-right",
+        title: 'Sucesso!',
+        description: 'Os dados foram salvos!',
+        status: 'success',
+        position: 'top-right',
         duration: 9000,
         isClosable: true,
       });
@@ -85,10 +112,10 @@ export default function Services() {
       formOnClose();
     } catch (error: any) {
       toast({
-        title: "Houve um erro",
+        title: 'Houve um erro',
         description: error.Message,
-        status: "error",
-        position: "top-right",
+        status: 'error',
+        position: 'top-right',
         duration: 9000,
         isClosable: true,
       });
@@ -98,15 +125,16 @@ export default function Services() {
 
   const formik = useFormik({
     initialValues: {
-      image: serviceImage,
-      name: "",
-      description: "",
-      duration: "",
-      price: "",
+      image:
+        'http://res.cloudinary.com/dovvizyxg/image/upload/v1689457590/hairdresser-using-drier-hair-client_pkgttk.jpg',
+      name: '',
+      description: '',
+      duration: '',
+      price: '',
     },
     validationSchema: Yup.object().shape({
       name: Yup.string().min(2).max(50).required(),
-      description: Yup.string().min(2).max(50).required(),
+      description: Yup.string().min(2).max(200).required(),
       duration: Yup.string().min(5).required(),
       price: Yup.string().min(5).required(),
     }),
@@ -114,7 +142,6 @@ export default function Services() {
   });
 
   useEffect(() => {
-    user = JSON.parse(String(localStorage.getItem("user")));
     api = getAxiosInstance(user);
     getData();
   }, []);
@@ -163,69 +190,18 @@ export default function Services() {
     }
   };
 
-  function handleImageChange(e: any) {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-
-    reader.onloadend = () => {
-      const image = new Image();
-      //@ts-ignore
-      image.src = reader.result;
-
-      image.onload = () => {
-        const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d");
-
-        // Define a largura e altura máximas para a imagem
-        const maxWidth = 800;
-        const maxHeight = 800;
-
-        let width = image.width;
-        let height = image.height;
-
-        // Redimensiona a imagem se a largura ou altura excederem os limites máximos
-        if (width > maxWidth || height > maxHeight) {
-          const ratio = Math.min(maxWidth / width, maxHeight / height);
-          width *= ratio;
-          height *= ratio;
-        }
-
-        // Desenha a imagem redimensionada no canvas
-        canvas.width = width;
-        canvas.height = height;
-        //@ts-ignore
-        context.drawImage(image, 0, 0, width, height);
-
-        // Converte o conteúdo do canvas em uma URL de dados com a melhor qualidade
-        const dataURL = canvas.toDataURL(file.type, 1);
-
-        // Define a melhor resolução e qualidade da imagem no state (setImageAvatar)
-        formik.setFieldValue("image", dataURL);
-      };
-    };
-
-    if (!e.target.files) {
-      return;
-    }
-
-    if (file.type === "image/png" || file.type === "image/jpeg") {
-      reader.readAsDataURL(file);
-      formik.setFieldValue("image", URL.createObjectURL(e.target.files[0]));
-    }
-  }
-
   return (
     <Page
-      path="/service"
-      title="Doupi - Cadastro de profissionais"
-      description="App para genciamento de agendamentos"
+      path='/service'
+      title='Doupi - Cadastro de profissionais'
+      description='App para genciamento de agendamentos'
     >
-      <Stack h={"full"} m={5}>
-        <Heading mb={5} fontSize={"2xl"} textAlign={"center"}>
+      <Stack h={'full'} m={5}>
+        <Heading mb={5} fontSize={'2xl'} textAlign={'center'}>
           Cadastro de Serviços
         </Heading>
-        <TableContainer shadow={"#cccccc4e 0px 0px 2px 1px"} rounded={20}>
-          <Table variant="striped">
+        <TableContainer shadow={'#cccccc4e 0px 0px 2px 1px'} rounded={20}>
+          <Table variant='striped'>
             <Thead>
               <Tr>
                 <Th>Nome</Th>
@@ -236,14 +212,14 @@ export default function Services() {
             <Tbody>
               {data.map((item: any) => (
                 <Tr key={item._id}>
-                  <Td display={"flex"} alignItems={"center"}>
+                  <Td display={'flex'} alignItems={'center'}>
                     <ChakraImage
                       src={item.image}
-                      alt="Imagem de Capa"
+                      alt='Imagem de Capa'
                       m={2}
                       rounded={10}
                       style={{
-                        objectFit: "cover",
+                        objectFit: 'cover',
                         width: 50,
                         height: 50,
                       }}
@@ -255,10 +231,10 @@ export default function Services() {
 
                   <Td>
                     <IconButton
-                      size={"sm"}
+                      size={'sm'}
                       icon={<EditIcon />}
-                      colorScheme="blue"
-                      aria-label="Editar"
+                      colorScheme='blue'
+                      aria-label='Editar'
                       mr={1}
                       onClick={() => {
                         formik.setValues(item);
@@ -275,13 +251,13 @@ export default function Services() {
             </Tbody>
           </Table>
         </TableContainer>
-        <Box position="fixed" bottom={{ base: "120px", md: "80px" }} right={4}>
+        <Box position='fixed' bottom={{ base: '120px', md: '80px' }} right={4}>
           <IconButton
-            colorScheme="blue"
+            colorScheme='blue'
             icon={<AddIcon />}
             isRound
-            size="lg"
-            aria-label="Adicionar"
+            size='lg'
+            aria-label='Adicionar'
             onClick={() => {
               formik.resetForm();
               setIsEditing(false);
@@ -293,56 +269,62 @@ export default function Services() {
 
       <Drawer
         isOpen={formIsOpen}
-        placement="right"
-        size={"xl"}
+        placement='right'
+        size={'xl'}
         onClose={() => 1}
       >
         <DrawerOverlay />
         <DrawerContent>
-          <DrawerHeader borderBottomWidth="1px">Serviço</DrawerHeader>
+          <DrawerHeader borderBottomWidth='1px'>Serviço</DrawerHeader>
 
           <DrawerBody>
             <FormControl
               mb={3}
-              id="image"
-              textAlign={"center"}
+              id='image'
+              textAlign={'center'}
               isRequired
               isInvalid={!!formik.errors.image && formik.touched.image}
             >
-              <FormLabel>Imagem</FormLabel>
+              <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                Imagem
+              </FormLabel>
               <Box
-                position="relative"
-                display="inline-block"
-                border={"1px solid #ccc"}
+                position='relative'
+                display='inline-block'
+                border={'1px solid #ccc'}
                 rounded={20}
-                width={100}
-                height={100}
-                overflow="hidden"
-                justifyContent="center"
-                alignItems="center"
+                width={200}
+                height={150}
+                overflow='hidden'
+                justifyContent='center'
+                alignItems='center'
               >
                 <ChakraImage
                   src={formik.values.image}
-                  alt="Imagem"
+                  alt='Imagem'
                   mb={2}
                   style={{
-                    objectFit: "cover",
-                    width: "100%",
-                    height: "100%",
+                    objectFit: 'cover',
+                    width: '100%',
+                    height: '100%',
                   }}
                 />
                 <Input
-                  type="file"
-                  accept="image/*"
-                  name="image"
-                  onChange={handleImageChange}
-                  position="absolute"
+                  type='file'
+                  accept='image/*'
+                  name='image'
+                  onChange={(event) =>
+                    handleImageImageAndUpload(event, 0.5, (url: string) =>
+                      formik.setFieldValue('image', url)
+                    )
+                  }
+                  position='absolute'
                   top={0}
                   left={0}
                   opacity={0}
-                  width="100%"
-                  height="100%"
-                  cursor="pointer"
+                  width='100%'
+                  height='100%'
+                  cursor='pointer'
                   zIndex={1}
                   required={false}
                 />
@@ -351,14 +333,16 @@ export default function Services() {
 
             <FormControl
               mb={3}
-              id="name"
+              id='name'
               isRequired
               isInvalid={!!formik.errors.name && formik.touched.name}
             >
-              <FormLabel>Nome</FormLabel>
+              <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                Nome
+              </FormLabel>
               <Input
-                type="text"
-                name="name"
+                type='text'
+                name='name'
                 value={formik.values.name}
                 onChange={formik.handleChange}
               />
@@ -366,16 +350,18 @@ export default function Services() {
 
             <FormControl
               mb={3}
-              id="description"
+              id='description'
               isRequired
               isInvalid={
                 !!formik.errors.description && formik.touched.description
               }
             >
-              <FormLabel>Descrição</FormLabel>
+              <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                Descrição
+              </FormLabel>
               <Input
-                type="text"
-                name="description"
+                type='text'
+                name='description'
                 value={formik.values.description}
                 onChange={formik.handleChange}
               />
@@ -384,43 +370,51 @@ export default function Services() {
             <HStack spacing={4}>
               <FormControl
                 mb={3}
-                id="price"
+                id='price'
                 isRequired
                 isInvalid={!!formik.errors.price && formik.touched.price}
               >
-                <FormLabel>Preço </FormLabel>
+                <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                  Preço{' '}
+                </FormLabel>
                 <Input
-                  name="price"
-                  as={InputMask}
+                  as={NumericFormat}
+                  name='price'
                   value={formik.values.price}
                   onChange={formik.handleChange}
-                  mask="99,99"
+                  thousandSeparator='.'
+                  decimalSeparator=','
+                  decimalScale={2}
+                  fixedDecimalScale={true}
                 />
               </FormControl>
 
               <FormControl
                 mb={3}
-                id="duration"
+                id='duration'
                 isRequired
                 isInvalid={!!formik.errors.duration && formik.touched.duration}
               >
-                <FormLabel> Duração do Serviço </FormLabel>
+                <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                  {' '}
+                  Duração do Serviço{' '}
+                </FormLabel>
 
                 <Input
-                  name="duration"
+                  name='duration'
                   as={InputMask}
                   value={formik.values.duration}
                   onChange={formik.handleChange}
-                  defaultValue={"01:00"}
-                  mask="99:99"
+                  defaultValue={'01:00'}
+                  mask='99:99'
                 />
               </FormControl>
             </HStack>
           </DrawerBody>
 
-          <DrawerFooter borderTopWidth="1px">
+          <DrawerFooter borderTopWidth='1px'>
             <Button
-              variant="outline"
+              variant='outline'
               mr={3}
               onClick={() => {
                 setIsEditing(false);
@@ -430,7 +424,7 @@ export default function Services() {
               Cancel
             </Button>
             <Button
-              colorScheme="blue"
+              colorScheme='blue'
               //@ts-ignore
               onClick={formik.handleSubmit}
             >

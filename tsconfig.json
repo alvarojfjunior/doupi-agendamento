@@ -18,9 +18,15 @@
     "paths": {
       "@/types/*": ["./src/@types/*"],
       "@/*": ["./src/*"],
-      "@/public/*": ["./public/*"],
+      "@/public/*": ["./public/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/services/smtpjs/smtp.js"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "src/services/smtpjs/smtp.js"
+  ],
   "exclude": ["node_modules"]
 }
+
