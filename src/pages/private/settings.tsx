@@ -11,7 +11,6 @@ import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '@/contexts/app';
 import Page from '@/components/Page';
 import axios from 'axios';
-import { getAxiosInstance } from '@/services/api';
 import { withIronSessionSsr } from 'iron-session/next';
 import QRCodeReact from 'qrcode.react';
 import { transformPhoneNumber } from '@/utils/general';
@@ -53,7 +52,7 @@ export default function Company({ user }: any) {
   const getWhatsAppServiceStatus = async () => {
     try {
       setQrCode('');
-      const { data } = await whatsappApiInstance.get(
+      const { data } = await axios.get(
         `${
           process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API
         }/connect-client?id=${transformPhoneNumber(user.companyWhatsapp)}`
@@ -83,7 +82,7 @@ export default function Company({ user }: any) {
   const sendMessage = async () => {
     try {
       appContext.onCloseLoading();
-      const { data } = await whatsappApiInstance.post(
+      const { data } = await axios.post(
         `${
           process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API
         }/send-message?id=${transformPhoneNumber(user.companyWhatsapp)}`,
