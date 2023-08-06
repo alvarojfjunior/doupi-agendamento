@@ -7,14 +7,13 @@ import {
   Text,
   Flex,
 } from '@chakra-ui/react';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import { AppContext } from '@/contexts/app';
 import Page from '@/components/Page';
 import axios from 'axios';
 import { withIronSessionSsr } from 'iron-session/next';
 import QRCodeReact from 'qrcode.react';
 import { transformPhoneNumber } from '@/utils/general';
-import { whatsappApiInstance } from '@/services/whatsappApi';
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req, res }) => {
