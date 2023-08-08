@@ -321,6 +321,7 @@ export default function Professionals({ user }: any) {
 
   return (
     <Page
+      user={user}
       path='/professional'
       title='Doupi - Cadastro de profissionais'
       description='App para genciamento de agendamentos'

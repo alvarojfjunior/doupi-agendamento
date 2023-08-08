@@ -19,13 +19,7 @@ import { MdCheckCircle } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { modifyTheme, pulsate } from '@/utils/style';
 import moment from 'moment';
-import axios from 'axios';
-import { sumHours } from '@/utils/time';
 import ReactInputMask from 'react-input-mask';
-
-const api = axios.create({
-  baseURL: '',
-});
 
 export default function SelectUserData({
   company,
@@ -37,6 +31,7 @@ export default function SelectUserData({
   selectedDuration,
   handleCLick,
 }: any) {
+
   const toast = useToast();
   const [isValid, setIsValid] = useState(false);
   const [name, setName] = useState('');

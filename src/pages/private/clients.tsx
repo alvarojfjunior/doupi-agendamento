@@ -180,6 +180,7 @@ export default function Clients({ user }: any) {
   };
   return (
     <Page
+    user={user}
       path='/client'
       title='Doupi - Cadastro de profissionais'
       description='App para genciamento de agendamentos'

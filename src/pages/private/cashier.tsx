@@ -111,6 +111,8 @@ export default function Clients({ user }: any) {
       });
       setIsEditing(false);
       formOnClose();
+
+      await getData()
     } catch (error: any) {
       toast({
         title: 'Houve um erro',
@@ -201,6 +203,7 @@ export default function Clients({ user }: any) {
   };
   return (
     <Page
+    user={user}
       path='/cashier'
       title='Doupi - Cadastro de profissionais'
       description='App para genciamento de agendamentos'

@@ -152,6 +152,7 @@ export default function Clients({ user }: any) {
 
   return (
     <Page
+    user={user}
       path='/reports'
       title='Doupi - Relatórios'
       description='App para genciamento e agendamentos'

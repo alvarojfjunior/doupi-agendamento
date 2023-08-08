@@ -95,7 +95,6 @@ export default function SignIn() {
       const { data } = await api.post('/api/auth/signin', credentials);
       const userAuth: IUserAuth = data;
 
-      localStorage.setItem('user', JSON.stringify(userAuth));
       toast({
         title: 'Sucesso',
         description: 'Seja bem vindo!',

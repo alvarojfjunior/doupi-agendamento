@@ -11,7 +11,6 @@ import {
 import { ReactNode, useContext } from 'react';
 import Logo from '@/components/Logo';
 import { useRouter } from 'next/router';
-import { AuthContext } from '@/contexts/auth';
 
 const SocialButton = ({
   children,
@@ -45,7 +44,6 @@ const SocialButton = ({
 
 export default function SmallWithLogoLeft() {
   const router = useRouter();
-  const { isAuth } = useContext(AuthContext);
   return (
     <Box
       w='full'
@@ -64,7 +62,7 @@ export default function SmallWithLogoLeft() {
         <Flex
           alignItems={'center'}
           cursor={'pointer'}
-          onClick={() => (isAuth ? router.push('private') : router.push('/'))}
+          onClick={() => router.push('/')}
         >
           <Logo color={'dark'} height={32} />
         </Flex>

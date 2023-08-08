@@ -3,7 +3,7 @@ export const stringToFloat = (str: string): Number => {
   if (!str) return 0
   const numericValue = str.replace(/[^\d,]/g, '');
   const floatValue = parseFloat(numericValue.replace(',', '.'));
-  return floatValue;
+  return str.includes('-') ? floatValue *-1 : floatValue;
 }
 
 export function floatToString (numb: number): string {

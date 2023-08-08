@@ -128,7 +128,6 @@ export default function SignupCard() {
 
       const userAuth: IUserAuth = data;
 
-      localStorage.setItem('user', JSON.stringify(userAuth));
 
       router.push('private/company');
     } catch (error: any) {
