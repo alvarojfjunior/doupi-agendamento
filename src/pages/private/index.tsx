@@ -458,6 +458,7 @@ export default function Panel({ schedules, professionals, user }: any) {
 
   return (
     <Page
+      user={user}
       path='/private'
       title='Doupi - Painel Geral'
       description='App para genciamento de agendamentos'
@@ -511,7 +512,7 @@ export default function Panel({ schedules, professionals, user }: any) {
             h={25}
             color={colorMode === 'dark' ? '#white' : 'gray.700'}
             cursor={'pointer'}
-            onClick={()=> getSchedules()}
+            onClick={() => getSchedules()}
           />
         </HStack>
 
@@ -569,7 +570,11 @@ export default function Panel({ schedules, professionals, user }: any) {
                               : 'transparent'
                           }
                           color={
-                            schedule.status !== 'agendado' ? 'white' : colorMode === 'dark' ? '#white' : '#black'
+                            schedule.status !== 'agendado'
+                              ? 'white'
+                              : colorMode === 'dark'
+                              ? '#white'
+                              : '#black'
                           }
                           key={schedule._id}
                           onClick={() => {
@@ -938,7 +943,11 @@ export default function Panel({ schedules, professionals, user }: any) {
                   ) : (
                     <>
                       <Box border={'1px solid #ccc'} p={2} borderRadius={10}>
-                        <Text fontWeight={'semibold'} textAlign={'center'} mb={2}>
+                        <Text
+                          fontWeight={'semibold'}
+                          textAlign={'center'}
+                          mb={2}
+                        >
                           {' '}
                           Faturar{' '}
                         </Text>

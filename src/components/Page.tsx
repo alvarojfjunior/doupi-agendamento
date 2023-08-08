@@ -1,16 +1,22 @@
-import Head from 'next/head';
 import { NextSeo } from 'next-seo';
-import seoConfigs from '../../next-seo.config';
-import { Component } from 'react';
+import Navbar from './Navbar';
+import { IUser } from '@/types/api/User';
 
 interface IProps {
+  user?: IUser;
   title: string;
   description: string;
   path: string;
   children: any;
 }
 
-export default function Page({ title, description, path, children }: IProps) {
+export default function Page({
+  user,
+  title,
+  description,
+  path,
+  children,
+}: IProps) {
   const url = process.env.NEXT_PUBLIC_API_URL + path;
   return (
     <>
@@ -23,6 +29,7 @@ export default function Page({ title, description, path, children }: IProps) {
           title,
         }}
       />
+      <Navbar user={user} />
       {children}
     </>
   );

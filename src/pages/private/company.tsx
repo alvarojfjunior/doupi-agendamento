@@ -114,7 +114,6 @@ export default function Company({ user }: any) {
   });
 
   useEffect(() => {
-    user = JSON.parse(String(localStorage.getItem('user')));
     api = getAxiosInstance(user);
     getCompanyData();
     appContext.onCloseLoading();
@@ -137,6 +136,7 @@ export default function Company({ user }: any) {
 
   return (
     <Page
+      user={user}
       path='/private/company'
       title='Doupi - Configurações da Empresa'
       description='App para genciamento de agendamentos'

@@ -19,7 +19,6 @@ import {
 } from '@chakra-ui/react';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 import { useRouter } from 'next/router';
-import { AuthContext } from '@/contexts/auth';
 import Logo from '@/components/Logo';
 import { AxiosInstance } from 'axios';
 import { getAxiosInstance } from '@/services/api';
@@ -37,10 +36,8 @@ const Links = [
   { label: 'Relatórios', href: '/private/reports' },
 ];
 
-let user: IUser;
 let api: AxiosInstance;
-export default function Navbar() {
-  const { isAuth } = useContext(AuthContext);
+export default function Navbar({ user }: any) {
   const appContext = useContext(AppContext);
   const { colorMode, toggleColorMode } = useColorMode();
   const router = useRouter();
@@ -49,14 +46,12 @@ export default function Navbar() {
     router.asPath.indexOf('/d/') >= 0 || router.asPath.indexOf('/a/') >= 0;
 
   useEffect(() => {
-    user = JSON.parse(String(localStorage.getItem('user')));
     api = getAxiosInstance(user);
   }, []);
 
   const handleLogout = async () => {
     try {
       appContext.onOpenLoading();
-      localStorage.removeItem('user');
       Cookies.remove('doupi_cookie');
       const { data } = await api.get(`/api/auth/logout`);
       router.push('/');
@@ -77,7 +72,7 @@ export default function Navbar() {
             aria-label={'Open Menu'}
             display={{ md: 'none' }}
             //@ts-ignore
-            visibility={!isAuth && 'hidden'}
+            visibility={!user && 'hidden'}
             onClick={isOpen ? onClose : onOpen}
           />
           <HStack spacing={8} alignItems={'center'}>
@@ -96,7 +91,7 @@ export default function Navbar() {
               spacing={4}
               display={{ base: 'none', md: 'flex' }}
             >
-              {isAuth &&
+              {user &&
                 Links.map((link) => (
                   <Button
                     key={link.href}
@@ -113,7 +108,7 @@ export default function Navbar() {
           <Flex alignItems={'center'}>
             <Stack direction={'row'} spacing={{ base: 0, md: 5, lg: 5 }}>
               <Menu>
-                {!isAuth ? (
+                {!user ? (
                   <Stack
                     direction={{ base: 'column', md: 'row', lg: 'row' }}
                     alignItems={'center'}
@@ -185,7 +180,9 @@ export default function Navbar() {
                       <MenuItem onClick={() => router.push('/private/company')}>
                         Dados da empresa
                       </MenuItem>
-                      <MenuItem onClick={() => router.push('/private/settings')}>
+                      <MenuItem
+                        onClick={() => router.push('/private/settings')}
+                      >
                         Configurações
                       </MenuItem>
                       <MenuItem onClick={handleLogout}>Sair</MenuItem>
@@ -208,7 +205,7 @@ export default function Navbar() {
         {isOpen ? (
           <Box pb={4} display={{ md: 'none' }}>
             <Stack as={'nav'} spacing={4}>
-              {isAuth &&
+              {user &&
                 Links.map((link) => (
                   <Button
                     key={link.href}

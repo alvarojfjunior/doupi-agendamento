@@ -139,6 +139,7 @@ export default function Company({ user }: any) {
 
   return (
     <Page
+      user={user}
       path='/private/settings'
       title='Doupi - Configurações'
       description='App para genciamento de agendamentos'

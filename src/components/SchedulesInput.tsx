@@ -93,7 +93,7 @@ const ScheduleForm = ({ schedules, onChange }: any) => {
 
           <Input
             w={100}
-            placeholder='Início'
+            placeholder='Fim'
             as={ReactInputMask}
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
