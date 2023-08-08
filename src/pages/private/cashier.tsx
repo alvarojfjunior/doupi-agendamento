@@ -142,17 +142,6 @@ export default function Clients({ user }: any) {
     onSubmit: onSubmit,
   });
 
-  // schema
-  //   .validate(formik.values, { abortEarly: false })
-  //   .then((validatedData) => {
-  //     // Se não houver erros, a validação passou
-  //     console.log('HEERE Dados válidos:', validatedData);
-  //   })
-  //   .catch((errors) => {
-  //     // Se houver erros, a validação falhou
-  //     console.log('HEERE Erros de validação:', errors);
-  //   });
-
   useEffect(() => {
     api = getAxiosInstance(user);
     getData();
