@@ -1,19 +1,18 @@
 import {
   Box,
   Button,
-  chakra,
   Heading,
   useToast,
   Text,
   Flex,
+  Image,
 } from '@chakra-ui/react';
-import { useContext, useState } from 'react';
-import { AppContext } from '@/contexts/app';
+import { useContext, useEffect, useState } from 'react';
 import Page from '@/components/Page';
 import axios from 'axios';
 import { withIronSessionSsr } from 'iron-session/next';
-import QRCodeReact from 'qrcode.react';
 import { transformPhoneNumber } from '@/utils/general';
+import { AppContext } from '@/contexts/app';
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req, res }) => {
@@ -43,87 +42,61 @@ export const getServerSideProps = withIronSessionSsr(
 );
 
 export default function Company({ user }: any) {
-  const token = '';
   const appContext = useContext(AppContext);
   const [isWhatsaapConnected, setIsWhatsaapConnected] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState('');
   const [countAttempts, setCountAttempts] = useState(0);
-  const [qrCode, setQrCode] = useState('null');
+  const [qrCode, setQrCode] = useState('');
   const toast = useToast();
 
-  const getWhatsAppServiceStatus = async () => {
-    try {
-      setQrCode('');
-      setLoadingMessage('Aguarde, checando status...');
+  useEffect(() => {
+    getData();
+  }, []);
 
+  const getData = async () => {
+    checkStatus();
+  };
+
+  const checkStatus = async () => {
+    try {
+      appContext.onOpenLoading();
       const { data: statusRes } = await axios.get(
         `${
           process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API
         }/api/${transformPhoneNumber(
           user.companyWhatsapp
-        )}/check-connection-session`
-      );
-
-      console.log(statusRes);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const getQrcode = async () => {
-    if (countAttempts > 5) {
-      setIsWhatsaapConnected(false);
-      setQrCode('');
-      return;
-    }
-
-    setCountAttempts(countAttempts + 1);
-    await new Promise((resolve) => setTimeout(() => resolve(null), 10000));
-    console.log('got a new qrcode');
-    try {
-      const { data } = await axios.get(
-        `${
-          process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API
-        }/session/qr/${transformPhoneNumber(user.companyWhatsapp)}`
-      );
-      setQrCode(data.message);
-    } catch (error) {
-      console.log('QR CODE ERROR', error);
-    }
-
-    if (!isWhatsaapConnected)
-      new Promise((resolve) => setTimeout(() => resolve(getQrcode()), 20000));
-  };
-
-  const sendMessage = async () => {
-    try {
-      appContext.onCloseLoading();
-      const { data } = await axios.post(
-        `${
-          process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API
-        }/client/sendMessage/${transformPhoneNumber(user.companyWhatsapp)}`,
+        )}/check-connection-session`,
         {
-          chatId: `${transformPhoneNumber(user.companyWhatsapp, false)}@c.us`,
-          contentType: 'string',
-          message: 'O serviço do whatsapp está em pleno funcionamento!',
+          headers: {
+            Authorization:
+              'Bearer $2b$10$XNFebRmGwTxQHr5PcTcuHObrF08hAo7D7RKpTCP0fT_ZJ98HY9N_m',
+          },
         }
       );
 
-      toast({
-        title: 'Serviço conectado!',
-        description: 'Está tudo certo! O serviço do whatsapp está configurado.',
-        status: 'success',
-        position: 'top-right',
-        duration: 6000,
-        isClosable: true,
-      });
-
-      if (data && data.success) {
+      if (statusRes.status) {
         setIsWhatsaapConnected(true);
+        toast({
+          title: 'Você está conectado!',
+          description:
+            'Está tudo certo por aqui, o serviço de whatsapp está configurado!',
+          status: 'success',
+          position: 'top-right',
+          duration: 6000,
+          isClosable: true,
+        });
       } else {
+        toast({
+          title: 'Você ainda não está conectado!',
+          description: 'Você ainda não está conectado, tente novamente!',
+          status: 'info',
+          position: 'top-right',
+          duration: 6000,
+          isClosable: true,
+        });
         setIsWhatsaapConnected(false);
       }
     } catch (error) {
+      console.log(error);
       toast({
         title: 'Houve algum problema',
         description:
@@ -133,6 +106,73 @@ export default function Company({ user }: any) {
         duration: 6000,
         isClosable: true,
       });
+      setIsWhatsaapConnected(false);
+    } finally {
+      appContext.onCloseLoading();
+    }
+  };
+
+  const connectWhatsapp = async () => {
+    try {
+      appContext.onOpenLoading();
+
+      await axios.post(
+        `${
+          process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API
+        }/api/${transformPhoneNumber(user.companyWhatsapp)}/start-session`,
+        {},
+        {
+          headers: {
+            Authorization:
+              'Bearer $2b$10$XNFebRmGwTxQHr5PcTcuHObrF08hAo7D7RKpTCP0fT_ZJ98HY9N_m',
+          },
+        }
+      );
+
+      getQrcode();
+    } catch (error) {
+      console.log('QR CODE ERROR', error);
+      appContext.onCloseLoading();
+      toast({
+        title: 'Houve algum problema',
+        description:
+          'Não conseguimos testar o serviço do whatsapp, tente novamente em instantes, ou aviso o nosso suporte!',
+        status: 'error',
+        position: 'top-right',
+        duration: 6000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const getQrcode = async () => {
+    try {
+      appContext.onOpenLoading();
+      if (countAttempts > 5) {
+        setIsWhatsaapConnected(false);
+        setQrCode('');
+        return;
+      }
+
+      setCountAttempts(countAttempts + 1);
+      await new Promise((resolve) => setTimeout(() => resolve(null), 10000));
+
+      const { data: qrcodeRes } = await axios.get(
+        `${
+          process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API
+        }/api/${transformPhoneNumber(user.companyWhatsapp)}/qrcode-session`,
+        {
+          responseType: 'blob',
+          headers: {
+            Authorization:
+              'Bearer $2b$10$XNFebRmGwTxQHr5PcTcuHObrF08hAo7D7RKpTCP0fT_ZJ98HY9N_m',
+          },
+        }
+      );
+      setQrCode(URL.createObjectURL(qrcodeRes));
+    } catch (error) {
+      console.log('QR CODE ERROR', error);
+    } finally {
       appContext.onCloseLoading();
     }
   };
@@ -160,63 +200,25 @@ export default function Company({ user }: any) {
             Serviço do whatsapp{' '}
           </Text>
           <Flex>
-            {!isWhatsaapConnected ? (
-              qrCode ? (
-                <Box w={'full'}>
-                  {qrCode === 'null' ? (
-                    <Button
-                      onClick={getWhatsAppServiceStatus}
-                      colorScheme='yellow'
-                      color={'white'}
-                    >
-                      {' '}
-                      Verificar{' '}
-                    </Button>
-                  ) : (
-                    <Box>
-                      <Text color={'#535353'} fontSize={13} mb={3}>
-                        {' '}
-                        Você ainda não está conectado, escaneie o qrcode abaixo
-                        pelo Whatsapp para conectar!{' '}
-                      </Text>
-                      <QRCodeReact
-                        value={qrCode}
-                        style={{
-                          width: '100%',
-                          height: 190,
-                        }}
-                      />
-                      {countAttempts > 0 && (
-                        <Button
-                          onClick={sendMessage}
-                          width={200}
-                          h={100}
-                          mt={3}
-                        >
-                          Testar
-                        </Button>
-                      )}
-                    </Box>
-                  )}
-                </Box>
-              ) : (
-                <Text
-                  fontWeight={'semibold'}
-                  color={'#535353'}
-                  textAlign={'center'}
-                >
-                  {loadingMessage}
-                </Text>
-              )
+            {isWhatsaapConnected ? (
+              <Text> Você está conectado! </Text>
             ) : (
               <Box>
-                <Text fontWeight={'bold'} color={'green'} textAlign={'center'}>
-                  {' '}
-                  Você está Conectado!{' '}
-                </Text>
-                <Button onClick={sendMessage} width={200} h={100} mb={5}>
-                  Testar
-                </Button>
+                <Text mb={5}> Você ainda não está conectado </Text>
+                {!qrCode ? (
+                  <Button onClick={connectWhatsapp} mt={5}>
+                    {' '}
+                    Conectar{' '}
+                  </Button>
+                ) : (
+                  <>
+                    <Image alt='qrcode' src={qrCode} />
+                    <Button onClick={checkStatus} w={'full'} mt={5}>
+                      {' '}
+                      Testar conexão{' '}
+                    </Button>
+                  </>
+                )}
               </Box>
             )}
           </Flex>
