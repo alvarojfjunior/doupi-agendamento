@@ -46,7 +46,10 @@ export default function SmallWithLogoLeft() {
   const router = useRouter();
   return (
     <Box
+      zIndex={0}
       w='full'
+      position={'absolute'}
+      bottom={0}
       bg={useColorModeValue('gray.50', 'gray.900')}
       color={useColorModeValue('gray.700', 'gray.200')}
     >
