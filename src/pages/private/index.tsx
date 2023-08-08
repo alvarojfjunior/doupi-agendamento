@@ -629,7 +629,7 @@ export default function Panel({ schedules, professionals, user }: any) {
         </Accordion>
       </Box>
 
-      <Box position='fixed' bottom={{ base: '120px', md: '80px' }} right={4}>
+      <Box position='fixed' bottom={'80px'} zIndex={1} right={4}>
         <IconButton
           colorScheme='blue'
           icon={<AddIcon />}

@@ -252,7 +252,7 @@ export default function Services({ user }: any) {
             </Tbody>
           </Table>
         </TableContainer>
-        <Box position='fixed' bottom={{ base: '120px', md: '80px' }} right={4}>
+        <Box position='fixed' bottom={'80px'} right={4}>
           <IconButton
             colorScheme='blue'
             icon={<AddIcon />}
