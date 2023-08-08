@@ -11,10 +11,13 @@ export const getAverage = (array: string[]): number => {
 };
 
 
-export const transformPhoneNumber = (phoneNumber: string): string => {
-  console.log(phoneNumber)
+export const transformPhoneNumber = (phoneNumber: string, isRemove9 = true): string => {
   const numericString = phoneNumber.replace(/\D/g, '');
-  const firstPart = numericString.substring(0, 2);
-  const lastPart = numericString.substring(3);
-  return '55' + firstPart + lastPart
+  if (isRemove9) {
+    const firstPart = numericString.substring(0, 2);
+    const lastPart = numericString.substring(3);
+    return '55' + firstPart + lastPart
+  } else {
+    return '55' + numericString
+  }
 }
