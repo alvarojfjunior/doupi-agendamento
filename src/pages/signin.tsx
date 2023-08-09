@@ -19,7 +19,7 @@ import NextLink from 'next/link';
 import { useContext, useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import { Formik, Form, Field } from 'formik';
-import { getAxiosInstance } from '@/services/api';
+import { getApiInstance } from '@/services/api';
 import { AppContext } from '@/contexts/app';
 import { useRouter } from 'next/router';
 import { useToast } from '@chakra-ui/react';
@@ -70,7 +70,7 @@ export default function SignIn() {
   const toast = useToast();
   const appContext = useContext(AppContext);
   const [showPassword, setShowPassword] = useState(false);
-  const api = getAxiosInstance();
+  const api = getApiInstance();
   const router = useRouter();
 
   useEffect(() => {

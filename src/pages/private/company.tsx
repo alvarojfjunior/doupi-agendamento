@@ -21,7 +21,7 @@ import { AppContext } from '@/contexts/app';
 import Page from '@/components/Page';
 import { AxiosInstance } from 'axios';
 import { IUser } from '@/types/api/User';
-import { getAxiosInstance } from '@/services/api';
+import { getApiInstance } from '@/services/api';
 import { useRouter } from 'next/router';
 import { withIronSessionSsr } from 'iron-session/next';
 import { handleImageImageAndUpload } from '@/utils/upload';
@@ -114,7 +114,7 @@ export default function Company({ user }: any) {
   });
 
   useEffect(() => {
-    api = getAxiosInstance(user);
+    api = getApiInstance(user);
     getCompanyData();
     appContext.onCloseLoading();
   }, []);

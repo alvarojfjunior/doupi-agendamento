@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '@/contexts/app';
 import Page from '@/components/Page';
 import { AxiosInstance } from 'axios';
-import { getAxiosInstance } from '@/services/api';
+import { getApiInstance } from '@/services/api';
 import { withIronSessionSsr } from 'iron-session/next';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
@@ -47,7 +47,7 @@ export default function Clients({ user }: any) {
   const [schedulesChartSet, setSchedulesChartSet] = useState<any>();
 
   useEffect(() => {
-    api = getAxiosInstance(user);
+    api = getApiInstance(user);
     handleSearch();
   }, []);
 

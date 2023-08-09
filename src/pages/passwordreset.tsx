@@ -17,7 +17,7 @@ import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import * as Yup from 'yup';
 import { Formik, Form, Field } from 'formik';
 import { useRouter } from 'next/router';
-import { getAxiosInstance } from '@/services/api';
+import { getApiInstance } from '@/services/api';
 import { AppContext } from '@/contexts/app';
 import { withIronSessionSsr } from 'iron-session/next';
 
@@ -54,7 +54,7 @@ export default function ResetPasswordForm(): JSX.Element {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const api = getAxiosInstance();
+  const api = getApiInstance();
   const router = useRouter();
   const { id, token } = router.query;
 

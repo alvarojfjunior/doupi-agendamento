@@ -18,7 +18,7 @@ import { useRouter } from 'next/router';
 import { useContext, useEffect } from 'react';
 import { useToast } from '@chakra-ui/react';
 import * as Yup from 'yup';
-import { getAxiosInstance } from '@/services/api';
+import { getApiInstance } from '@/services/api';
 import { withIronSessionSsr } from 'iron-session/next';
 
 export const getServerSideProps = withIronSessionSsr(
@@ -51,7 +51,7 @@ export const getServerSideProps = withIronSessionSsr(
 export default function ForgotPasswordForm(): JSX.Element {
   const router = useRouter();
   const appContext = useContext(AppContext);
-  const api = getAxiosInstance();
+  const api = getApiInstance();
   const toast = useToast();
 
   useEffect(() => {

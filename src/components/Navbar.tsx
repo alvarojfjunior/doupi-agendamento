@@ -21,7 +21,7 @@ import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 import { useRouter } from 'next/router';
 import Logo from '@/components/Logo';
 import { AxiosInstance } from 'axios';
-import { getAxiosInstance } from '@/services/api';
+import { getApiInstance } from '@/services/api';
 import { IUser } from '@/types/api/User';
 import { AppContext } from '@/contexts/app';
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
@@ -46,7 +46,7 @@ export default function Navbar({ user }: any) {
     router.asPath.indexOf('/d/') >= 0 || router.asPath.indexOf('/a/') >= 0;
 
   useEffect(() => {
-    api = getAxiosInstance(user);
+    api = getApiInstance(user);
   }, []);
 
   const handleLogout = async () => {

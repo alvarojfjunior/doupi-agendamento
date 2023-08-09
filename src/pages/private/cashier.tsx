@@ -32,7 +32,7 @@ import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '@/contexts/app';
 import Page from '@/components/Page';
 import { AxiosInstance } from 'axios';
-import { getAxiosInstance } from '@/services/api';
+import { getApiInstance } from '@/services/api';
 import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
 import { AddIcon, EditIcon } from '@chakra-ui/icons';
 import { withIronSessionSsr } from 'iron-session/next';
@@ -145,7 +145,7 @@ export default function Clients({ user }: any) {
   });
 
   useEffect(() => {
-    api = getAxiosInstance(user);
+    api = getApiInstance(user);
     getData();
   }, []);
 

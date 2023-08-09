@@ -23,7 +23,7 @@ import NextLink from 'next/link';
 import * as Yup from 'yup';
 import { Formik, Form, Field } from 'formik';
 import { useRouter } from 'next/router';
-import { getAxiosInstance } from '@/services/api';
+import { getApiInstance } from '@/services/api';
 import { AppContext } from '@/contexts/app';
 import Page from '@/components/Page';
 import { PhoneInput } from '@/components/Fields';
@@ -78,7 +78,7 @@ export default function SignupCard() {
   const appContext = useContext(AppContext);
   const [showPassword, setShowPassword] = useState(false);
 
-  const api = getAxiosInstance();
+  const api = getApiInstance();
   const router = useRouter();
 
   const SignupSchema = Yup.object().shape({
