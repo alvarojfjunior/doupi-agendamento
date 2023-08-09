@@ -3,7 +3,7 @@ import { AppContext } from '@/contexts/app';
 import InputMask from 'react-input-mask';
 import Page from '@/components/Page';
 import { AxiosInstance } from 'axios';
-import { getAxiosInstance } from '@/services/api';
+import { getApiInstance } from '@/services/api';
 import { useState } from 'react';
 import {
   Accordion,
@@ -203,7 +203,7 @@ export default function Panel({ schedules, professionals, user }: any) {
   } = useDisclosure();
 
   useEffect(() => {
-    api = getAxiosInstance(user);
+    api = getApiInstance(user);
     appContext.onCloseLoading();
   }, []);
 

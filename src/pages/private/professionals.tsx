@@ -38,7 +38,7 @@ import { useRouter } from 'next/router';
 import Page from '@/components/Page';
 import { IUser } from '@/types/api/User';
 import { AxiosInstance } from 'axios';
-import { getAxiosInstance } from '@/services/api';
+import { getApiInstance } from '@/services/api';
 import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
 import { AddIcon, EditIcon } from '@chakra-ui/icons';
 import SchedulesInput from '@/components/SchedulesInput';
@@ -209,7 +209,7 @@ export default function Professionals({ user }: any) {
   });
 
   useEffect(() => {
-    api = getAxiosInstance(user);
+    api = getApiInstance(user);
     getData();
   }, []);
 

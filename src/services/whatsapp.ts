@@ -1,14 +1,13 @@
 import axios from 'axios';
 
-export const getApiInstance = (user?: any) => {
-  //const url = process.env.NEXT_PUBLIC_API_URL;
-  const url = '';
+export const getWhatsappInstance = (whatsappToken?: string) => {
+  const url = process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API;
   try {
-    if (user) {
+    if (whatsappToken) {
       return axios.create({
         baseURL: url,
         headers: {
-          Authorization: `Bearer ${user.token}`,
+          Authorization: `Bearer ${whatsappToken}`,
           'Content-Type': 'application/json',
         },
       });

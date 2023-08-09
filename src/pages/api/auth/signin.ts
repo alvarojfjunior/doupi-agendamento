@@ -51,6 +51,8 @@ export default withIronSessionApiRoute(
             companyId: user.companyId._id,
             companyName: user.companyId.name,
             companyWhatsapp: user.companyId.whatsapp,
+            isWhatsappService: user.companyId.isWhatsappService,
+            whatsappToken: user.companyId.whatsappToken,
             token: user.token,
             phone: user.phone,
             name: user.name,

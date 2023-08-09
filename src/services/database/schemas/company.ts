@@ -3,6 +3,22 @@ import Mongoose from 'mongoose';
 export let CompanySchema: Mongoose.Schema;
 try {
   CompanySchema = Mongoose.model('Company').schema;
+
+  // // DATABASE MIGRATION
+  // CompanySchema.add({
+  //   whatsappToken: {
+  //     type: String
+  //   },
+  // });
+  // const Company = Mongoose.model('Company', CompanySchema);
+  // Company.updateMany(
+  //   {},
+  //   { $set: { whatsappToken: '' } }
+  // )
+  //   .then(res => console.log(res))
+  //   .catch(error => console.log(error))
+
+
 } catch (error) {
   CompanySchema = new Mongoose.Schema(
     {
@@ -48,12 +64,23 @@ try {
         type: String,
         required: true,
       },
+      isWhatsappService: {
+        type: Boolean,
+        required: true,
+        default: false,
+      },
+      whatsappToken: {
+        type: String
+      },
       active: {
         type: Boolean,
         required: true,
         default: true,
       },
     },
-    { collection: 'companies', timestamps: true }
+    {
+      collection: 'companies',
+      timestamps: true,
+    }
   );
 }
