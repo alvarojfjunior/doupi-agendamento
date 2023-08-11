@@ -20,6 +20,7 @@ import { useRouter } from 'next/router';
 import { getScheduleNotification } from '@/utils/notificarions';
 import { ArrowForwardIcon, ArrowLeftIcon } from '@chakra-ui/icons';
 import { modifyTheme } from '@/utils/style';
+import { frontendSendMessage } from '@/services/whatsapp';
 
 export async function getServerSideProps(context: any) {
   const { companyName } = context.query;
@@ -132,16 +133,17 @@ export default function CompanyPage({ company, services: servicesProps }: any) {
         moment(selectedDate, 'YYYY-MM-DD').format('DD/MM/YYYY'),
         selectedTime
       );
-      const message = encodeURIComponent(notidy);
-      const whatsapp = String(selectedProfessional.whatsapp)
-        .replaceAll(' ', '')
-        .replaceAll('(', '')
-        .replaceAll(')', '')
-        .replaceAll('-', '');
-      window.open(
-        `https://api.whatsapp.com/send?phone=55${whatsapp}&text=${message}`,
-        '_blank'
+
+      frontendSendMessage(
+        company,
+        selectedProfessional.whatsapp,
+        notidy,
+        null,
+        null
       );
+
+      frontendSendMessage(company, phone, notidy, null, null);
+
       setStep(1);
       appContext.onCloseLoading();
     } catch (error: any) {
@@ -164,7 +166,12 @@ export default function CompanyPage({ company, services: servicesProps }: any) {
         <title>{company.name}</title>
       </Head>
       <Stack mb={30}>
-        <Box w={'100%'} bgColor={modifyTheme(company.color, 0.5)} boxShadow={`0px 0px 10px 10px ${company.color}`} mb={5}>
+        <Box
+          w={'100%'}
+          bgColor={modifyTheme(company.color, 0.5)}
+          boxShadow={`0px 0px 10px 10px ${company.color}`}
+          mb={5}
+        >
           <ChakraImage
             src={company.coverImage}
             objectFit='cover'

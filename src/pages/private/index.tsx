@@ -65,6 +65,7 @@ import { getDayOfWeekInPortuguese } from '@/utils/date';
 import { pulsate } from '@/utils/style';
 import { floatToString, stringToFloat } from '@/utils/helpers';
 import { NumericFormat } from 'react-number-format';
+import { frontendSendMessage } from '@/services/whatsapp';
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req }) => {
@@ -264,16 +265,7 @@ export default function Panel({ schedules, professionals, user }: any) {
           moment(date, 'YYYY-MM-DD').format('DD/MM/YYYY'),
           values.time
         );
-        const message = encodeURIComponent(notidy);
-        const phone = String(values.phone)
-          .replaceAll(' ', '')
-          .replaceAll('(', '')
-          .replaceAll(')', '')
-          .replaceAll('-', '');
-        window.open(
-          `https://api.whatsapp.com/send?phone=55${phone}&text=${message}`,
-          '_blank'
-        );
+        frontendSendMessage(user, values.phone, notidy, toast, appContext);
       }
       appContext.onCloseLoading();
     } catch (error: any) {
@@ -917,14 +909,12 @@ export default function Panel({ schedules, professionals, user }: any) {
                     colorScheme='blue'
                     h={'80px'}
                     onClick={() => {
-                      const phone = String(selectedSchedule.client.phone)
-                        .replaceAll(' ', '')
-                        .replaceAll('(', '')
-                        .replaceAll(')', '')
-                        .replaceAll('-', '');
-                      window.open(
-                        `https://api.whatsapp.com/send?phone=55${phone}&text=${remainderMessage}`,
-                        '_blank'
+                      frontendSendMessage(
+                        user,
+                        selectedSchedule.client.phone,
+                        remainderMessage,
+                        toast,
+                        appContext
                       );
                       onClose();
                     }}

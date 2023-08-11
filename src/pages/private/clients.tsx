@@ -29,20 +29,18 @@ import {
   Textarea,
   useToast,
 } from '@chakra-ui/react';
-import makeAnimated from 'react-select/animated';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '@/contexts/app';
 import InputMask from 'react-input-mask';
-import { useRouter } from 'next/router';
 import Page from '@/components/Page';
-import { IUser } from '@/types/api/User';
 import { AxiosInstance } from 'axios';
 import { getApiInstance } from '@/services/api';
 import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
 import { AddIcon, ArrowRightIcon, EditIcon } from '@chakra-ui/icons';
 import { withIronSessionSsr } from 'iron-session/next';
+import { frontendSendMessage } from '@/services/whatsapp';
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req, res }) => {
@@ -180,7 +178,7 @@ export default function Clients({ user }: any) {
   };
   return (
     <Page
-    user={user}
+      user={user}
       path='/client'
       title='Doupi - Cadastro de profissionais'
       description='App para genciamento de agendamentos'
@@ -215,8 +213,15 @@ export default function Clients({ user }: any) {
                       onClick={() => {
                         formik.setValues(item);
                         setIsEditing(true);
-                        const sugestionMessage = `Olá ${item.name}, tudo bem? Aqui é da ${user.companyName}, vamos agendar? \nAcesse o link abaixo e agende já! \n\nhttps://doupi.com.br/d/${user.companyName.replaceAll(' ', '-')}`
-                        setMessage(sugestionMessage)
+                        const sugestionMessage = `Olá ${
+                          item.name
+                        }, tudo bem? Aqui é da ${
+                          user.companyName
+                        }, vamos agendar? \nAcesse o link abaixo e agende já! \n\nhttps://doupi.com.br/d/${user.companyName.replaceAll(
+                          ' ',
+                          '-'
+                        )}`;
+                        setMessage(sugestionMessage);
                         formOnOpen();
                       }}
                     />
@@ -313,15 +318,7 @@ export default function Clients({ user }: any) {
                       colorScheme='blue'
                       h={'80px'}
                       onClick={() => {
-                        const phone = String(formik.values.phone)
-                          .replaceAll(' ', '')
-                          .replaceAll('(', '')
-                          .replaceAll(')', '')
-                          .replaceAll('-', '');
-                        window.open(
-                          `https://api.whatsapp.com/send?phone=55${phone}&text=${message}`,
-                          '_blank'
-                        );
+                        frontendSendMessage(user, formik.values.phone, message, toast, appContext);
                       }}
                     >
                       <ArrowRightIcon />

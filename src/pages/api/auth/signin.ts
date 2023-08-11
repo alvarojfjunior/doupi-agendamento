@@ -19,7 +19,7 @@ export default withIronSessionApiRoute(
 
         const user = await User.findOne({ email }).populate({
           path: 'companyId',
-          select: 'name whatsapp'
+          select: 'name whatsapp isWhatsappService whatsappToken'
         }).lean();
 
         if (!user) return res.status(401).send('Invalid Credentials');
@@ -58,6 +58,8 @@ export default withIronSessionApiRoute(
             name: user.name,
             email: user.email,
           };
+
+          console.log(response)
 
           req.session.user = response
           await req.session.save();
