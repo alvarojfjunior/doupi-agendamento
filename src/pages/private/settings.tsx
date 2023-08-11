@@ -404,7 +404,10 @@ export default function Company({ user }: any) {
                 )}
               </Box>
             ) : (
-              <Button onClick={checkIfWorkAndStartSesseion}>
+              <Button
+                //@ts-ignore
+                onClick={checkIfWorkAndStartSesseion}
+              >
                 {' '}
                 Verificar status{' '}
               </Button>
