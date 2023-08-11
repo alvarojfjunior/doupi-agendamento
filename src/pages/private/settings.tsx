@@ -49,7 +49,7 @@ export default function Company({ user }: any) {
   const appContext = useContext(AppContext);
   const [company, setCompany] = useState({});
   const [isWhatsaapConnected, setIsWhatsaapConnected] = useState(false);
-  const [countAttempts, setCountAttempts] = useState(0);
+  const [dontKnowStatus, setDontKnowStatus] = useState(false);
   const [qrCode, setQrCode] = useState('');
   const toast = useToast();
 
@@ -60,143 +60,167 @@ export default function Company({ user }: any) {
   }, []);
 
   const getData = async () => {
-    checkStatus();
-  };
-
-  const getCompany = async () => {
     try {
       const { data } = await api.get(`/api/companies?_id=${user.companyId}`);
-      if (data.length > 0) setCompany(data[0]);
-      return data[0];
+      const newCompany = data[0];
+      setCompany(newCompany);
+      whatsappToken = newCompany.whatsappToken;
+
+      checkIfWorkAndStartSesseion();
     } catch (error) {
-      console.log('Error to get company');
-      return null;
+      console.log('error');
     }
   };
 
-  const checkStatus = async (token?: string, nofity = true) => {
+  const checkIfWorkAndStartSesseion = async (nofity = true) => {
     try {
-      appContext.onOpenLoading();
+      let isConncted = false;
 
-      const companyRes = company ? company : await getCompany();
+      if (nofity) appContext.onOpenLoading();
 
-      whatsappToken = token || companyRes.whatsappToken || whatsappToken;
-
-      if (!whatsappToken) throw new Error('No token!');
-
-      const { data: statusRes } = await getWhatsappInstance(whatsappToken).get(
-        `${
-          process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API
-        }/api/${transformPhoneNumber(
-          user.companyWhatsapp
-        )}/check-connection-session`
-      );
-
-      if (statusRes.status) {
-        setIsWhatsaapConnected(true);
-        setQrCode('');
-
-        const body = {
-          _id: user.companyId,
-          isWhatsappService: true,
-          whatsappToken,
-        };
-
-        await api.put(`/api/companies`, body);
-
-        toast({
-          title: 'Você está conectado!',
-          description:
-            'Está tudo certo por aqui, o serviço de whatsapp está configurado!',
-          status: 'success',
-          position: 'top-right',
-          duration: 6000,
-          isClosable: true,
-        });
-      } else {
+      if (!whatsappToken) {
         if (nofity)
           toast({
-            title: 'O serviço de Whatsapp não está conectado!',
-            description: 'O Whatsapp está desconectado, tente novamente!',
+            title: 'O serviço de Whatsapp Doupi NÃO está conectado!',
+            description: 'Você precisa se conectar!',
             status: 'info',
             position: 'top-right',
             duration: 6000,
             isClosable: true,
           });
         setIsWhatsaapConnected(false);
+        return false;
       }
-    } catch (error) {
-      if (nofity)
+
+      const isConnected = await connectWhatsapp(false, nofity);
+
+      if (isConnected) {
         toast({
-          title: 'O serviço de Whatsapp não está conectado!',
-          description: 'O Whatsapp está desconectado, tente novamente!',
-          status: 'info',
+          title: 'O serviço de Whatsapp Doupi está conectado!',
+          description: 'Está tudo certo!',
+          status: 'success',
           position: 'top-right',
           duration: 6000,
           isClosable: true,
         });
-      setIsWhatsaapConnected(false);
-    } finally {
-      appContext.onCloseLoading();
-    }
-  };
-
-  const connectWhatsapp = async () => {
-    try {
-      appContext.onOpenLoading();
-
-      const { data: generateTokenRes } = await api.post(`/api/whatsapp`, {
-        clientId: transformPhoneNumber(user.companyWhatsapp),
-      });
-
-      whatsappToken = generateTokenRes.token;
-
-      await getWhatsappInstance(whatsappToken).post(
-        `${
-          process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API
-        }/api/${transformPhoneNumber(user.companyWhatsapp)}/start-session`
-      );
-
-      await new Promise((resolve) => setTimeout(() => resolve(null), 10000));
+        setIsWhatsaapConnected(true);
+        isConncted = true;
+      } else {
+        if (nofity)
+          toast({
+            title: 'O serviço de Whatsapp Doupi NÃO está conectado!',
+            description: 'Você precisa se conectar!',
+            status: 'info',
+            position: 'top-right',
+            duration: 6000,
+            isClosable: true,
+          });
+        setIsWhatsaapConnected(false);
+        isConncted = true;
+      }
 
       appContext.onCloseLoading();
-
-      getQrcode();
+      return isConncted;
     } catch (error) {
-      console.log('QR CODE ERROR', error);
       appContext.onCloseLoading();
       toast({
-        title: 'Houve algum problema',
-        description:
-          'Não conseguimos testar o serviço do whatsapp, tente novamente em instantes, ou aviso o nosso suporte!',
+        title: 'Não foi possível verificar o seu status!',
+        description: 'Tente mais tarde, ou entre em contato com o suporte!',
         status: 'error',
         position: 'top-right',
         duration: 6000,
         isClosable: true,
       });
+      setDontKnowStatus(true);
+      setIsWhatsaapConnected(false);
+      setQrCode('');
+      return false;
+    }
+  };
+
+  const connectWhatsapp = async (isNew = false, nofity = true) => {
+    try {
+      if (nofity) appContext.onOpenLoading();
+
+      let isConncted = false;
+
+      if (isNew) {
+        const { data: generateTokenRes } = await api.post(`/api/whatsapp`, {
+          clientId: transformPhoneNumber(user.companyWhatsapp),
+        });
+        whatsappToken = generateTokenRes.token;
+      }
+
+      while (true) {
+        const { data: startRes } = await getWhatsappInstance(
+          whatsappToken
+        ).post(
+          `${
+            process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API
+          }/api/${transformPhoneNumber(user.companyWhatsapp)}/start-session`
+        );
+
+        if (startRes.status === 'CONNECTED') {
+          isConncted = true;
+          const body = {
+            _id: user.companyId,
+            isWhatsappService: true,
+            whatsappToken,
+          };
+          await api.put(`/api/companies`, body);
+          setIsWhatsaapConnected(true);
+          setQrCode('');
+          break;
+        } else if (startRes.qrcode) {
+          isConncted = false;
+          setIsWhatsaapConnected(false);
+          if (isNew) {
+            setQrCode(startRes.qrcode);
+            getQrcode();
+          }
+          break;
+        } else {
+          isConncted = false;
+          await new Promise((resolve) =>
+            setTimeout(() => resolve(null), 10000)
+          );
+        }
+      }
+
+      appContext.onCloseLoading();
+      return isConncted;
+    } catch (error) {
+      console.log('QR CODE ERROR', error);
+      appContext.onCloseLoading();
+      toast({
+        title: 'Houve um problema ao se conectar',
+        description:
+          'Não foi possível se conectar no serviço de whatsapp da Doupi, tente mais tarde!',
+        status: 'error',
+        position: 'top-right',
+        duration: 6000,
+        isClosable: true,
+      });
+      setDontKnowStatus(true);
+      whatsappToken = user.whatsappToken;
+      return false;
     }
   };
 
   const getQrcode = async () => {
     try {
-      for (let i = 0; i < 4 || !isWhatsaapConnected; i++) {
-        if (isWhatsaapConnected) {
-          setIsWhatsaapConnected(false);
-          setQrCode('');
-          setCountAttempts(0);
-          break;
-        }
+      while (true) {
+        await new Promise((resolve) => setTimeout(() => resolve(null), 5000));
 
-        const { data: qrcodeRes } = await axios.get(
-          `${
-            process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API
-          }/api/${transformPhoneNumber(user.companyWhatsapp)}/qrcode-session`,
+        const isConnected = await connectWhatsapp(false, false);
+        if (isConnected) break;
+
+        const { data: qrcodeRes } = await getWhatsappInstance(
+          whatsappToken
+        ).get(
+          `/api/${transformPhoneNumber(user.companyWhatsapp)}/qrcode-session`,
           {
             responseType: 'arraybuffer',
-            headers: {
-              'Content-Type': 'image/png',
-              Authorization: `Bearer ${whatsappToken}`,
-            },
           }
         );
 
@@ -210,12 +234,9 @@ export default function Company({ user }: any) {
           );
 
         setQrCode(base64String);
-
-        await new Promise((resolve) => setTimeout(() => resolve(null), 10000));
-        await checkStatus(whatsappToken, false);
       }
     } catch (error) {
-      console.log('QR CODE ERROR', error);
+      console.log(error);
     }
   };
 
@@ -230,19 +251,20 @@ export default function Company({ user }: any) {
           process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API
         }/api/${transformPhoneNumber(user.companyWhatsapp)}/send-message`,
         {
-          phone: `${transformPhoneNumber(user.companyWhatsapp)}@c.us`,
+          phone: transformPhoneNumber(user.companyWhatsapp),
           isGroup: false,
           message: 'O serviço de whatsapp da Doupi está conectado!',
         }
       );
       appContext.onCloseLoading();
-    } catch (error) {
+    } catch (error: any) {
       console.log('QR CODE ERROR', error);
       appContext.onCloseLoading();
       toast({
         title: 'Houve algum problema',
-        description:
-          'Não conseguimos testar o serviço do whatsapp, tente novamente em instantes, ou aviso o nosso suporte!',
+        description: error.response
+          ? error.response.data.message
+          : 'Não foi possível enviar a mensagem!',
         status: 'error',
         position: 'top-right',
         duration: 6000,
@@ -271,7 +293,35 @@ export default function Company({ user }: any) {
 
       await api.put(`/api/companies`, body);
 
-      checkStatus();
+      checkIfWorkAndStartSesseion();
+
+      appContext.onCloseLoading();
+    } catch (error) {
+      console.log('QR CODE ERROR', error);
+      appContext.onCloseLoading();
+      toast({
+        title: 'Houve algum problema',
+        description:
+          'Não conseguimos encessar o serviço do whatsapp, tente novamente em instantes, ou aviso o nosso suporte!',
+        status: 'error',
+        position: 'top-right',
+        duration: 6000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const restartConnection = async () => {
+    try {
+      appContext.onOpenLoading();
+
+      await getWhatsappInstance(whatsappToken).post(
+        `${
+          process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API
+        }/api/${transformPhoneNumber(user.companyWhatsapp)}/close-session`
+      );
+
+      await checkIfWorkAndStartSesseion();
 
       appContext.onCloseLoading();
     } catch (error) {
@@ -312,36 +362,55 @@ export default function Company({ user }: any) {
             Serviço do whatsapp{' '}
           </Text>
           <Flex justifyContent={'center'} gap={10}>
-            {isWhatsaapConnected ? (
-              <Box display={'flex'} flexDir={'column'} gap={5}>
-                <Text> Você está conectado! </Text>
-                <Button onClick={sendMessage}>
-                  {' '}
-                  Enviar mensagem pra mim mesmo{' '}
-                </Button>
-                <Button onClick={disconnectService} colorScheme='red'>
-                  {' '}
-                  Desconectar serviço{' '}
-                </Button>
-              </Box>
-            ) : (
+            {!dontKnowStatus ? (
               <Box>
-                <Text mb={5}> Você ainda não está conectado </Text>
-                {!qrCode ? (
-                  <Button onClick={connectWhatsapp} mt={5}>
-                    {' '}
-                    Conectar{' '}
-                  </Button>
+                {isWhatsaapConnected ? (
+                  <Box display={'flex'} flexDir={'column'} gap={5}>
+                    <Text> Você está conectado! </Text>
+                    <Button onClick={sendMessage} colorScheme='blue'>
+                      {' '}
+                      Enviar mensagem pra mim mesmo{' '}
+                    </Button>
+                    <Button onClick={restartConnection} colorScheme='yellow'>
+                      {' '}
+                      Reiniciar conexão{' '}
+                    </Button>
+                    <Button onClick={disconnectService} colorScheme='red'>
+                      {' '}
+                      Desconectar serviço{' '}
+                    </Button>
+                  </Box>
                 ) : (
-                  <>
-                    {qrCode ? (
-                      <Image alt='qrcode' src={qrCode} />
+                  <Box>
+                    <Text mb={5}> Você ainda não está conectado </Text>
+                    {!qrCode ? (
+                      <Button
+                        onClick={() => connectWhatsapp(true, true)}
+                        mt={5}
+                      >
+                        {' '}
+                        Conectar{' '}
+                      </Button>
                     ) : (
-                      <Text> Aguarde o qr code </Text>
+                      <>
+                        {qrCode ? (
+                          <Image alt='qrcode' src={qrCode} />
+                        ) : (
+                          <Text> Aguarde o qr code </Text>
+                        )}
+                      </>
                     )}
-                  </>
+                  </Box>
                 )}
               </Box>
+            ) : (
+              <Button
+                //@ts-ignore
+                onClick={checkIfWorkAndStartSesseion}
+              >
+                {' '}
+                Verificar status{' '}
+              </Button>
             )}
           </Flex>
         </Box>
