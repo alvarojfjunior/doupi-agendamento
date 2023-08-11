@@ -89,7 +89,8 @@ export default function Company({ user }: any) {
             isClosable: true,
           });
         setIsWhatsaapConnected(false);
-        return false;
+        appContext.onCloseLoading();
+        return false
       }
 
       const isConnected = await connectWhatsapp(false, nofity);
