@@ -9,11 +9,11 @@ import {
 } from '@chakra-ui/react';
 import { useContext, useEffect, useState } from 'react';
 import Page from '@/components/Page';
-import axios, { AxiosInstance } from 'axios';
+import { AxiosInstance } from 'axios';
 import { withIronSessionSsr } from 'iron-session/next';
 import { transformPhoneNumber } from '@/utils/general';
 import { AppContext } from '@/contexts/app';
-import { getWhatsappInstance } from '@/services/whatsapp';
+import { frontendSendMessage, getWhatsappInstance } from '@/services/whatsapp';
 import { getApiInstance } from '@/services/api';
 
 export const getServerSideProps = withIronSessionSsr(
@@ -90,7 +90,7 @@ export default function Company({ user }: any) {
           });
         setIsWhatsaapConnected(false);
         appContext.onCloseLoading();
-        return false
+        return false;
       }
 
       const isConnected = await connectWhatsapp(false, nofity);
@@ -106,6 +106,11 @@ export default function Company({ user }: any) {
         });
         setIsWhatsaapConnected(true);
         isConncted = true;
+        await getWhatsappInstance(whatsappToken).post(
+          `${
+            process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API
+          }/api/${transformPhoneNumber(user.companyWhatsapp)}/close-session`
+        );
       } else {
         if (nofity)
           toast({
@@ -152,7 +157,7 @@ export default function Company({ user }: any) {
         whatsappToken = generateTokenRes.token;
       }
 
-      while (true) {
+      for (let i = 0; i <= 5; i++) {
         const { data: startRes } = await getWhatsappInstance(
           whatsappToken
         ).post(
@@ -241,42 +246,11 @@ export default function Company({ user }: any) {
     }
   };
 
-  const sendMessage = async () => {
+  const logoutService = async () => {
     try {
       appContext.onOpenLoading();
 
-      console.log(whatsappToken);
-
-      await getWhatsappInstance(whatsappToken).post(
-        `${
-          process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API
-        }/api/${transformPhoneNumber(user.companyWhatsapp)}/send-message`,
-        {
-          phone: transformPhoneNumber(user.companyWhatsapp),
-          isGroup: false,
-          message: 'O serviço de whatsapp da Doupi está conectado!',
-        }
-      );
-      appContext.onCloseLoading();
-    } catch (error: any) {
-      console.log('QR CODE ERROR', error);
-      appContext.onCloseLoading();
-      toast({
-        title: 'Houve algum problema',
-        description: error.response
-          ? error.response.data.message
-          : 'Não foi possível enviar a mensagem!',
-        status: 'error',
-        position: 'top-right',
-        duration: 6000,
-        isClosable: true,
-      });
-    }
-  };
-
-  const disconnectService = async () => {
-    try {
-      appContext.onOpenLoading();
+      await connectWhatsapp()
 
       await getWhatsappInstance(whatsappToken).post(
         `${
@@ -368,7 +342,18 @@ export default function Company({ user }: any) {
                 {isWhatsaapConnected ? (
                   <Box display={'flex'} flexDir={'column'} gap={5}>
                     <Text> Você está conectado! </Text>
-                    <Button onClick={sendMessage} colorScheme='blue'>
+                    <Button
+                      onClick={() =>
+                        frontendSendMessage(
+                          user,
+                          user.companyWhatsapp,
+                          'O serviço de whatsapp Doupi, está em pleno funcionamento',
+                          toast,
+                          appContext
+                        )
+                      }
+                      colorScheme='blue'
+                    >
                       {' '}
                       Enviar mensagem pra mim mesmo{' '}
                     </Button>
@@ -376,7 +361,7 @@ export default function Company({ user }: any) {
                       {' '}
                       Reiniciar conexão{' '}
                     </Button>
-                    <Button onClick={disconnectService} colorScheme='red'>
+                    <Button onClick={logoutService} colorScheme='red'>
                       {' '}
                       Desconectar serviço{' '}
                     </Button>

@@ -318,7 +318,15 @@ export default function Clients({ user }: any) {
                       colorScheme='blue'
                       h={'80px'}
                       onClick={() => {
-                        frontendSendMessage(user, formik.values.phone, message, toast, appContext);
+                        frontendSendMessage(user, formik.values.phone, message, null, null);
+                        toast({
+                          title: 'Sucesso!',
+                          description: 'Mensagem enviada!',
+                          status: 'success',
+                          position: 'top-right',
+                          duration: 9000,
+                          isClosable: true,
+                        });
                       }}
                     >
                       <ArrowRightIcon />

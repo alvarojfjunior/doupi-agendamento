@@ -124,10 +124,7 @@ export default function SignupCard() {
         password: signupData.password,
       };
 
-      const { data } = await api.post('/api/auth/signin', credentials);
-
-      const userAuth: IUserAuth = data;
-
+      await api.post('/api/auth/signin', credentials);
 
       router.push('private/company');
     } catch (error: any) {
