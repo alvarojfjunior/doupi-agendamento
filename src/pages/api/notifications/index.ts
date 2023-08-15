@@ -85,10 +85,9 @@ export default async function handler(
       ]);
 
 
-      const countChanged: any = []
+      const notificationsSent: any = []
 
       const toNotify: any[] = []
-
 
       schedules.forEach((schedule) => {
         const diff = moment(schedule.time, 'hh:mm').diff(moment(), 'minutes')
@@ -123,7 +122,7 @@ export default async function handler(
                 message: remaindMessage(schedule),
               }
             );
-            countChanged.push({
+            notificationsSent.push({
               company: schedule.company.name,
               clientName: schedule.client.name,
             })
@@ -141,7 +140,7 @@ export default async function handler(
         }
       }
 
-      return res.status(200).send(countChanged)
+      return res.status(200).send(notificationsSent)
     }
 
     return res.status(404);
