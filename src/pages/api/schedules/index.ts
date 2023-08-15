@@ -3,7 +3,6 @@ import { Client, Schedule } from '../../../services/database';
 import { authenticate } from '@/utils/apiAuth';
 import { createDossie } from '@/utils/createDossie';
 import mongoose from 'mongoose';
-import moment from 'moment'
 
 export default async function handler(
   req: NextApiRequest,

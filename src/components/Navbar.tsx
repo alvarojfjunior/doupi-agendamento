@@ -22,10 +22,8 @@ import { useRouter } from 'next/router';
 import Logo from '@/components/Logo';
 import { AxiosInstance } from 'axios';
 import { getApiInstance } from '@/services/api';
-import { IUser } from '@/types/api/User';
 import { AppContext } from '@/contexts/app';
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
-import Cookies from 'js-cookie';
 
 const Links = [
   { label: 'Agendas', href: '/private/' },
@@ -52,11 +50,11 @@ export default function Navbar({ user }: any) {
   const handleLogout = async () => {
     try {
       appContext.onOpenLoading();
-      Cookies.remove('doupi_cookie');
       const { data } = await api.get(`/api/auth/logout`);
       router.push('/');
       appContext.onCloseLoading();
     } catch (error) {
+      console.log(error)
       appContext.onCloseLoading();
     }
   };

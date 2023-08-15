@@ -265,7 +265,7 @@ export default function Panel({ schedules, professionals, user }: any) {
           moment(date, 'YYYY-MM-DD').format('DD/MM/YYYY'),
           values.time
         );
-        frontendSendMessage(user, values.phone, notidy, toast, appContext);
+        frontendSendMessage(user, values.phone, notidy, null, null);
       }
       appContext.onCloseLoading();
     } catch (error: any) {
@@ -913,9 +913,16 @@ export default function Panel({ schedules, professionals, user }: any) {
                         user,
                         selectedSchedule.client.phone,
                         remainderMessage,
-                        toast,
-                        appContext
+                        null, null
                       );
+                      toast({
+                        title: 'Sucesso!',
+                        description: 'Mensagem enviada!',
+                        status: 'success',
+                        position: 'top-right',
+                        duration: 9000,
+                        isClosable: true,
+                      });
                       onClose();
                     }}
                   >
