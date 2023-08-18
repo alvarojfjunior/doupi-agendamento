@@ -5,10 +5,7 @@ import { getWhatsappInstance, startSession } from '@/services/whatsapp';
 import { transformPhoneNumber } from '@/utils/general';
 import { remaindMessage } from '@/utils/notificarions';
 
-export default async function handler(
-  req: any,
-  res: NextApiResponse
-) {
+export default async function handler(req: any, res: NextApiResponse) {
   try {
     if (req.method === 'GET') {
       const schedules = await Schedule.aggregate([
@@ -25,7 +22,7 @@ export default async function handler(
         {
           $match: {
             day: moment().format('YYYY-MM-DD'),
-            status: 'agendado'
+            status: 'agendado',
           },
         },
         {
@@ -73,10 +70,10 @@ export default async function handler(
             pipeline: [
               {
                 $match: {
-                  isWhatsappService: true
+                  isWhatsappService: true,
                 },
               },
-            ]
+            ],
           },
         },
         {
@@ -84,17 +81,19 @@ export default async function handler(
         },
       ]);
 
+      const notificationsSent: any = [];
 
-      const notificationsSent: any = []
+      const toNotify: any[] = [];
 
-      const toNotify: any[] = []
+      console.log('Agendamentos encontrados:', schedules.length)
 
       schedules.forEach((schedule) => {
-        const diff = moment(schedule.time, 'hh:mm').diff(moment(), 'minutes')
-        if (diff > 60 && diff < 120) {
-          toNotify.push(schedule)
+        const diff = moment(schedule.time, 'hh:mm').diff(moment(), 'minutes');
+        console.log('Falta:', diff, 'minutos')
+        if (diff > 30 /*&& diff < 120*/) {
+          toNotify.push(schedule);
         }
-      })
+      });
 
       const groupsByCompanyId: any = {};
       for (const object of toNotify) {
@@ -105,42 +104,51 @@ export default async function handler(
         groupsByCompanyId[companyId].push(object);
       }
 
-
       for (const companyId in groupsByCompanyId) {
         const group = groupsByCompanyId[companyId];
         try {
           console.log(`Send mensage to: ${group[0].company.name}`);
-          const startSessionRes = await startSession(group[0].company)
-          if (!startSessionRes) return
+          const startSessionRes = await startSession(group[0].company);
+          if (!startSessionRes) return;
           for (const schedule of group) {
             await getWhatsappInstance(group[0].company.whatsappToken).post(
-              `${process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API
-              }/api/${transformPhoneNumber(group[0].company.whatsapp || group[0].company.whatsapp)}/send-message`,
+              `${
+                process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API
+              }/api/${transformPhoneNumber(
+                group[0].company.whatsapp || group[0].company.whatsapp
+              )}/send-message`,
               {
                 phone: transformPhoneNumber(schedule.client.phone),
                 isGroup: false,
-                message: remaindMessage(schedule),
+                message: remaindMessage(schedule, true),
               }
             );
             notificationsSent.push({
               company: schedule.company.name,
               clientName: schedule.client.name,
-            })
+            });
             console.log('Sent notification to: ', schedule.client.name);
           }
-          console.log('All notifications from ', group[0].company.name, 'was sent.');
+          console.log(
+            'All notifications from ',
+            group[0].company.name,
+            'was sent.'
+          );
         } catch (error) {
-          console.log('Error to send some notification')
+          console.log('Error to send some notification');
         } finally {
           await getWhatsappInstance(group[0].company.whatsappToken).post(
-            `${process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API
-            }/api/${transformPhoneNumber(group[0].company.whatsapp || group[0].company.whatsapp)}/close-session`,
+            `${
+              process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_API
+            }/api/${transformPhoneNumber(
+              group[0].company.whatsapp || group[0].company.whatsapp
+            )}/close-session`,
             {}
           );
         }
       }
 
-      return res.status(200).send(notificationsSent)
+      return res.status(200).send(notificationsSent);
     }
 
     return res.status(404);
