@@ -1,11 +1,10 @@
-import type { NextApiResponse } from 'next';
 import { Schedule } from '../../../services/database';
 import moment from 'moment';
 import { getWhatsappInstance, startSession } from '@/services/whatsapp';
 import { transformPhoneNumber } from '@/utils/general';
 import { remaindMessage } from '@/utils/notificarions';
 
-export default async function handler(req: any, res: NextApiResponse) {
+export default async function handler(req: any, res: any) {
   try {
     if (req.method === 'GET') {
       const schedules = await Schedule.aggregate([
@@ -148,12 +147,12 @@ export default async function handler(req: any, res: NextApiResponse) {
         }
       }
 
-      return res.status(200).send(notificationsSent);
+      return res.status(200).json({ error: true, data: notificationsSent });
     }
 
     return res.status(404);
   } catch (error: any) {
     console.log(error);
-    return res.status(500).json({ data: error, message: error.message });
+    return res.status(500).json({ error: true, data: error.message });
   }
 }
