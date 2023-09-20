@@ -20,7 +20,7 @@ import ConfirmButtonModal from '@/components/ConfirmButtonModal';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { frontendSendMessage } from '@/services/whatsapp';
+import { sendWhatsappMessage } from '@/services/whatsapp';
 
 export async function getServerSideProps(context: any) {
   try {
@@ -99,7 +99,7 @@ export default function CompanyPage({ company, schedule }: any) {
         'DD/MM/YYYY'
       )} ${schedule.time}`;
 
-      frontendSendMessage(company, company.phone, message, null, null);
+      sendWhatsappMessage(company.phone, message);
 
     } catch (error) {
       console.log(error);

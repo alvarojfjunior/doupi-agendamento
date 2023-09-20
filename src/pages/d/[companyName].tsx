@@ -20,7 +20,7 @@ import { useRouter } from 'next/router';
 import { getScheduleNotification } from '@/utils/notificarions';
 import { ArrowForwardIcon, ArrowLeftIcon } from '@chakra-ui/icons';
 import { modifyTheme } from '@/utils/style';
-import { frontendSendMessage } from '@/services/whatsapp';
+import { sendWhatsappMessage } from '@/services/whatsapp';
 
 export async function getServerSideProps(context: any) {
   const { companyName } = context.query;
@@ -134,15 +134,12 @@ export default function CompanyPage({ company, services: servicesProps }: any) {
         selectedTime
       );
 
-      frontendSendMessage(
-        company,
+      sendWhatsappMessage(
         selectedProfessional.whatsapp,
         notidy,
-        null,
-        null
       );
 
-      frontendSendMessage(company, phone, notidy, null, null);
+      sendWhatsappMessage(phone, notidy);
 
       setStep(1);
       appContext.onCloseLoading();
