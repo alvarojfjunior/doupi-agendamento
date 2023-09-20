@@ -40,7 +40,7 @@ import { getApiInstance } from '@/services/api';
 import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
 import { AddIcon, ArrowRightIcon, EditIcon } from '@chakra-ui/icons';
 import { withIronSessionSsr } from 'iron-session/next';
-import { frontendSendMessage } from '@/services/whatsapp';
+import { sendWhatsappMessage } from '@/services/whatsapp';
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req, res }) => {
@@ -318,7 +318,7 @@ export default function Clients({ user }: any) {
                       colorScheme='blue'
                       h={'80px'}
                       onClick={() => {
-                        frontendSendMessage(user, formik.values.phone, message, null, null);
+                        sendWhatsappMessage(formik.values.phone, message);
                         toast({
                           title: 'Sucesso!',
                           description: 'Mensagem enviada!',

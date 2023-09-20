@@ -65,7 +65,7 @@ import { getDayOfWeekInPortuguese } from '@/utils/date';
 import { pulsate } from '@/utils/style';
 import { floatToString, stringToFloat } from '@/utils/helpers';
 import { NumericFormat } from 'react-number-format';
-import { frontendSendMessage } from '@/services/whatsapp';
+import { sendWhatsappMessage } from '@/services/whatsapp';
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req }) => {
@@ -265,7 +265,7 @@ export default function Panel({ schedules, professionals, user }: any) {
           moment(date, 'YYYY-MM-DD').format('DD/MM/YYYY'),
           values.time
         );
-        frontendSendMessage(user, values.phone, notidy, null, null);
+        sendWhatsappMessage(values.phone, notidy);
       }
       appContext.onCloseLoading();
     } catch (error: any) {
@@ -909,11 +909,9 @@ export default function Panel({ schedules, professionals, user }: any) {
                     colorScheme='blue'
                     h={'80px'}
                     onClick={() => {
-                      frontendSendMessage(
-                        user,
+                      sendWhatsappMessage(
                         selectedSchedule.client.phone,
                         remainderMessage,
-                        null, null
                       );
                       toast({
                         title: 'Sucesso!',
