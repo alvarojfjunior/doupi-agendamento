@@ -59,8 +59,6 @@ export default withIronSessionApiRoute(
             email: user.email,
           };
 
-          console.log(response)
-
           req.session.user = response
           await req.session.save();
           return res.status(200).json(response);
