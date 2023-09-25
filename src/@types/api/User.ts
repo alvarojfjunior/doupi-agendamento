@@ -3,9 +3,9 @@ export interface IUser {
   active: boolean;
   companyId: string;
   companyName: string;
-  whatsappToken: string;
   companyWhatsapp: string;
-  isWhatsappService: boolean;
+  isDoupiAdmin: Boolean;
+  userAccess: Number;
   name: string;
   email: string;
   phone: string;

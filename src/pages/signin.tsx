@@ -53,14 +53,6 @@ export const getServerSideProps = withIronSessionSsr(
   }
 );
 
-interface IUserAuth {
-  email: string;
-  name: string;
-  status: number;
-  token: string;
-  type: number;
-}
-
 type IForm = {
   email: string;
   password: string;
@@ -92,8 +84,8 @@ export default function SignIn() {
         email: values.email,
         password: values.password,
       };
+
       const { data } = await api.post('/api/auth/signin', credentials);
-      const userAuth: IUserAuth = data;
 
       toast({
         title: 'Sucesso',
@@ -105,9 +97,9 @@ export default function SignIn() {
       });
       router.push('private');
     } catch (error: any) {
-      const errorMessage = error.response.data.message;
+      const errorMessage = error.response.data || 'Erro desconhecido';
       toast({
-        title: 'Usuário ou senha incorretos.',
+        title: 'Não foi possível entrar.',
         description: errorMessage,
         status: 'error',
         position: 'top-right',

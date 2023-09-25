@@ -8,7 +8,6 @@ import {
   Text,
   Tbody,
   Td,
-  useColorMode,
   IconButton,
   Stack,
   Heading,
@@ -16,7 +15,6 @@ import {
   Drawer,
   DrawerOverlay,
   DrawerContent,
-  HStack,
   DrawerHeader,
   DrawerBody,
   FormLabel,
@@ -24,10 +22,8 @@ import {
   Input,
   DrawerFooter,
   Button,
-  Divider,
-  Flex,
-  Textarea,
   useToast,
+  Checkbox,
 } from '@chakra-ui/react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -37,10 +33,8 @@ import InputMask from 'react-input-mask';
 import Page from '@/components/Page';
 import { AxiosInstance } from 'axios';
 import { getApiInstance } from '@/services/api';
-import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
-import { AddIcon, ArrowRightIcon, EditIcon } from '@chakra-ui/icons';
+import { AddIcon, EditIcon } from '@chakra-ui/icons';
 import { withIronSessionSsr } from 'iron-session/next';
-import { sendWhatsappMessage } from '@/services/whatsapp';
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req, res }) => {
@@ -74,7 +68,6 @@ export default function Clients({ user }: any) {
   const appContext = useContext(AppContext);
   const [isEditing, setIsEditing] = useState(false);
   const [data, setData] = useState([]);
-  const [message, setMessage] = useState('');
   const {
     isOpen: formIsOpen,
     onOpen: formOnOpen,
@@ -85,12 +78,10 @@ export default function Clients({ user }: any) {
   const onSubmit = async (values: any) => {
     try {
       appContext.onOpenLoading();
-      let res: any;
 
       values.companyId = user.companyId;
 
-      if (isEditing) res = await api.put(`/api/clients`, values);
-      else res = await api.post(`/api/clients`, values);
+      const res = await api.put(`/api/companies`, values);
 
       updateData(res.data);
       appContext.onCloseLoading();
@@ -113,6 +104,9 @@ export default function Clients({ user }: any) {
         isClosable: true,
       });
       appContext.onCloseLoading();
+    } finally {
+      getData()
+      formOnClose();
     }
   };
 
@@ -120,10 +114,12 @@ export default function Clients({ user }: any) {
     initialValues: {
       name: '',
       phone: '',
+      active: false,
     },
     validationSchema: Yup.object().shape({
       name: Yup.string().min(2).max(50).required(),
       phone: Yup.string().min(2).required(),
+      active: Yup.boolean().required(),
     }),
     onSubmit: onSubmit,
   });
@@ -149,9 +145,7 @@ export default function Clients({ user }: any) {
   const getData = async () => {
     try {
       appContext.onOpenLoading();
-      const { data } = await api.get(
-        `/api/clients?companyId=${user.companyId}`
-      );
+      const { data } = await api.get(`/api/companies`);
 
       setData(data);
 
@@ -163,19 +157,6 @@ export default function Clients({ user }: any) {
     }
   };
 
-  const handleDelete = async (item: any) => {
-    try {
-      appContext.onOpenLoading();
-      const { data } = await api.delete(`/api/clients?_id=${item._id}`);
-
-      setData((prevArray) => prevArray.filter((d: any) => d._id !== item._id));
-
-      appContext.onCloseLoading();
-    } catch (error) {
-      console.log(error);
-      appContext.onCloseLoading();
-    }
-  };
   return (
     <Page
       user={user}
@@ -185,7 +166,7 @@ export default function Clients({ user }: any) {
     >
       <Stack h={'full'} m={5}>
         <Heading mb={5} fontSize={'2xl'} textAlign={'center'}>
-          Cadastro de Clientes
+          Empresas da Doupi
         </Heading>
         <TableContainer shadow={'#cccccc4e 0px 0px 2px 1px'} rounded={20}>
           <Table variant='striped'>
@@ -212,21 +193,8 @@ export default function Clients({ user }: any) {
                       mr={1}
                       onClick={() => {
                         formik.setValues(item);
-                        setIsEditing(true);
-                        const sugestionMessage = `Olá ${
-                          item.name
-                        }, tudo bem? Aqui é da ${
-                          user.companyName
-                        }, vamos agendar? \nAcesse o link abaixo e agende já! \n\nhttps://doupi.com.br/d/${user.companyName.replaceAll(
-                          ' ',
-                          '-'
-                        )}`;
-                        setMessage(sugestionMessage);
                         formOnOpen();
                       }}
-                    />
-                    <DeleteConfirmationModal
-                      onDelete={() => handleDelete(item)}
                     />
                   </Td>
                 </Tr>
@@ -234,20 +202,6 @@ export default function Clients({ user }: any) {
             </Tbody>
           </Table>
         </TableContainer>
-        <Box position='fixed' bottom={'80px'} zIndex={1} right={4}>
-          <IconButton
-            colorScheme='blue'
-            icon={<AddIcon />}
-            isRound
-            size='lg'
-            aria-label='Adicionar'
-            onClick={() => {
-              formik.resetForm();
-              setIsEditing(false);
-              formOnOpen();
-            }}
-          />
-        </Box>
       </Stack>
 
       <Drawer
@@ -273,6 +227,7 @@ export default function Clients({ user }: any) {
               <Input
                 type='text'
                 name='name'
+                disabled={true}
                 value={formik.values.name}
                 onChange={formik.handleChange}
               />
@@ -287,6 +242,7 @@ export default function Clients({ user }: any) {
                 Telefone{' '}
               </FormLabel>
               <Input
+                disabled={true}
                 name='phone'
                 as={InputMask}
                 value={formik.values.phone}
@@ -295,46 +251,27 @@ export default function Clients({ user }: any) {
               />
             </FormControl>
 
-            {isEditing && (
-              <Box>
-                <Divider marginBlock={10} />
-
-                <Box w={'full'}>
-                  <Text fontWeight={'semibold'}>
-                    {' '}
-                    Enviar mensagem para o cliente:{' '}
-                  </Text>
-                  <Flex alignItems={'center'}>
-                    <Textarea
-                      resize={'none'}
-                      height={'80px'}
-                      overflowY='hidden'
-                      placeholder='Mensagem'
-                      value={message}
-                      onChange={(e: any) => setMessage(e.target.value)}
-                    />
-                    <Button
-                      variant='outline'
-                      colorScheme='blue'
-                      h={'80px'}
-                      onClick={() => {
-                        sendWhatsappMessage(formik.values.phone, message);
-                        toast({
-                          title: 'Sucesso!',
-                          description: 'Mensagem enviada!',
-                          status: 'success',
-                          position: 'top-right',
-                          duration: 9000,
-                          isClosable: true,
-                        });
-                      }}
-                    >
-                      <ArrowRightIcon />
-                    </Button>
-                  </Flex>
-                </Box>
-              </Box>
-            )}
+            <FormControl
+              id='active'
+              isInvalid={!!formik.errors.active && formik.touched.active}
+              display={'flex'}
+              justifyContent={'start'}
+              alignItems={'center'}
+              marginTop={5}
+            >
+              <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                Ativo:{' '}
+              </FormLabel>
+              <Checkbox
+                mb={2}
+                size={'md'}
+                fontWeight={'medium'}
+                isChecked={formik.values.active}
+                onChange={(e: any) =>
+                  formik.setFieldValue('active', e.target.checked)
+                }
+              />
+            </FormControl>
           </DrawerBody>
 
           <DrawerFooter borderTopWidth='1px'>

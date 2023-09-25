@@ -178,6 +178,10 @@ export default function Navbar({ user }: any) {
                       <MenuItem onClick={() => router.push('/private/company')}>
                         Dados da empresa
                       </MenuItem>
+
+                      {user.isDoupiAdmin && <MenuItem onClick={() => router.push('/private/doupiAdmin/companies')}>
+                        Painel Doupi
+                      </MenuItem>}
                       <MenuItem onClick={handleLogout}>Sair</MenuItem>
                     </MenuList>
                   </Stack>

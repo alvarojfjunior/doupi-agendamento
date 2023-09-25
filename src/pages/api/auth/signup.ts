@@ -15,7 +15,6 @@ export default async function handler(
         name: body.companyName,
         color: '#2D4356',
         coverImage: 'http://res.cloudinary.com/dovvizyxg/image/upload/v1689457021/barber-shop-design-template-a5839e60d342e6dafe51cf9a413870ee_screen_pzaim3.jpg',
-        logoImage: 'http://res.cloudinary.com/dovvizyxg/image/upload/v1689457382/logoipsum-285_y7nomd.png',
         businessType: body.type,
         responsableName: body.userName,
         email: body.email,

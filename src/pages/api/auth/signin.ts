@@ -19,10 +19,13 @@ export default withIronSessionApiRoute(
 
         const user = await User.findOne({ email }).populate({
           path: 'companyId',
-          select: 'name whatsapp isWhatsappService whatsappToken'
+          select: 'active name whatsapp'
         }).lean();
 
-        if (!user) return res.status(401).send('Invalid Credentials');
+
+        if (!user) return res.status(401).send('Usuário ou senha inválidos.');
+
+        if (!user.companyId.active) return res.status(401).send('A sua empresa não está ativa, procure o suporte.');
 
         const isPasswordMatch = await bcrypt.compare(password, user.password);
 
@@ -51,15 +54,13 @@ export default withIronSessionApiRoute(
             companyId: user.companyId._id,
             companyName: user.companyId.name,
             companyWhatsapp: user.companyId.whatsapp,
-            isWhatsappService: user.companyId.isWhatsappService,
-            whatsappToken: user.companyId.whatsappToken,
+            isDoupiAdmin: user.isDoupiAdmin,
+            userAccess: user.userAccess,
             token: user.token,
             phone: user.phone,
             name: user.name,
             email: user.email,
           };
-
-          console.log(response)
 
           req.session.user = response
           await req.session.save();
