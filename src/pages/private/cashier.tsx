@@ -392,7 +392,7 @@ export default function Clients({ user }: any) {
                 formOnClose();
               }}
             >
-              Cancel
+              Cancelar
             </Button>
             <Button
               colorScheme='blue'

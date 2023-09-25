@@ -58,16 +58,6 @@ try {
         type: String,
         required: true,
       },
-      userAccess: { //0=basicUser, 1=adminUser
-        type: Number,
-        required: true,
-        default: 0,
-      },
-      isDoupiAdmin: {
-        type: Boolean,
-        required: true,
-        default: false,
-      },
       active: {
         type: Boolean,
         required: true,

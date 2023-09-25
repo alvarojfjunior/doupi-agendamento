@@ -65,13 +65,6 @@ interface IForm {
   confirmPassword: string;
 }
 
-interface IUserAuth {
-  email: string;
-  name: string;
-  status: number;
-  token: string;
-  type: number;
-}
 
 export default function SignupCard() {
   const toast = useToast();

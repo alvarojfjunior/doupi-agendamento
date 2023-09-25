@@ -872,7 +872,7 @@ export default function Panel({ schedules, professionals, user }: any) {
                 formOnClose();
               }}
             >
-              Cancel
+              Cancelar
             </Button>
             <Button
               colorScheme='blue'
