@@ -629,6 +629,17 @@ export default function Panel({ schedules, professionals, user }: any) {
           size='lg'
           aria-label='Adicionar'
           onClick={() => {
+            if (!professionals[0]) {
+              toast({
+                title: 'O seu cadastro está incompleto!',
+                description: 'Antes de criar agendamentos, tenha certeza que possui profissionais e serviços cadastrados.',
+                status: 'warning',
+                position: 'top-right',
+                duration: 2000,
+                isClosable: true,
+              });
+              return
+            }
             formik.resetForm();
             setIsEditing(false);
             getServicesPerProfessional(professionals[0]._id);

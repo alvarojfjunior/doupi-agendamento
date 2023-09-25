@@ -4,19 +4,17 @@ export let CompanySchema: Mongoose.Schema;
 try {
   CompanySchema = Mongoose.model('Company').schema;
 
-  // // DATABASE MIGRATION
+  // DATABASE MIGRATION
   // CompanySchema.add({
-  //   whatsappToken: {
-  //     type: String
+  //   userAccess: {
+  //     type: Number,
+  //     default: false,
   //   },
   // });
   // const Company = Mongoose.model('Company', CompanySchema);
-  // Company.updateMany(
-  //   {},
-  //   { $set: { whatsappToken: '' } }
-  // )
-  //   .then(res => console.log(res))
-  //   .catch(error => console.log(error))
+  // Company.updateMany({}, { $set: { userAccess: 1 } })
+  //   .then((res) => console.log(res))
+  //   .catch((error) => console.log(error));
 
 
 } catch (error) {
@@ -39,10 +37,6 @@ try {
         type: String,
         required: true,
       },
-      logoImage: {
-        type: String,
-        required: true,
-      },
       coverImage: {
         type: String,
         required: true,
@@ -52,11 +46,11 @@ try {
         required: true,
         unique: true,
       },
-      phone: {
+      document: {
         type: String,
         required: true,
       },
-      document: {
+      phone: {
         type: String,
         required: true,
       },
@@ -64,13 +58,15 @@ try {
         type: String,
         required: true,
       },
-      isWhatsappService: {
+      userAccess: { //0=basicUser, 1=adminUser
+        type: Number,
+        required: true,
+        default: 0,
+      },
+      isDoupiAdmin: {
         type: Boolean,
         required: true,
         default: false,
-      },
-      whatsappToken: {
-        type: String
       },
       active: {
         type: Boolean,

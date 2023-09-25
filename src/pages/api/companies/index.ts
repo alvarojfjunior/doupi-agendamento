@@ -64,8 +64,6 @@ export default withIronSessionApiRoute(
         if (modifiedCount > 0) {
           const companyRes: any = await Company.findOne({ _id }).lean();
 
-          req.session.isWhatsappService = companyRes.isWhatsappService
-          req.session.whatsappToken = companyRes.whatsappToken
           req.session.whatsapp = companyRes.whatsapp
           await req.session.save();
 

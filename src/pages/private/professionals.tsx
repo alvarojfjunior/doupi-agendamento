@@ -381,7 +381,7 @@ export default function Professionals({ user }: any) {
             </Tbody>
           </Table>
         </TableContainer>
-        <Box position='fixed' bottom={'80px'} right={4}>
+        <Box position='fixed' bottom={'80px'} zIndex={1} right={4}>
           <IconButton
             colorScheme='blue'
             icon={<AddIcon />}
