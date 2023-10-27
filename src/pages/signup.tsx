@@ -65,7 +65,6 @@ interface IForm {
   confirmPassword: string;
 }
 
-
 export default function SignupCard() {
   const toast = useToast();
   const appContext = useContext(AppContext);
@@ -203,7 +202,7 @@ export default function SignupCard() {
 
                   <Stack spacing={4} mb={5}>
                     <HStack>
-                      <Box>
+                      <Box w={'50%'}>
                         <FormControl
                           id='type'
                           isRequired
@@ -212,7 +211,7 @@ export default function SignupCard() {
                           <FormLabel
                             fontSize={{ base: 'sm', md: 'md', lg: 'md' }}
                           >
-                            Ramo da sua empresa
+                            Ramo
                           </FormLabel>
                           <Field as={Select} type='text' name='type'>
                             <option value='Beleza'>Beleza</option>
@@ -222,121 +221,116 @@ export default function SignupCard() {
                         </FormControl>
                       </Box>
 
-                      <Box>
+                      <Box w={'50%'}>
                         <FormControl
                           id='phone'
                           isRequired
                           isInvalid={!!errors.phone && touched.phone}
                         >
-                          <FormLabel>Telefone de contato </FormLabel>
+                          <FormLabel>Telefone (whatsapp) </FormLabel>
                           <Field as={PhoneInput} type='text' name='phone' />
                         </FormControl>
                       </Box>
                     </HStack>
+                  </Stack>
 
-                    <FormControl
-                      mb={5}
-                      id='email'
-                      isRequired
-                      isInvalid={!!errors.email && touched.email}
+                  <FormControl
+                    mb={5}
+                    id='email'
+                    isRequired
+                    isInvalid={!!errors.email && touched.email}
+                  >
+                    <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
+                      Email para contato e login
+                    </FormLabel>
+                    <Field as={Input} type='email' name='email' />
+                  </FormControl>
+
+                  <Stack spacing={4} mb={5}>
+                    <HStack>
+                      <Box>
+                        <FormControl
+                          id='password'
+                          isRequired
+                          isInvalid={!!errors.password && touched.password}
+                        >
+                          <FormLabel
+                            fontSize={{ base: 'sm', md: 'md', lg: 'md' }}
+                          >
+                            Senha
+                          </FormLabel>
+                          <InputGroup>
+                            <Field
+                              as={Input}
+                              type={showPassword ? 'text' : 'password'}
+                              name='password'
+                            />
+                            <InputRightElement h={'full'}>
+                              <Button
+                                variant={'ghost'}
+                                onClick={() =>
+                                  setShowPassword(
+                                    (showPassword) => !showPassword
+                                  )
+                                }
+                              >
+                                {showPassword ? <ViewIcon /> : <ViewOffIcon />}
+                              </Button>
+                            </InputRightElement>
+                            <FormErrorMessage position={'absolute'} top={8}>
+                              {errors.password}
+                            </FormErrorMessage>
+                          </InputGroup>
+                        </FormControl>
+                      </Box>
+
+                      <Box>
+                        <FormControl
+                          id='confirmPassword'
+                          isRequired
+                          isInvalid={
+                            !!errors.confirmPassword && touched.confirmPassword
+                          }
+                        >
+                          <FormLabel
+                            fontSize={{ base: 'sm', md: 'md', lg: 'md' }}
+                          >
+                            Confirme a Senha
+                          </FormLabel>
+                          <InputGroup>
+                            <Field
+                              as={Input}
+                              type={showPassword ? 'text' : 'password'}
+                              name='confirmPassword'
+                            />
+                            <FormErrorMessage position={'absolute'} top={8}>
+                              {errors.confirmPassword}
+                            </FormErrorMessage>
+                          </InputGroup>
+                        </FormControl>
+                      </Box>
+                    </HStack>
+                  </Stack>
+
+                  <Stack spacing={10} pt={2}>
+                    <Button
+                      type='submit'
+                      loadingText='Submitting'
+                      size='lg'
+                      color={useColorModeValue('#fff', '#fff')}
+                      bg={useColorModeValue('#ffc03f', '#ffc03f')}
+                      _hover={{ filter: 'brightness(110%)' }}
                     >
-                      <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
-                        Email para contato e login
-                      </FormLabel>
-                      <Field as={Input} type='email' name='email' />
-                    </FormControl>
-
-                    <Stack spacing={4} mb={5}>
-                      <HStack>
-                        <Box>
-                          <FormControl
-                            id='password'
-                            isRequired
-                            isInvalid={!!errors.password && touched.password}
-                          >
-                            <FormLabel
-                              fontSize={{ base: 'sm', md: 'md', lg: 'md' }}
-                            >
-                              Senha
-                            </FormLabel>
-                            <InputGroup>
-                              <Field
-                                as={Input}
-                                type={showPassword ? 'text' : 'password'}
-                                name='password'
-                              />
-                              <InputRightElement h={'full'}>
-                                <Button
-                                  variant={'ghost'}
-                                  onClick={() =>
-                                    setShowPassword(
-                                      (showPassword) => !showPassword
-                                    )
-                                  }
-                                >
-                                  {showPassword ? (
-                                    <ViewIcon />
-                                  ) : (
-                                    <ViewOffIcon />
-                                  )}
-                                </Button>
-                              </InputRightElement>
-                              <FormErrorMessage position={'absolute'} top={8}>
-                                {errors.password}
-                              </FormErrorMessage>
-                            </InputGroup>
-                          </FormControl>
-                        </Box>
-
-                        <Box>
-                          <FormControl
-                            id='confirmPassword'
-                            isRequired
-                            isInvalid={
-                              !!errors.confirmPassword &&
-                              touched.confirmPassword
-                            }
-                          >
-                            <FormLabel
-                              fontSize={{ base: 'sm', md: 'md', lg: 'md' }}
-                            >
-                              Confirme a Senha
-                            </FormLabel>
-                            <InputGroup>
-                              <Field
-                                as={Input}
-                                type={showPassword ? 'text' : 'password'}
-                                name='confirmPassword'
-                              />
-                              <FormErrorMessage position={'absolute'} top={8}>
-                                {errors.confirmPassword}
-                              </FormErrorMessage>
-                            </InputGroup>
-                          </FormControl>
-                        </Box>
-                      </HStack>
-                    </Stack>
-
-                    <Stack spacing={10} pt={2}>
-                      <Button
-                        type='submit'
-                        loadingText='Submitting'
-                        size='lg'
-                        color={useColorModeValue('#fff', '#fff')}
-                        bg={useColorModeValue('#ffc03f', '#ffc03f')}
-                        _hover={{ filter: 'brightness(110%)' }}
-                      >
-                        Cadastrar
-                      </Button>
-                    </Stack>
-                    <Stack pt={6}>
-                      <Text align={'center'}>
-                        Já é cadastrado?{' '}
-                        <Link as={NextLink} href='./signin' color={'#ffc03f'}>
-                          Entrar
-                        </Link>
-                      </Text>
-                    </Stack>
+                      Cadastrar
+                    </Button>
+                  </Stack>
+                  <Stack pt={6}>
+                    <Text align={'center'}>
+                      Já é cadastrado?{' '}
+                      <Link as={NextLink} href='./signin' color={'#ffc03f'}>
+                        Entrar
+                      </Link>
+                    </Text>
                   </Stack>
                 </Box>
               </Stack>
