@@ -154,7 +154,7 @@ export default function Navbar({ user }: any) {
                       <Avatar
                         size={'sm'}
                         src={
-                          'https://avatars.dicebear.com/api/male/username.svg'
+                          'https://api.dicebear.com/7.x/avataaars-neutral/svg?eyes=squint&mouth=smile&backgroundType=gradientLinear'
                         }
                       />
                     </MenuButton>
@@ -164,7 +164,7 @@ export default function Navbar({ user }: any) {
                         <Avatar
                           size={'2xl'}
                           src={
-                            'https://avatars.dicebear.com/api/male/username.svg'
+                            'https://api.dicebear.com/7.x/avataaars-neutral/svg?eyes=squint&mouth=smile&backgroundType=gradientLinear'
                           }
                         />
                       </Center>

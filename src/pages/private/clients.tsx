@@ -258,7 +258,7 @@ export default function Clients({ user }: any) {
       >
         <DrawerOverlay />
         <DrawerContent>
-          <DrawerHeader borderBottomWidth='1px'>Serviço</DrawerHeader>
+          <DrawerHeader borderBottomWidth='1px'>Cliete</DrawerHeader>
 
           <DrawerBody>
             <FormControl

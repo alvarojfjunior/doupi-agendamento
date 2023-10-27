@@ -63,6 +63,10 @@ export default function Company({ user }: any) {
   const onSubmit = async (values: any) => {
     try {
       appContext.onOpenLoading();
+
+
+      values.whatsapp = values.phone
+
       const { data } = await api.put(`/api/companies`, values);
       appContext.onCloseLoading();
       router.push('/private');
@@ -96,19 +100,15 @@ export default function Company({ user }: any) {
       businessType: 'Beleza',
       color: '',
       phone: '',
-      whatsapp: '',
       email: '',
-      document: '',
     },
     validationSchema: Yup.object().shape({
       coverImage: Yup.string().min(50).required(),
       name: Yup.string().min(2).max(50).required(),
-      document: Yup.string().min(2).max(50).required(),
       color: Yup.string().min(2).max(10).required(),
       businessType: Yup.string().min(2).max(50).required(),
       responsableName: Yup.string().min(2).max(50).required(),
-      phone: Yup.string().required(),
-      whatsapp: Yup.string().max(16).required(),
+      phone: Yup.string().max(16).required(),
     }),
     onSubmit: onSubmit,
   });
@@ -288,55 +288,17 @@ export default function Company({ user }: any) {
               </FormControl>
 
               <FormControl
-                id='document'
-                isRequired
-                isInvalid={!!formik.errors.document && formik.touched.document}
-              >
-                <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
-                  {' '}
-                  Documento
-                </FormLabel>
-                <Input
-                  type='string'
-                  name='document'
-                  value={formik.values.document}
-                  onChange={formik.handleChange}
-                />
-              </FormControl>
-            </HStack>
-
-            <HStack>
-              <FormControl
                 id='phone'
                 isRequired
                 isInvalid={!!formik.errors.phone && formik.touched.phone}
               >
                 <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
-                  Telefone de contato{' '}
+                  Telefone (whatsapp){' '}
                 </FormLabel>
                 <Input
                   name='phone'
                   as={InputMask}
                   value={formik.values.phone}
-                  onChange={formik.handleChange}
-                  mask='(99) 9 9999-9999'
-                />
-              </FormControl>
-
-              <FormControl
-                id='whatsapp'
-                isRequired
-                isInvalid={!!formik.errors.whatsapp && formik.touched.whatsapp}
-              >
-                <FormLabel fontSize={{ base: 'sm', md: 'md', lg: 'md' }}>
-                  {' '}
-                  Whatsapp{' '}
-                </FormLabel>
-
-                <Input
-                  name='whatsapp'
-                  as={InputMask}
-                  value={formik.values.whatsapp}
                   onChange={formik.handleChange}
                   mask='(99) 9 9999-9999'
                 />

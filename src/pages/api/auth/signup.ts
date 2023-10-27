@@ -19,8 +19,7 @@ export default async function handler(
         responsableName: body.userName,
         email: body.email,
         phone: body.phone,
-        whatsapp: body.phone,
-        document: '0',
+        whatsapp: body.phone
       };
 
       const company = await new Company(newCompany).save();

@@ -46,10 +46,6 @@ try {
         required: true,
         unique: true,
       },
-      document: {
-        type: String,
-        required: true,
-      },
       phone: {
         type: String,
         required: true,
