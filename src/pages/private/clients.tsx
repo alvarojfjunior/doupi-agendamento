@@ -192,7 +192,7 @@ export default function Clients({ user }: any) {
             <Thead>
               <Tr>
                 <Th>Nome</Th>
-                <Th>Phone</Th>
+                <Th>Telefone</Th>
                 <Th width={50}>Opções</Th>
               </Tr>
             </Thead>
