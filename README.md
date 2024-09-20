@@ -30,7 +30,7 @@ CRM for service companies that manage appointment scheduling.
 
 ## Screenshots
 
-<img src="images/2.png" />
+<img src="./images/2.png" />
 
 <!-- ![Screenshot2](images/2.png)
 ![Screenshot3](images/3.png)
