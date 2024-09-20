@@ -1,23 +1,23 @@
 # Doupi
 
-CRM para empresas de serviço que trabalham com agendamento de horários.
+CRM for service companies that manage appointment scheduling.
 
-## Tecnologias
+## Technologies
 
-- **Monolito**: Next.js
-- **Banco de Dados**: MongoDB
+- **Monolith**: Next.js
+- **Database**: MongoDB
 
-## Instalação
+## Installation
 
-1. Clonar o repositório:
+1. Clone the repository:
    ```bash
    git clone https://github.com/alvarojfjunior/doupi.git
 
-2. Instale as dependencias:
+2. Install dependencies:
    ```bash
    npm i
 
-2. Execute em desenvolvimento:
+2. Execute in dev environment:
    ```bash
    npm run dev
 
