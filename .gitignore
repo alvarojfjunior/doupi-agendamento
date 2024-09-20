@@ -42,3 +42,9 @@ yarn.lock
 next-env.d.ts
 
 dump
+
+
+.env.development
+.env.production
+.env.local
+.env
