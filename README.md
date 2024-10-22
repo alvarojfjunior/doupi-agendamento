@@ -9,21 +9,23 @@ CRM for service companies that manage appointment scheduling.
 
 ## Installation
 
-1. Clone the repository:
+1. Setup the .env file
+
+2. Clone the repository:
 
    ```bash
    git clone https://github.com/alvarojfjunior/doupi.git
 
    ```
 
-2. Install dependencies:
+3. Install dependencies:
 
    ```bash
    npm i
 
    ```
 
-3. Execute in dev environment:
+4. Execute in dev environment:
    ```bash
    npm run dev
    ```
