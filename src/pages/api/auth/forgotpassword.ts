@@ -39,7 +39,7 @@ export default async function handler(
         await Email.send({
           Host: 'smtp.elasticemail.com',
           Username: process.env.SENDER_EMAIL,
-          Password: process.env.EMAIL_SECRET,
+          Password: process.env.EMAIL_PASSWORD,
           To: email,
           From: process.env.SENDER_EMAIL,
           Subject: 'Doupi - Recuperar senha',
