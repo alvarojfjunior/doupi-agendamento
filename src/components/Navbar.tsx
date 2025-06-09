@@ -51,11 +51,31 @@ export default function Navbar({ user }: any) {
     try {
       appContext.onOpenLoading();
       const { data } = await api.get(`/api/auth/logout`);
+      
+      // Limpar qualquer estado local que possa estar mantendo informações do usuário
+      if (typeof window !== 'undefined') {
+        // Limpar localStorage se estiver sendo usado para armazenar dados do usuário
+        localStorage.removeItem('user');
+        
+        // Forçar um hard refresh para garantir que todos os estados sejam limpos
+        window.location.href = '/';
+        return; // Importante: retornar aqui para evitar que o código abaixo seja executado
+      }
+      
       router.push('/');
       appContext.onCloseLoading();
     } catch (error) {
-      console.log(error)
+      console.log(error);
       appContext.onCloseLoading();
+      
+      // Adicionar notificação de erro
+      toast({
+        title: 'Erro ao fazer logout',
+        description: 'Ocorreu um erro ao tentar sair. Tente novamente.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
   const { isOpen, onOpen, onClose } = useDisclosure();
