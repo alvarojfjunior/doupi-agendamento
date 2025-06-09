@@ -9,8 +9,10 @@ export default withIronSessionApiRoute(
         await req.session.destroy();
         
         // Configurar o cookie para expirar imediatamente
+        // Garantir que as configurações sejam consistentes em todos os ambientes
+        const isProduction = process.env.NODE_ENV === 'production';
         res.setHeader('Set-Cookie', [
-          `doupi_cookie=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; ${process.env.NODE_ENV === 'production' ? 'Secure; ' : ''}SameSite=Strict`,
+          `doupi_cookie=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; ${isProduction ? 'Secure; ' : ''}SameSite=Strict; Max-Age=0`,
         ]);
         
         return res.status(200).send({ ok: true });

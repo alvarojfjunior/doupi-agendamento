@@ -16,6 +16,7 @@ import {
   Stack,
   useColorMode,
   Center,
+  useToast, // Adicionar importação do useToast
 } from '@chakra-ui/react';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 import { useRouter } from 'next/router';
@@ -39,6 +40,7 @@ export default function Navbar({ user }: any) {
   const appContext = useContext(AppContext);
   const { colorMode, toggleColorMode } = useColorMode();
   const router = useRouter();
+  const toast = useToast(); // Adicionar hook useToast
 
   const isCompanyPage =
     router.asPath.indexOf('/d/') >= 0 || router.asPath.indexOf('/a/') >= 0;
@@ -50,16 +52,17 @@ export default function Navbar({ user }: any) {
   const handleLogout = async () => {
     try {
       appContext.onOpenLoading();
-      const { data } = await api.get(`/api/auth/logout`);
+      await api.get(`/api/auth/logout`);
       
-      // Limpar qualquer estado local que possa estar mantendo informações do usuário
+      // Limpar todos os dados do localStorage que possam estar relacionados ao usuário
       if (typeof window !== 'undefined') {
-        // Limpar localStorage se estiver sendo usado para armazenar dados do usuário
         localStorage.removeItem('user');
+        localStorage.removeItem('name');
+        localStorage.removeItem('phone');
         
         // Forçar um hard refresh para garantir que todos os estados sejam limpos
         window.location.href = '/';
-        return; // Importante: retornar aqui para evitar que o código abaixo seja executado
+        return;
       }
       
       router.push('/');
@@ -68,7 +71,7 @@ export default function Navbar({ user }: any) {
       console.log(error);
       appContext.onCloseLoading();
       
-      // Adicionar notificação de erro
+      // Exibir notificação de erro
       toast({
         title: 'Erro ao fazer logout',
         description: 'Ocorreu um erro ao tentar sair. Tente novamente.',
@@ -76,6 +79,9 @@ export default function Navbar({ user }: any) {
         duration: 5000,
         isClosable: true,
       });
+      
+      // Tentar forçar o redirecionamento mesmo em caso de erro
+      window.location.href = '/';
     }
   };
   const { isOpen, onOpen, onClose } = useDisclosure();
