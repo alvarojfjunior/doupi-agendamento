@@ -21,6 +21,8 @@
     "@types/node": "20.4.2",
     "@types/react": "18.2.15",
     "@types/react-dom": "18.2.7",
+    "@vercel/analytics": "^1.5.0",
+    "@vercel/speed-insights": "^1.2.0",
     "apexcharts": "^3.41.0",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.0",

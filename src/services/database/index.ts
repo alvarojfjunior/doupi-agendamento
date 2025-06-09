@@ -10,49 +10,75 @@ import { UserSchema } from './schemas/user';
 import { DossieSchema } from './schemas/dossie';
 import { PasswordResetSchema } from './schemas/passwordReset';
 
-let isConnected = false;
+// Variável global para armazenar a conexão entre invocações serverless
+declare global {
+  var mongoose: {
+    conn: typeof Mongoose | null;
+    promise: Promise<typeof Mongoose> | null;
+  };
+}
+
+// Inicializa a variável global se não existir
+global.mongoose = global.mongoose || { conn: null, promise: null };
 
 if (!process.env.MONGOOSE_URI) {
   console.log('erro');
   throw new Error('Invalid environment variable: "MONGOOSE_URI"');
 }
 
-Mongoose.Promise = global.Promise;
-
 const databaseUrl = process.env.MONGOOSE_URI;
 
-const connectToDatabase = async (): Promise<void> => {
-  if (isConnected) {
+async function connectToDatabase() {
+  // Se já temos uma conexão, use-a
+  if (global.mongoose.conn) {
     console.log('Usando conexão existente com MongoDB');
-    return;
+    return global.mongoose.conn;
   }
 
-  try {
-    await Mongoose.connect(databaseUrl, {
+  // Se uma conexão está sendo estabelecida, aguarde-a
+  if (!global.mongoose.promise) {
+    const opts = {
       serverSelectionTimeoutMS: 30000,
       socketTimeoutMS: 45000,
       maxPoolSize: 10,
       minPoolSize: 5,
-    });
-    isConnected = true;
-    console.log('Nova conexão com MongoDB estabelecida');
-  } catch (error) {
-    console.error('Erro ao conectar ao MongoDB:', error);
-    isConnected = false;
-    // Tenta reconectar após 5 segundos
-    setTimeout(connectToDatabase, 5000);
-  }
-};
+    };
 
-// Adiciona listeners para gerenciar a conexão
+    // Armazena a promessa de conexão para reutilização
+    global.mongoose.promise = Mongoose.connect(databaseUrl, opts).then((mongoose) => {
+      console.log('Nova conexão com MongoDB estabelecida');
+      return mongoose;
+    }).catch((error) => {
+      console.error('Erro ao conectar ao MongoDB:', error);
+      global.mongoose.promise = null; // Reseta a promessa em caso de erro
+      throw error;
+    });
+  }
+
+  try {
+    // Aguarda a promessa de conexão ser resolvida
+    const mongoose = await global.mongoose.promise;
+    global.mongoose.conn = mongoose;
+    return mongoose;
+  } catch (error) {
+    global.mongoose.promise = null;
+    throw error;
+  }
+}
+
+// Garante que a conexão seja estabelecida antes de exportar os modelos
+connectToDatabase().catch(console.error);
+
+// Adiciona listener para reconexão em caso de desconexão
 Mongoose.connection.on('disconnected', () => {
-  isConnected = false;
   console.log('MongoDB desconectado, tentando reconectar...');
-  setTimeout(connectToDatabase, 5000);
+  global.mongoose.conn = null;
+  global.mongoose.promise = null;
+  // Tenta reconectar após um breve atraso
+  setTimeout(() => connectToDatabase().catch(console.error), 5000);
 });
 
-connectToDatabase();
-
+// Exporta os modelos
 export const User = Mongoose.model('User', UserSchema);
 export const Dossie = Mongoose.model('Dossie', DossieSchema);
 export const PasswordReset = Mongoose.model(
