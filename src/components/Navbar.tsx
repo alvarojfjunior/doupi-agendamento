@@ -52,23 +52,25 @@ export default function Navbar({ user }: any) {
   const handleLogout = async () => {
     try {
       appContext.onOpenLoading();
-      await api.get(`/api/auth/logout`);
       
-      // Limpar todos os dados do localStorage que possam estar relacionados ao usuário
+      // Fazer a requisição de logout
+      await fetch('/api/auth/logout', {
+        method: 'GET',
+        credentials: 'include' // Importante para incluir cookies na requisição
+      });
+      
+      // Limpar todos os dados do localStorage
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('user');
-        localStorage.removeItem('name');
-        localStorage.removeItem('phone');
+        localStorage.clear(); // Limpar todo o localStorage
         
-        // Forçar um hard refresh para garantir que todos os estados sejam limpos
+        // Forçar um hard refresh para a página inicial
         window.location.href = '/';
         return;
       }
       
-      router.push('/');
       appContext.onCloseLoading();
     } catch (error) {
-      console.log(error);
+      console.error('Erro ao fazer logout:', error);
       appContext.onCloseLoading();
       
       // Exibir notificação de erro
@@ -80,8 +82,10 @@ export default function Navbar({ user }: any) {
         isClosable: true,
       });
       
-      // Tentar forçar o redirecionamento mesmo em caso de erro
-      window.location.href = '/';
+      // Mesmo com erro, tentar forçar o redirecionamento
+      if (typeof window !== 'undefined') {
+        window.location.href = '/';
+      }
     }
   };
   const { isOpen, onOpen, onClose } = useDisclosure();
