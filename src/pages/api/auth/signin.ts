@@ -35,7 +35,7 @@ export default withIronSessionApiRoute(
           if (!secretJwrtCode) return res.status(500);
 
           const token = jwt.sign(user, secretJwrtCode, {
-            //expiresIn: "2h",
+            expiresIn: "24h", // Adicionando expiração de 24 horas
           });
 
           user.token = token;

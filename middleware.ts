@@ -11,6 +11,9 @@ export const middleware = async (req: NextRequest) => {
     password: process.env.SESSION_SECRET,
     cookieOptions: {
       secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      sameSite: "strict",
+      maxAge: 86400, // 24 horas em segundos
     },
   });
 

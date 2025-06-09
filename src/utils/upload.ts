@@ -1,22 +1,41 @@
 import axios from "axios";
 
-//CLOUD NAME = dovvizyxg
-//API SECRET = 6B0yUi53AguKw7BpYvdWvOKXugY
-//API KEY = 655772814277416
-//api base url = CLOUDINARY_URL=cloudinary://655772814277416:6B0yUi53AguKw7BpYvdWvOKXugY@dovvizyxg
-
-export const handleImageImageAndUpload = async (event: any, quality: number,  callback: Function) => {
-  const file = await compactImage(event.target.files[0], quality);
+export const handleImageImageAndUpload = async (event: any, quality: number, callback: Function) => {
+  // Validar o arquivo antes de processar
+  const file = event.target.files[0];
+  
+  // Verificar se é uma imagem
+  if (!file.type.startsWith('image/')) {
+    console.error('O arquivo não é uma imagem');
+    return;
+  }
+  
+  // Verificar o tamanho (limitar a 5MB)
+  const maxSize = 5 * 1024 * 1024; // 5MB
+  if (file.size > maxSize) {
+    console.error('O arquivo é muito grande (máximo 5MB)');
+    return;
+  }
+  
+  // Verificar extensões permitidas
+  const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+  const fileExtension = file.name.split('.').pop().toLowerCase();
+  if (!allowedExtensions.includes(fileExtension)) {
+    console.error('Extensão de arquivo não permitida');
+    return;
+  }
+  
+  const compressedFile = await compactImage(file, quality);
 
   const formData = new FormData();
-  formData.append('file', file);
+  formData.append('file', compressedFile);
   formData.append('upload_preset', 'cmh3szwf');
   try {
     const { data } = await axios.post(
       `https://api.cloudinary.com/v1_1/dovvizyxg/image/upload`,
       formData
     );
-    callback(data.secure_url)
+    callback(data.secure_url);
   } catch (error) {
     console.log(error);
   }

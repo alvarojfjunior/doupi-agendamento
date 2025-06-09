@@ -39,7 +39,7 @@ export default async function handler(
       await Email.send({
         Host: 'smtp.elasticemail.com',
         Username: process.env.SENDER_EMAIL,
-        Password: 'DF7DE980816DB8D752B26B8F488A08A92F56',
+        Password: process.env.EMAIL_PASSWORD,
         //@ts-ignore
         To: user.email,
         From: process.env.SENDER_EMAIL,
