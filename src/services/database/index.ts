@@ -10,6 +10,8 @@ import { UserSchema } from './schemas/user';
 import { DossieSchema } from './schemas/dossie';
 import { PasswordResetSchema } from './schemas/passwordReset';
 
+let isConnected = false;
+
 if (!process.env.MONGOOSE_URI) {
   console.log('erro');
   throw new Error('Invalid environment variable: "MONGOOSE_URI"');
@@ -20,8 +22,34 @@ Mongoose.Promise = global.Promise;
 const databaseUrl = process.env.MONGOOSE_URI;
 
 const connectToDatabase = async (): Promise<void> => {
-  await Mongoose.connect(databaseUrl, {});
+  if (isConnected) {
+    console.log('Usando conexão existente com MongoDB');
+    return;
+  }
+
+  try {
+    await Mongoose.connect(databaseUrl, {
+      serverSelectionTimeoutMS: 30000,
+      socketTimeoutMS: 45000,
+      maxPoolSize: 10,
+      minPoolSize: 5,
+    });
+    isConnected = true;
+    console.log('Nova conexão com MongoDB estabelecida');
+  } catch (error) {
+    console.error('Erro ao conectar ao MongoDB:', error);
+    isConnected = false;
+    // Tenta reconectar após 5 segundos
+    setTimeout(connectToDatabase, 5000);
+  }
 };
+
+// Adiciona listeners para gerenciar a conexão
+Mongoose.connection.on('disconnected', () => {
+  isConnected = false;
+  console.log('MongoDB desconectado, tentando reconectar...');
+  setTimeout(connectToDatabase, 5000);
+});
 
 connectToDatabase();
 
