@@ -152,7 +152,7 @@ export default function Company({ user }: any) {
             </FormLabel>
             <Link href={`/d/${formik.values.name.replaceAll(' ', '-')}`}>
               {' '}
-              https://doupi.com.br/d/{formik.values.name.replaceAll(
+              {process.env.NEXT_PUBLIC_API_URL}/d/{formik.values.name.replaceAll(
                 ' ',
                 '-'
               )}{' '}

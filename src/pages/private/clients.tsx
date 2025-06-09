@@ -217,7 +217,7 @@ export default function Clients({ user }: any) {
                           item.name
                         }, tudo bem? Aqui é da ${
                           user.companyName
-                        }, vamos agendar? \nAcesse o link abaixo e agende já! \n\nhttps://doupi.com.br/d/${user.companyName.replaceAll(
+                        }, vamos agendar? \nAcesse o link abaixo e agende já! \n\n${process.env.NEXT_PUBLIC_API_URL}/d/${user.companyName.replaceAll(
                           ' ',
                           '-'
                         )}`;

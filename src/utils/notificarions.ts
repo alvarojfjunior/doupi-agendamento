@@ -18,7 +18,7 @@ export const getScheduleNotification = (
   )}*. \n\n`;
   notification += `Data: *${date} as ${hour}*.\n\n`;
   notification += `Caso queira cancelar, basta acessar o link abaixo: \n`;
-  notification += `https://doupi.com.br/a/${sheduleId}`;
+  notification += `${process.env.NEXT_PUBLIC_API_URL}/a/${sheduleId}`;
 
   return notification;
 };
