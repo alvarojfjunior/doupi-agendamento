@@ -4,15 +4,15 @@ export let CompanySchema: Mongoose.Schema;
 try {
   CompanySchema = Mongoose.model('Company').schema;
 
-  // DATABASE MIGRATION
+  // to add a new field on schema
   // CompanySchema.add({
-  //   userAccess: {
-  //     type: Number,
+  //   isWhatsappApi: {
+  //     type: Boolean,
   //     default: false,
   //   },
   // });
   // const Company = Mongoose.model('Company', CompanySchema);
-  // Company.updateMany({}, { $set: { userAccess: 1 } })
+  // Company.updateMany({}, { $set: { isWhatsappApi: false } })
   //   .then((res) => console.log(res))
   //   .catch((error) => console.log(error));
 
@@ -53,6 +53,10 @@ try {
       whatsapp: {
         type: String,
         required: true,
+      },
+      isWhatsappApi: {
+        type: Boolean,
+        default: false,
       },
       active: {
         type: Boolean,

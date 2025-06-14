@@ -21,3 +21,6 @@ export const transformPhoneNumber = (phoneNumber: string, isRemove9 = true): str
     return '55' + numericString
   }
 }
+
+
+export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));

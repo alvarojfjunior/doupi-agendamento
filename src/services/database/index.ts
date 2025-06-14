@@ -29,9 +29,7 @@ if (!process.env.MONGOOSE_URI) {
 const databaseUrl = process.env.MONGOOSE_URI;
 
 async function connectToDatabase() {
-  // Se já temos uma conexão, use-a
   if (global.mongoose.conn) {
-    console.log('Usando conexão existente com MongoDB');
     return global.mongoose.conn;
   }
 
@@ -45,14 +43,16 @@ async function connectToDatabase() {
     };
 
     // Armazena a promessa de conexão para reutilização
-    global.mongoose.promise = Mongoose.connect(databaseUrl, opts).then((mongoose) => {
-      console.log('Nova conexão com MongoDB estabelecida');
-      return mongoose;
-    }).catch((error) => {
-      console.error('Erro ao conectar ao MongoDB:', error);
-      global.mongoose.promise = null; // Reseta a promessa em caso de erro
-      throw error;
-    });
+    global.mongoose.promise = Mongoose.connect(databaseUrl, opts)
+      .then((mongoose) => {
+        console.log('Nova conexão com MongoDB estabelecida');
+        return mongoose;
+      })
+      .catch((error) => {
+        console.error('Erro ao conectar ao MongoDB:', error);
+        global.mongoose.promise = null; // Reseta a promessa em caso de erro
+        throw error;
+      });
   }
 
   try {

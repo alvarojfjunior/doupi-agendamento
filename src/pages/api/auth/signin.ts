@@ -19,7 +19,7 @@ export default withIronSessionApiRoute(
 
         const user = await User.findOne({ email }).populate({
           path: 'companyId',
-          select: 'active name whatsapp'
+          select: 'active name whatsapp isWhatsappApi'
         }).lean();
 
 
@@ -54,6 +54,7 @@ export default withIronSessionApiRoute(
             companyId: user.companyId._id,
             companyName: user.companyId.name,
             companyWhatsapp: user.companyId.whatsapp,
+            companyIsWhatsappApi: user.companyId.isWhatsappApi,
             isDoupiAdmin: user.isDoupiAdmin,
             userAccess: user.userAccess,
             token: user.token,

@@ -4,6 +4,7 @@ export interface IUser {
   companyId: string;
   companyName: string;
   companyWhatsapp: string;
+  isUseWhatsappApi: string;
   isDoupiAdmin: Boolean;
   userAccess: Number;
   name: string;

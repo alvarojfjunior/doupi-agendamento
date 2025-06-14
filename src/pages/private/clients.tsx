@@ -318,7 +318,12 @@ export default function Clients({ user }: any) {
                       colorScheme='blue'
                       h={'80px'}
                       onClick={() => {
-                        sendWhatsappMessage(formik.values.phone, message);
+                        sendWhatsappMessage(
+                          formik.values.phone,
+                          message,
+                          user.companyIsWhatsappApi,
+                          user.companyWhatsapp,
+                        );
                         toast({
                           title: 'Sucesso!',
                           description: 'Mensagem enviada!',
