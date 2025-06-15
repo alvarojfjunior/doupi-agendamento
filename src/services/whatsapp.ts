@@ -1,17 +1,10 @@
-import axios from 'axios';
+import { getApiInstance } from './api';
 
-const whatsappApiInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_WHATSAPP_URL,
-  headers: {
-    'x-api-token': process.env.NEXT_PUBLIC_API_WHATSAPP_TOKEN,
-    'Content-Type': 'application/json',
-  },
-});
-
-export const deleteSessionWhatsappApi = async (sessionId: string) => {
+export const deleteSessionWhatsappApi = async (sessionId: string, user: any) => {
   try {
-    const { data } = await whatsappApiInstance.delete(
-      `/session/${getFormatedWhatsappNumber(sessionId)}`
+    const apiInstance = getApiInstance(user);
+    const { data } = await apiInstance.delete(
+      `/api/integrations/whatsapp/session?sessionId=${getFormatedWhatsappNumber(sessionId)}`
     );
     return data;
   } catch (error) {
@@ -19,17 +12,19 @@ export const deleteSessionWhatsappApi = async (sessionId: string) => {
   }
 };
 
-export const createSessionWhatsappApi = async (sessionId: string) => {
-  const { data } = await whatsappApiInstance.post('/session/create', {
-    id: getFormatedWhatsappNumber(sessionId),
+export const createSessionWhatsappApi = async (sessionId: string, user: any) => {
+  const apiInstance = getApiInstance(user);
+  const { data } = await apiInstance.post('/api/integrations/whatsapp/session', {
+    sessionId: getFormatedWhatsappNumber(sessionId),
   });
   return data;
 };
 
-export const getQrCodeSessionWhatsappApi = async (sessionId: string) => {
+export const getQrCodeSessionWhatsappApi = async (sessionId: string, user: any) => {
   try {
-    const response = await whatsappApiInstance.get(
-      `/session/${getFormatedWhatsappNumber(sessionId)}/qr`,
+    const apiInstance = getApiInstance(user);
+    const response = await apiInstance.get(
+      `/api/integrations/whatsapp/qrcode?sessionId=${getFormatedWhatsappNumber(sessionId)}`,
       {
         responseType: 'blob',
       }
@@ -45,9 +40,11 @@ export const getQrCodeSessionWhatsappApi = async (sessionId: string) => {
 export const sendMessageWhatsappApi = async (
   sessionId: string,
   to: string,
-  message: string
+  message: string,
+  user: any
 ) => {
-  const { data } = await whatsappApiInstance.post(`/message/send`, {
+  const apiInstance = getApiInstance(user);
+  const { data } = await apiInstance.post(`/api/integrations/whatsapp`, {
     sessionId: getFormatedWhatsappNumber(sessionId),
     to: getFormatedWhatsappNumber(to),
     text: message,
@@ -57,7 +54,7 @@ export const sendMessageWhatsappApi = async (
 
 const sendWhatsappMessageUsingLink = (to: string, message: string) => {
   const phone = getFormatedWhatsappNumber(to);
-  const text = encodeURIComponent(message); // garante codificação correta  [oai_citation:12‡pureoxygenlabs.com](https://pureoxygenlabs.com/how-to-create-a-whatsapp-deep-link-with-a-pre-populated-message/?utm_source=chatgpt.com)
+  const text = encodeURIComponent(message);
 
   // Links
   const schemeLink = `whatsapp://send?phone=55${phone}&text=${text}`;
@@ -85,14 +82,21 @@ export const sendWhatsappMessage = (
   to: string,
   message: string,
   isUseWhatsappApi = false,
-  companyWhatsappNumber = ''
+  companyWhatsappNumber = '',
+  user?: any
 ) => {
-  if (isUseWhatsappApi && companyWhatsappNumber)
-    sendMessageWhatsappApi(companyWhatsappNumber, to, message);
+  if (isUseWhatsappApi && companyWhatsappNumber && user)
+    sendMessageWhatsappApi(companyWhatsappNumber, to, message, user);
   else sendWhatsappMessageUsingLink(to, message);
 };
 
 export function getFormatedWhatsappNumber(str: string) {
   const somenteAlfaNum = str.replace(' 9 ', '').replace(/[^a-zA-Z0-9]/g, '');
-  return '55' + somenteAlfaNum;
+  
+  // Verifica se o número já começa com '55'
+  if (somenteAlfaNum.startsWith('55')) {
+    return somenteAlfaNum;
+  } else {
+    return '55' + somenteAlfaNum;
+  }
 }

@@ -158,10 +158,11 @@ export default function Company({ user }: any) {
       const data = await sendMessageWhatsappApi(
         formik.values.phone,
         formik.values.phone,
-        'O serviço de whatsapp está configuradao.'
+        'O serviço de whatsapp está configuradao.',
+        user
       );
 
-      if (!data.success)
+      if (data.message != 'ok')
         throw new Error('Erro ao testar conexão com a API do WhatsApp');
 
       setIsWhatsappApiConnected(true);
@@ -192,10 +193,10 @@ export default function Company({ user }: any) {
   const handleReconnectWhatsappConnection = async () => {
     try {
       appContext.onOpenLoading();
-      await deleteSessionWhatsappApi(formik.values.phone);
-      await createSessionWhatsappApi(formik.values.phone);
+      await deleteSessionWhatsappApi(formik.values.phone, user);
+      await createSessionWhatsappApi(formik.values.phone, user);
       await delay(1500);
-      const data = await getQrCodeSessionWhatsappApi(formik.values.phone);
+      const data = await getQrCodeSessionWhatsappApi(formik.values.phone, user);
       setWhatsappQrCode(data);
       appContext.onCloseLoading();
     } catch (error) {

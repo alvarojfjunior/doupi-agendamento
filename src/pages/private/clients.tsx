@@ -323,6 +323,7 @@ export default function Clients({ user }: any) {
                           message,
                           user.companyIsWhatsappApi,
                           user.companyWhatsapp,
+                          user
                         );
                         toast({
                           title: 'Sucesso!',
