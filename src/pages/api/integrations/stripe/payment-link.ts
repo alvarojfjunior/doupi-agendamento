@@ -1,9 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import Stripe from 'stripe';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: '2025-05-28.basil',
-});
+import { Company } from '../../../../services/database';
+import { authenticate } from '@/utils/apiAuth';
 
 export default async function handler(
   req: NextApiRequest,
@@ -21,14 +19,35 @@ export default async function handler(
       currency = 'brl',
       successUrl,
       cancelUrl,
+      companyId,
     } = req.body;
 
     // Validação básica
-    if (!name || !amount || !successUrl || !cancelUrl) {
+    if (!name || !amount || !successUrl || !cancelUrl || !companyId) {
       return res.status(400).json({
-        error: 'Parâmetros obrigatórios: name, amount, successUrl, cancelUrl',
+        error: 'Parâmetros obrigatórios: name, amount, successUrl, cancelUrl, companyId',
       });
     }
+
+    // Buscar a empresa e suas chaves do Stripe
+    const company = await Company.findById(companyId).lean();
+    
+    if (!company) {
+      return res.status(404).json({ error: 'Empresa não encontrada' });
+    }
+    
+    if (!company.isStripeEnabled) {
+      return res.status(400).json({ error: 'Stripe não está habilitado para esta empresa' });
+    }
+    
+    if (!company.stripeSecretKey) {
+      return res.status(400).json({ error: 'Chave secreta do Stripe não configurada para esta empresa' });
+    }
+
+    // Inicializar o Stripe com a chave da empresa
+    const stripe = new Stripe(company.stripeSecretKey, {
+      apiVersion: '2025-05-28.basil',
+    });
 
     // Cria um produto para o link de pagamento
     const product = await stripe.products.create({

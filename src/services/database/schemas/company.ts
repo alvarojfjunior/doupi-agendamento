@@ -6,16 +6,23 @@ try {
 
   // to add a new field on schema
   // CompanySchema.add({
-  //   isWhatsappApi: {
+  //   isStripeEnabled: {
   //     type: Boolean,
   //     default: false,
   //   },
+  //   stripePublishableKey: {
+  //     type: String,
+  //     default: '',
+  //   },
+  //   stripeSecretKey: {
+  //     type: String,
+  //     default: '',
+  //   },
   // });
   // const Company = Mongoose.model('Company', CompanySchema);
-  // Company.updateMany({}, { $set: { isWhatsappApi: false } })
+  // Company.updateMany({}, { $set: { isStripeEnabled: false, stripePublishableKey: '', stripeSecretKey: '' } })
   //   .then((res) => console.log(res))
   //   .catch((error) => console.log(error));
-
 
 } catch (error) {
   CompanySchema = new Mongoose.Schema(
@@ -57,6 +64,18 @@ try {
       isWhatsappApi: {
         type: Boolean,
         default: false,
+      },
+      isStripeEnabled: {
+        type: Boolean,
+        default: false,
+      },
+      stripePublishableKey: {
+        type: String,
+        default: '',
+      },
+      stripeSecretKey: {
+        type: String,
+        default: '',
       },
       active: {
         type: Boolean,
